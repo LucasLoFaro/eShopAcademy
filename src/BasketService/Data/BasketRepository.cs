@@ -70,10 +70,13 @@ namespace Data
                 return -1;
 
             var existingItem = basket.Items.FirstOrDefault(i => i.ProductID == item.ProductID);
-            if (existingItem != null && existingItem.Quantity > 0) 
+            if (existingItem == null)
+                return -1;
+            
+            if (existingItem.Quantity - item.Quantity > 0)
                 existingItem.Quantity -= item.Quantity;
             else
-                basket.Items.Remove(item);
+                basket.Items.Remove(existingItem);
 
             try
             {

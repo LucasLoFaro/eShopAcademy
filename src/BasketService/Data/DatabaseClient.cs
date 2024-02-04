@@ -14,6 +14,11 @@ namespace Data
             redis = ConnectionMultiplexer.Connect(settings.CurrentValue.URL);
             db = redis.GetDatabase();
         }
+        public DatabaseClient(String url)
+        {
+            redis = ConnectionMultiplexer.Connect(url);
+            db = redis.GetDatabase();
+        }
 
         public IDatabase GetDatabase()
         {

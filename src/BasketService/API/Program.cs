@@ -19,20 +19,23 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
-app.MapGet("/basket/clientId", (Guid clientID, IBasketRepository basketRepository) =>
+app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketRepository basketRepository) =>
 {
-    var basket = basketRepository.GetBasketByClientId(clientID);
+    var basket = await basketRepository.GetBasketByClientId(clientID);
     return basket != null ? Results.Ok(basket) : Results.NotFound();
 });
 
-app.MapPost("/basket/clientId/add", (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
+app.MapPost("/basket/clientId/add", async (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
 {
-    return basketRepository.AddProductToBasket(clientID, item) == 0 ? Results.Ok() : Results.NotFound();
+    return await basketRepository.AddProductToBasket(clientID, item) ? Results.Ok() : Results.NotFound();
 });
 
-app.MapPost("/basket/clientId/remove", (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
+app.MapPost("/basket/clientId/remove", async (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
 {
-    return basketRepository.RemoveProductFromBasket(clientID, item) == 0 ? Results.Ok() : Results.NotFound();
+    return await basketRepository.RemoveProductFromBasket(clientID, item) ? Results.Ok() : Results.NotFound();
 });
+
+
+
 
 app.Run();

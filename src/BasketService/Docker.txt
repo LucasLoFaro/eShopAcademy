@@ -1,0 +1,2 @@
+docker run --volume=/data --workdir=/data -p 6379:6379 -d redis
+docker run --volume=/var/lib/rabbitmq -p 15672:15672 -p 5672:5672 -p 5673:5673 -d rabbitmq:3-management

@@ -7,14 +7,15 @@ namespace Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductsRepository productsRepository;
+
         public ProductService(IProductsRepository _productsRepository)
         {
             productsRepository = _productsRepository;
         }
 
-        async Task<IEnumerable<Product>> IProductService.ListProducts()
+        async Task<Product> IProductService.GetMostExpensiveProduct()
         {
-            return await productsRepository.GetAllAsync();
+            return await productsRepository.GetMostExpensive();
         }
     }
 }

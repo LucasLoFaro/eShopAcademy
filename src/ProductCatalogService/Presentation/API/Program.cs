@@ -17,8 +17,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
-builder.Services.AddScoped<ICassandraDatabaseClient, DataStaxDatabaseClient>();
-builder.Services.AddScoped<IDatabaseSettingsProvider, FileDataBaseSettings>();
+builder.Services.AddSingleton<ICassandraDatabaseClient, DataStaxDatabaseClient>();
+builder.Services.AddSingleton<IDatabaseSettingsProvider, FileDataBaseSettings>();
 
 var app = builder.Build();
 

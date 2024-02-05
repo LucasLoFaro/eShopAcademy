@@ -11,46 +11,51 @@ namespace Data.Repositories
     {
         ICassandraDatabaseClient _cassandraSessionProvider;
         private readonly ISession _session;
-
+        Mapper _mapper;
         public ProductsRepository(ICassandraDatabaseClient cassandraSessionProvider)
         {
             _cassandraSessionProvider = cassandraSessionProvider;
             _cassandraSessionProvider.OpenConnection();
             _session = _cassandraSessionProvider.GetSession();
+            _mapper = new Mapper(_session);
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            var cql = "USE \"ProductCatalogMicroservice\"";
-            var statement = new SimpleStatement(cql);
-            await _session.ExecuteAsync(statement);
-
-            MappingConfiguration mappingConfiguration = new MappingConfiguration();
-            Mapper mapper = new Mapper(_session, mappingConfiguration);
-            IEnumerable<Product> products = mapper.Fetch<Product>("SELECT * FROM ProductCatalog");
-            if (products.Count() < 1)
-                throw new Exception("No Products");
-            List<Product> prodList = products.ToList();
+            List<Product> products = _mapper.Fetch<Product>("SELECT * FROM ProductCatalog").ToList();
 
             return products;
         }
+        public async Task<Product> GetByIdAsync(string productId)
+        {
+            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
 
-        /*private Product MapToProduct(Row row)
+            return products?.FirstOrDefault();
+        }
+
+        public async Task AddAsync(Product product)
         {
-            return new Product
-            {
-                Id = row.GetValue<Guid>("productid"),
-                Name = row.GetValue<string>("name"),
-                Price = row.GetValue<decimal>("price"),
-                Description = row.GetValue<string>("description"),
-                ImageUrl = row.GetValue<string>("image"),
-                CategoryDescription = row.GetValue<string>("categorydescription")
-            };
-        }*/
-        
-        public async Task<RowSet> ExecuteQuery(IStatement statement)
+            await _mapper.InsertAsync(product);
+        }
+
+        public async Task UpdateAsync(string productId, Product updatedProduct)
         {
-            return await _session.ExecuteAsync(statement);
+            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
+            Product product = products.FirstOrDefault();
+            _mapper.Update(product);
+        }
+
+        public async Task DeleteAsync(Guid productId)
+        {
+            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
+            Product product = products.FirstOrDefault();
+            await _mapper.DeleteAsync<Product>(product);
+        }
+
+        public async Task<Product> GetMostExpensive()
+        {
+           Product product = _mapper.Fetch<Product>("SELECT * FROM ProductCatalog ORDER BY Price DESC LIMIT 1;").ToList().FirstOrDefault();
+            return product;
         }
     }
 

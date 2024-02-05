@@ -10,5 +10,8 @@ namespace Application.Interfaces.Data
     public interface IProductsRepository
     {
         public Task<IEnumerable<Product>> GetAllAsync();
+        public Task<Product> GetByIdAsync(string id);
+        public Task<Product> GetMostExpensive();
+        
     }
 }

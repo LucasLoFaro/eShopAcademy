@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -17,42 +17,18 @@ namespace API.Controllers
             productService = _productService;
         }
         // GET: api/<ProductController>
+        [Route("MostExpensive")]
         [HttpGet]
-        async public Task<IEnumerable<Product>> Get()
+        async public Task<IActionResult> Get()
         {
             try
             {
-                return await productService.ListProducts();
+                return Ok(await productService.GetMostExpensiveProduct());
             }
             catch (Exception ex)
             {
-                return Enumerable.Empty<Product>();
+                return null;
             }
-        }
-
-        // GET api/<ProductController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<ProductController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<ProductController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<ProductController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

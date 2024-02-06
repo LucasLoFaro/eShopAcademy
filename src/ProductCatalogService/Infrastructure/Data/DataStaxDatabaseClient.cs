@@ -20,7 +20,7 @@ namespace Data
            .WithCloudSecureConnectionBundle(_databaseSettings.GetConnectionBundlePath())
            .WithCredentials(_databaseSettings.GetClient(), _databaseSettings.GetSecret())
                        .Build();
-            _session = _cluster.Connect("ProductCatalogMicroservice");
+            _session = _cluster.Connect("ProductsKeyspace");
         }
 
         public void Dispose()

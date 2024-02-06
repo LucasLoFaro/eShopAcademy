@@ -11,7 +11,10 @@ namespace Application.Interfaces.Data
     {
         public Task<IEnumerable<Product>> GetAllAsync();
         public Task<Product> GetByIdAsync(string id);
+        public Task AddAsync(Product product);
+        public Task DeleteAsync(Product productId);
+        public Task UpdateAsync(string productId, Product updatedProduct);
         public Task<Product> GetMostExpensive();
-        
+
     }
 }

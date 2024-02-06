@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces.Data;
-using Application.Interfaces.Services;
-using Data.Repositories;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Domain.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -54,23 +52,64 @@ namespace API.Controllers
                     });
             }
         }
-        /*
+        
         // POST api/<ProductController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] Product product)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _productsRepository.AddAsync(product);
+                return StatusCode(StatusCodes.Status201Created, "Product created successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while adding product: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to add product");
+            }
         }
 
         // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(string id, [FromBody] Product product)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _productsRepository.UpdateAsync(id,product);
+                return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while updating product: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to update product");
+            }
         }
 
         // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
-        }*/
+            try
+            {
+                Product product = await _productsRepository.GetByIdAsync(id);
+                await _productsRepository.DeleteAsync(product);
+                return StatusCode(StatusCodes.Status201Created, "Product deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while deleting product: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to delete product");
+            }
+        }
     }
 }

@@ -22,13 +22,13 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            List<Product> products = _mapper.Fetch<Product>("SELECT * FROM ProductCatalog").ToList();
+            List<Product> products = _mapper.Fetch<Product>("SELECT * FROM Products").ToList();
 
             return products;
         }
         public async Task<Product> GetByIdAsync(string productId)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
+            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM Products WHERE ProductId = ?", productId).ToList();
 
             return products?.FirstOrDefault();
         }
@@ -40,22 +40,19 @@ namespace Data.Repositories
 
         public async Task UpdateAsync(string productId, Product updatedProduct)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
+            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM Products WHERE ProductId = ?", productId).ToList();
             Product product = products.FirstOrDefault();
             _mapper.Update(product);
         }
 
-        public async Task DeleteAsync(Guid productId)
+        public async Task DeleteAsync(Product product)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM ProductCatalog WHERE ProductId = ?", productId).ToList();
-            Product product = products.FirstOrDefault();
             await _mapper.DeleteAsync<Product>(product);
         }
 
-        public async Task<Product> GetMostExpensive()
+        public Task<Product> GetMostExpensive()
         {
-           Product product = _mapper.Fetch<Product>("SELECT * FROM ProductCatalog ORDER BY Price DESC LIMIT 1;").ToList().FirstOrDefault();
-            return product;
+            throw new NotImplementedException();
         }
     }
 

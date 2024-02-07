@@ -2,9 +2,6 @@
 using Domain.DTOs;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
-using System.Collections.Generic;
 
 namespace API.Controllers
 {
@@ -12,12 +9,10 @@ namespace API.Controllers
     [Route("api/stock")]
     public class StockController : ControllerBase
     {
-        public readonly StockDbContext _context;
         public IStockRepository _stockRepository { get; }
 
-        public StockController(StockDbContext context, IStockRepository stockRepository)
+        public StockController(IStockRepository stockRepository)
         {
-            _context = context;
             _stockRepository = stockRepository;
         }
 

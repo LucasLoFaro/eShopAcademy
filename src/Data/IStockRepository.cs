@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Entities;
 
 namespace Data
 {
-    internal interface IStockRepository<T> where T : class
+    public interface IStockRepository
     {
-        Task<T> GetByGuidAsync(int id);
-        Task<IReadOnlyList<T>> GetAllAsync();
-        Task<T> AddAsync(T entity);
-        Task<bool> RemoveAsync(int id);
-        Task<bool> UpdateAsync(T entity);
+        Task<IReadOnlyList<Stock>> GetAllAsync();
+
+        Task<IReadOnlyList<Stock>> GetByProductGuidAsync(string productGuid);
+
+        Task<Stock> GetByProductGuidAndWarehouseAsync(string productGuid, string warehouse);
+
+        Task<bool> UpdateAsync(Stock stock);
+        Task<Stock> AddAsync(Stock stock);
+
     }
 }

@@ -1,32 +1,54 @@
 ﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
-    public class StockRepository : IStockRepository<Stock>
+    public class StockRepository : IStockRepository
     {
-        public Task<Stock> AddAsync(Stock entity)
+
+        public readonly StockDbContext _context;
+
+        public StockRepository(StockDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task<IReadOnlyList<Stock>> GetAllAsync()
+
+        public async Task<IReadOnlyList<Stock>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Stocks.ToListAsync();
         }
 
-        public Task<Stock> GetByGuidAsync(int id)
+        public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(string productGuid)
         {
-            throw new NotImplementedException();
+            IReadOnlyList<Stock> stock = await _context.Stocks.Where(
+                x => x.ProductGuid == productGuid &&
+                x.Quantity != 0).ToListAsync();
+
+            return stock;
         }
 
-        public Task<bool> RemoveAsync(int id)
+        public async Task<Stock> GetByProductGuidAndWarehouseAsync(string productGuid, string warehouse)
         {
-            throw new NotImplementedException();
+            Stock stock = await _context.Stocks.Where(
+                    x => x.ProductGuid == productGuid &&
+                    x.Warehouse == warehouse &&
+                    x.Quantity != 0).FirstOrDefaultAsync();
+            return stock;
         }
 
-        public Task<bool> UpdateAsync(Stock entity)
+        public async Task<Stock> AddAsync(Stock stock)
         {
-            throw new NotImplementedException();
+            _context.Stocks.Add(stock);
+            await _context.SaveChangesAsync();
+            return stock;
         }
+
+        public async Task<bool> UpdateAsync(Stock stock)
+        {
+            _context.Stocks.Update(stock);
+            return await _context.SaveChangesAsync() > 0 ? true : false;
+        }
+
     }
 }

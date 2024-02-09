@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRPC.Protos";
+
+package stock;
+
+service StockProtoService{
+    rpc GetAll(GetStockByProdGuidRequest) returns (stream StockModel);
+    rpc GetStockByProductGuid(GetStockByProdGuidRequest) returns (stream StockModel);
+    rpc GetStockByProductGuidAndWarehouse(GetStockByProdAndWarehouseRequest) returns (StockModel);
+    rpc IncreaseStock(IncreaseStockRequest) returns (IncreaseStockResponse);
+    rpc DecreaseStock(DecreaseStockRequest) returns (DecreaseStockResponse);
+}
+
+message StockModel{
+    string _id = 1;
+    string productGuid = 2;
+    int32 quantity = 3;
+    string warehouse = 4;
+}
+
+message GetStockByProdGuidRequest {
+    string productGuid = 1;
+}
+
+message GetStockByProdAndWarehouseRequest {
+    string productGuid = 1;
+    string warehouse = 2;
+}
+
+message IncreaseStockRequest {
+    string productGuid = 1;
+    int32 quantity = 2;
+    string warehouse = 3;
+}
+
+message DecreaseStockRequest {
+    string productGuid = 1;
+    int32 quantity = 2;
+    string warehouse = 3;
+}
+
+message IncreaseStockResponse {
+    bool success = 1;
+}
+
+message DecreaseStockResponse {
+    bool success = 1;
+}
+/*
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetAll()
+
+        [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
+
+
+        [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
+        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string wa
+
+
+        public async Task<ActionResult> IncreaseStock([FromForm] AlterStockDTO alterStock)
+
+
+        public async Task<ActionResult> DecreaseStock([FromForm] AlterStockDTO alterStock)
+
+        */

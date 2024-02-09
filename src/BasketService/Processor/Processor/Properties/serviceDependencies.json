@@ -12,7 +12,7 @@
     },
     "rabbitmq1": {
       "type": "rabbitmq",
-      "connectionId": "bus",
+      "connectionId": "rabbitmq",
       "dynamicId": null
     }
   }

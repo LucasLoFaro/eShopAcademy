@@ -42,8 +42,7 @@ namespace Data
                 item.Product = new Product {
                     ID = item.Product.ID,
                     Name = "",
-                    Price = 0,
-                    Stock = 0
+                    Price = 0
                 };
                 // Then query the actual name and price values from the products collection
                 productTasks[item.Product.ID] = batch.HashGetAllAsync(PRODUCT_PREFIX + item.Product.ID);
@@ -59,7 +58,6 @@ namespace Data
                 var productHash = productTasks[item.Product.ID].Result;
                 item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString();
                 item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString());
-                item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
             }
 
             return basket;

@@ -4,7 +4,7 @@
       "commandName": "Project",
       "commandLineArgs": "--port 7187",
       "environmentVariables": {
-        "REDIS_URL": "localhost"
+        "REDIS_URL": "basket-db:6379"
       }
     },
     "Docker": {

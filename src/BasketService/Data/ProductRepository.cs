@@ -22,11 +22,20 @@ namespace Data
             HashEntry[] productHash = {
                 new HashEntry("ID", product.ID.ToString()),
                 new HashEntry("Name", product.Name),
-                new HashEntry("Price", product.Price),
-                new HashEntry("Stock", product.Stock)
+                new HashEntry("Price", product.Price)
             };
 
             await _cache.HashSetAsync(PRODUCT_PREFIX + product.ID.ToString(), productHash);
+            return true;
+        }
+        public async Task<bool> UpdateProductStock(ProductStockDTO stock)
+        {
+            HashEntry[] productStockHash = {
+                new HashEntry("ProductID", stock.ProductID.ToString()),
+                new HashEntry("Stock", stock.Stock)
+            };
+
+            await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductID.ToString(), productStockHash);
             return true;
         }
     }

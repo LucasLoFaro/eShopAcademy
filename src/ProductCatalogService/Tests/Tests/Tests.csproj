@@ -23,7 +23,6 @@
     <ProjectReference Include="..\..\Infrastructure\Data\Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Services\Services.csproj" />
     <ProjectReference Include="..\..\Presentation\API\API.csproj" />
-    <ProjectReference Include="..\..\Presentation\EventsProcessor\EventsProcessor.csproj" />
     <ProjectReference Include="..\..\Presentation\gRPC\gRPC.csproj" />
   </ItemGroup>
 

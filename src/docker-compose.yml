@@ -1,0 +1,56 @@
+name: eshopacademy
+version: '3.4'
+
+services:
+  product-api:
+    image: ${DOCKER_REGISTRY-}product-api
+    build:
+      context: .
+      dockerfile: ProductCatalogService/Presentation/API/Dockerfile
+    depends_on:
+      - product-db
+      - rabbitmq
+  
+  product-db:
+    image: postgres
+
+  product-grpc:
+    image: ${DOCKER_REGISTRY-}product-grpc
+    build:
+      context: .
+      dockerfile: ProductCatalogService/Presentation/gRPC/Dockerfile
+    depends_on:
+      - product-db
+      - rabbitmq
+
+  basket-api:
+    image: ${DOCKER_REGISTRY-}basket-api
+    build:
+      context: .
+      dockerfile: BasketService/API/Dockerfile
+    depends_on:
+      - basket-db
+
+  basket-db:
+    image: redis
+       
+  basket-processor:
+    image: ${DOCKER_REGISTRY-}basket-processor
+    build:
+      context: .
+      dockerfile: BasketService/Processor/Processor/Dockerfile
+    depends_on:
+      - basket-db
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  
+networks:
+  backend:

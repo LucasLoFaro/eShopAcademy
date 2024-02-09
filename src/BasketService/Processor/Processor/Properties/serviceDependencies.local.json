@@ -16,7 +16,7 @@
       "containerName": "rabbitmq",
       "containerImage": "rabbitmq:3-management-alpine",
       "type": "rabbitmq.container",
-      "connectionId": "bus",
+      "connectionId": "rabbitmq",
       "dynamicId": null
     }
   }

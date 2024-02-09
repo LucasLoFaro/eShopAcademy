@@ -21,15 +21,15 @@ namespace Processor
         [Function("UpdateProductData")]
         public void UpdateProductData([RabbitMQTrigger("products", ConnectionStringSetting = "rabbitmq")] Product product)
         {
-            _logger.LogInformation($"C# Queue trigger function processed: {product.ID}");
+            _logger.LogInformation($"Updating product data for: {product.ID}");
             _productRepository.AddOrUpdateProduct(product);
         }
 
         [Function("UpdateStock")]
-        public void UpdateStock([RabbitMQTrigger("stock", ConnectionStringSetting = "rabbitmq")] Product product)
+        public void UpdateStock([RabbitMQTrigger("stock", ConnectionStringSetting = "rabbitmq")] ProductStockDTO stock)
         {
-            _logger.LogInformation($"C# Queue trigger function processed: {product.ID}");
-            throw new NotImplementedException();
+            _logger.LogInformation($"Updating stock for: {stock.ProductID}");
+            _productRepository.UpdateProductStock(stock);
         }
     }
 }

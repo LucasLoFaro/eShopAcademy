@@ -1,15 +1,15 @@
-//using Data;
+using Data;
 using gRPC.Services;
-//using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddGrpc();
-//builder.Services.AddDbContext<StockDbContext>(options =>
- //   options.UseMongoDB("mongodb://admin:admin@localhost:27017/"/*Configuration.GetConnectionString("DefaultConnection"*/, "eShopAcademy")
-//);
-//builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddGrpc(opt => { opt.EnableDetailedErrors = true;});
+builder.Services.AddDbContext<StockDbContext>(options =>
+    options.UseMongoDB("mongodb://admin:admin@localhost:27017/"/*Configuration.GetConnectionString("DefaultConnection"*/, "eShopAcademy")
+);
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 
 var app = builder.Build();

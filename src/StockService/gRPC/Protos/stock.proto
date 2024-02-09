@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option csharp_namespace = "gRPC.Protos";
 
+import "google/protobuf/empty.proto";
+
 package stock;
 
 service StockProtoService{
@@ -10,7 +12,9 @@ service StockProtoService{
     rpc GetStockByProductGuidAndWarehouse(GetStockByProdAndWarehouseRequest) returns (StockModel);
     rpc IncreaseStock(IncreaseStockRequest) returns (IncreaseStockResponse);
     rpc DecreaseStock(DecreaseStockRequest) returns (DecreaseStockResponse);
+    rpc Test (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
+
 
 message StockModel{
     string _id = 1;

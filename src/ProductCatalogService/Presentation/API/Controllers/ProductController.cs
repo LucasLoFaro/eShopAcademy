@@ -91,7 +91,7 @@ namespace API.Controllers
 
             try
             {
-                await _db.UpdateAsync(product);
+                await _db.AddAsync(product);
 
                 return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
             }

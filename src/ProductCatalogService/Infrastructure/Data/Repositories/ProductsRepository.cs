@@ -31,18 +31,12 @@ namespace Data.Repositories
         {
             return await _products.OrderByDescending(p => p.Price).FirstOrDefault().ExecuteAsync();
         }
+        
         public async Task AddAsync(Product product)
         {
             await _products.Insert(product).ExecuteAsync();
         }
 
-        public async Task UpdateAsync(Product product)
-        {
-            await _products.Where(p => p.ID == product.ID)
-                .Select(p => product)
-                .Update()
-                .ExecuteAsync();
-        }
         public async Task DeleteAsync(Product product)
         {
             await _products.Where(p => p.ID == product.ID)

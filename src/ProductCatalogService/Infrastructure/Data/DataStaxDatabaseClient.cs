@@ -17,9 +17,9 @@ namespace Data
             Cluster = Cluster.Builder()
                      .AddContactPoints(dbSettings.CurrentValue.Host)
                      .Build();
-            Session = Cluster.Connect(dbSettings.CurrentValue.KeySpace);
             
-            SetupDBStructure().ConfigureAwait(false);
+            SetupDBStructure();
+            Session = Cluster.Connect(dbSettings.CurrentValue.KeySpace);
 
             //This is like a db context / object relational mapping
             MappingConfiguration.Global.Define(
@@ -29,12 +29,13 @@ namespace Data
                 .Column(p => p.ID, c => c.WithName("ID")));
         }
 
-        private async Task SetupDBStructure()
+        private void SetupDBStructure()
         {
-            await Session.ExecuteAsync(new SimpleStatement("CREATE KEYSPACE IF NOT EXISTS eshopacademy" +
+            Session = Cluster.Connect();
+            Session.Execute(new SimpleStatement("CREATE KEYSPACE IF NOT EXISTS eshopacademy" +
                 " WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }"));
-            await Session.ExecuteAsync(new SimpleStatement("USE eshopacademy"));
-            await Session.ExecuteAsync(new SimpleStatement("CREATE TABLE IF NOT EXISTS eshopacademy.Products(" +
+            Session.Execute(new SimpleStatement("USE eshopacademy"));
+            Session.Execute(new SimpleStatement("CREATE TABLE IF NOT EXISTS eshopacademy.Products(" +
                 "ID UUID PRIMARY KEY," +
                 "Name text," +
                 "Price float," +

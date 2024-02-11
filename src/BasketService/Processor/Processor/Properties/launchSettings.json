@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Processor": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7187",
+      "environmentVariables": {
+        "REDIS_URL": "localhost"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 31220,
+      "useSSL": false
+    }
+  }
+}

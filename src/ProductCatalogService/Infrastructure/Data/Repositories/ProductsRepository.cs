@@ -1,12 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Cassandra;
+using Domain.Entities;
+using Application.Interfaces.Data;
+using Data.Interfaces;
+using Cassandra;
+using Cassandra.Mapping;
+using Cassandra.Data.Linq;
 
 namespace Data.Repositories
 {
-    internal class ProductsRepository
+
+    public class ProductsRepository : IProductsRepository
     {
+        private readonly Table<Product> _products;
+        
+        public ProductsRepository(ICassandraDatabaseClient cassandraSessionProvider)
+        {
+            _products = new Table<Product>(cassandraSessionProvider.Session);
+        }
+
+        public async Task<IEnumerable<Product>> GetAllAsync()
+        {
+            return await _products.Select(p => p).ExecuteAsync();
+        }
+        public async Task<Product> GetByIdAsync(Guid id)
+        {
+            return await _products.Where(p => p.ID == id).FirstOrDefault().ExecuteAsync();
+        }
+
+        public async Task<Product> GetMostExpensive()
+        {
+            return await _products.OrderByDescending(p => p.Price).FirstOrDefault().ExecuteAsync();
+        }
+        public async Task AddAsync(Product product)
+        {
+            await _products.Insert(product).ExecuteAsync();
+        }
+
+        public async Task UpdateAsync(Product product)
+        {
+            await _products.Where(p => p.ID == product.ID)
+                .Select(p => product)
+                .Update()
+                .ExecuteAsync();
+        }
+        public async Task DeleteAsync(Product product)
+        {
+            await _products.Where(p => p.ID == product.ID)
+                  .Delete()
+                  .ExecuteAsync();
+        }
     }
+
 }

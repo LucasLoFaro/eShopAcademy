@@ -8,6 +8,6 @@ namespace Data
 {
     public class DatabaseSettings
     {
-        public String URL = "localhost";
+        public String URL { get; set; }
     }
 }

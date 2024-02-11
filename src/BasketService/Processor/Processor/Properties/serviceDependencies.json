@@ -7,13 +7,9 @@
       "type": "storage",
       "connectionId": "AzureWebJobsStorage"
     },
-    "secrets1": {
-      "type": "secrets"
-    },
     "rabbitmq1": {
       "type": "rabbitmq",
-      "connectionId": "bus",
-      "dynamicId": null
+      "connectionId": "rabbitmq"
     }
   }
 }

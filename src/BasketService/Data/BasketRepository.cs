@@ -57,13 +57,18 @@ namespace Data
             foreach (var item in basket.Items)
             {
                 var productHash = productTasks[item.Product.ID].Result;
-                item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString();
-                item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString());
-                item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
+                if(productHash != null)
+                {
+                    item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString();
+                    item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString());
+                    item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
+                }                
             }
 
             return basket;
         }
+
+        //ToDo: Check stock before adding to basket
         public async Task<bool> AddProductToBasket(Guid clientId, Item item)
         {
             var basket = await GetBasketByClientId(clientId);

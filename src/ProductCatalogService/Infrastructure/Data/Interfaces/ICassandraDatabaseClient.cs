@@ -9,7 +9,6 @@ namespace Data.Interfaces
 {
     public interface ICassandraDatabaseClient : IDisposable
     {
-        void OpenConnection();
-        ISession GetSession();
+        public ISession Session { get; }
     }
 }

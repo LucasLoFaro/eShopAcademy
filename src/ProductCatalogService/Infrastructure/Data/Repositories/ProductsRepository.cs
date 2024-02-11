@@ -2,57 +2,52 @@
 using Domain.Entities;
 using Application.Interfaces.Data;
 using Data.Interfaces;
+using Cassandra;
 using Cassandra.Mapping;
+using Cassandra.Data.Linq;
 
 namespace Data.Repositories
 {
 
     public class ProductsRepository : IProductsRepository
     {
-        ICassandraDatabaseClient _cassandraSessionProvider;
-        private readonly ISession _session;
-        Mapper _mapper;
+        private readonly Table<Product> _products;
+        
         public ProductsRepository(ICassandraDatabaseClient cassandraSessionProvider)
         {
-            _cassandraSessionProvider = cassandraSessionProvider;
-            _cassandraSessionProvider.OpenConnection();
-            _session = _cassandraSessionProvider.GetSession();
-            _mapper = new Mapper(_session);
+            _products = new Table<Product>(cassandraSessionProvider.Session);
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            List<Product> products = _mapper.Fetch<Product>("SELECT * FROM Products").ToList();
-
-            return products;
+            return await _products.Select(p => p).ExecuteAsync();
         }
-        public async Task<Product> GetByIdAsync(string productId)
+        public async Task<Product> GetByIdAsync(Guid id)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM Products WHERE ProductId = ?", productId).ToList();
-
-            return products?.FirstOrDefault();
+            return await _products.Where(p => p.ID == id).FirstOrDefault().ExecuteAsync();
         }
 
+        public async Task<Product> GetMostExpensive()
+        {
+            return await _products.OrderByDescending(p => p.Price).FirstOrDefault().ExecuteAsync();
+        }
         public async Task AddAsync(Product product)
         {
-            await _mapper.InsertAsync(product);
+            await _products.Insert(product).ExecuteAsync();
         }
 
-        public async Task UpdateAsync(string productId, Product updatedProduct)
+        public async Task UpdateAsync(Product product)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM Products WHERE ProductId = ?", productId).ToList();
-            Product product = products.FirstOrDefault();
-            _mapper.Update(product);
+            await _products.Where(p => p.ID == product.ID)
+                .Select(p => product)
+                .Update()
+                .ExecuteAsync();
         }
-
         public async Task DeleteAsync(Product product)
         {
-            await _mapper.DeleteAsync<Product>(product);
-        }
-
-        public Task<Product> GetMostExpensive()
-        {
-            throw new NotImplementedException();
+            await _products.Where(p => p.ID == product.ID)
+                  .Delete()
+                  .ExecuteAsync();
         }
     }
 

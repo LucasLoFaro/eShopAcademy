@@ -19,7 +19,7 @@ namespace Processor
         }
 
         [Function("UpdateProductData")]
-        public void UpdateProductData([RabbitMQTrigger("products", ConnectionStringSetting = "rabbitmq")] Product product)
+        public void UpdateProductData([RabbitMQTrigger(queueName:"products", HostName = "rabbitmq", UserNameSetting = "guest",PasswordSetting ="guest")] ProductDTO product)
         {
             _logger.LogInformation($"Updating product data for: {product.ID}");
             _productRepository.AddOrUpdateProduct(product);

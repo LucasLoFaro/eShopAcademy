@@ -17,7 +17,7 @@ namespace Data
             _cache = database.GetDatabase();
         }
 
-        public async Task<bool> AddOrUpdateProduct(Product product)
+        public async Task<bool> AddOrUpdateProduct(ProductDTO product)
         {
             HashEntry[] productHash = {
                 new HashEntry("ID", product.ID.ToString()),
@@ -31,7 +31,7 @@ namespace Data
         public async Task<bool> UpdateProductStock(ProductStockDTO stock)
         {
             HashEntry[] productStockHash = {
-                new HashEntry("ProductID", stock.ProductID.ToString()),
+                new HashEntry("ID", stock.ProductID.ToString()),
                 new HashEntry("Stock", stock.Stock)
             };
 

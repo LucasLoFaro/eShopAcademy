@@ -74,7 +74,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "BasketService\Data\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "BasketService\Tests\Tests.csproj", "{2D9EE00D-9654-404C-BB59-1330537EC710}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{0E7B3A9A-4046-4506-B8CE-81C5CEF567FD}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "DockerCompose\docker-compose.dcproj", "{0E7B3A9A-4046-4506-B8CE-81C5CEF567FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsProcessor", "BasketService\EventsProcessor\EventsProcessor\EventsProcessor.csproj", "{C791FFA9-FFBF-49CA-B8A9-BD7DE65D094D}"
 stock-integration-lucas

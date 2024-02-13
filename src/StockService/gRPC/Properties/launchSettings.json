@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "gRPC": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52572;http://localhost:52573"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

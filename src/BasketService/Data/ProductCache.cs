@@ -1,5 +1,6 @@
 ﻿using Data.Interfaces;
-using Domain;
+using Domain.DTOs;
+using Domain.Entities;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
@@ -7,12 +8,12 @@ using System.Text.Json;
 
 namespace Data
 {
-    public class ProductRepository : IProductRepository
+    public class ProductCache : IProductCache
     {
         private IDatabase _cache;
         private const String PRODUCT_PREFIX = "product:";
 
-        public ProductRepository(DatabaseClient database)
+        public ProductCache(DatabaseClient database)
         {
             _cache = database.GetDatabase();
         }

@@ -6,8 +6,7 @@
       "serviceActions": {
         "api": "StartDebugging",
         "grpc": "StartDebugging",
-        "eventsprocessor": "StartDebugging",
-        "processor": "StartDebugging"
+        "eventsprocessor": "StartDebugging"
       }
     }
   }

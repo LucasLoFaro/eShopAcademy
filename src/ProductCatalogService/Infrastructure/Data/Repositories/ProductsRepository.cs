@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Application.Interfaces.Data;
 using Data.Interfaces;
-using Cassandra;
 using Cassandra.Mapping;
 using Cassandra.Data.Linq;
 
@@ -39,9 +38,7 @@ namespace Data.Repositories
 
         public async Task DeleteAsync(Product product)
         {
-            await _products.Where(p => p.ID == product.ID)
-                  .Delete()
-                  .ExecuteAsync();
+            await _products.Where(p => p.ID == product.ID).Delete().ExecuteAsync();
         }
     }
 

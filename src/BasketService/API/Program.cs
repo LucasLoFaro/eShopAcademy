@@ -1,6 +1,6 @@
 using Data;
 using Data.Interfaces;
-using Domain;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Inject services
 builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("Database"));
 builder.Services.AddSingleton<DatabaseClient>();
-builder.Services.AddTransient<IBasketRepository, BasketRepository>();
+builder.Services.AddTransient<IBasketCache, BasketCache>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -19,18 +19,18 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
-app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketRepository basketRepository) =>
+app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketCache basketRepository) =>
 {
     var basket = await basketRepository.GetBasketByClientId(clientID);
     return basket != null ? Results.Ok(basket) : Results.NotFound();
 });
 
-app.MapPost("/basket/clientId/add", async (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
+app.MapPost("/basket/clientId/add", async (Guid clientID, [FromBody] Item item, IBasketCache basketRepository) =>
 {
     return await basketRepository.AddProductToBasket(clientID, item) ? Results.Ok() : Results.NotFound();
 });
 
-app.MapPost("/basket/clientId/remove", async (Guid clientID, [FromBody] Item item, IBasketRepository basketRepository) =>
+app.MapPost("/basket/clientId/remove", async (Guid clientID, [FromBody] Item item, IBasketCache basketRepository) =>
 {
     return await basketRepository.RemoveProductFromBasket(clientID, item) ? Results.Ok() : Results.NotFound();
 });

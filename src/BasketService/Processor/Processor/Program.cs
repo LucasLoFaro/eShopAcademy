@@ -9,7 +9,8 @@ var host = new HostBuilder()
     .ConfigureServices(s =>
     {
         s.AddSingleton<DatabaseClient>(new DatabaseClient(System.Environment.GetEnvironmentVariable("REDIS_URL")));
-        s.AddTransient<IProductRepository, ProductRepository>();
+        s.AddTransient<IProductCache, ProductCache>();
+        
     })
     .Build();
 

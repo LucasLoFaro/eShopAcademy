@@ -4,32 +4,33 @@ using Microsoft.Extensions.Logging;
 using Domain;
 using Data;
 using Data.Interfaces;
+using Domain.Events;
 
 namespace Processor
 {
     public class ProductsEventsProcessor
     {
         private readonly ILogger _logger;
-        private readonly IProductRepository _productRepository;
+        private readonly IProductCache _productCache;
 
-        public ProductsEventsProcessor(ILoggerFactory loggerFactory, IProductRepository productRepository)
+        public ProductsEventsProcessor(ILoggerFactory loggerFactory, IProductCache productRepository)
         {
             _logger = loggerFactory.CreateLogger<ProductsEventsProcessor>();
-            _productRepository = productRepository;
+            _productCache = productRepository;
         }
 
         [Function("UpdateProductData")]
-        public void UpdateProductData([RabbitMQTrigger(queueName:"products", HostName = "rabbitmq", UserNameSetting = "guest",PasswordSetting ="guest")] ProductDTO product)
+        public void UpdateProductData([RabbitMQTrigger("product-events", HostName = "rabbitmq", UserNameSetting = "guest",PasswordSetting ="guest")] ProductUpdatedEvent productUpdatedEvent)
         {
-            _logger.LogInformation($"Updating product data for: {product.ID}");
-            _productRepository.AddOrUpdateProduct(product);
+            _logger.LogInformation($"Updating product data for: {productUpdatedEvent.Product.ID}");
+            _productCache.AddOrUpdateProduct(productUpdatedEvent.Product);
         }
 
-        [Function("UpdateStock")]
-        public void UpdateStock([RabbitMQTrigger("stock", ConnectionStringSetting = "rabbitmq")] ProductStockDTO stock)
-        {
-            _logger.LogInformation($"Updating stock for: {stock.ProductID}");
-            _productRepository.UpdateProductStock(stock);
-        }
+        //[Function("UpdateStock")]
+        //public void UpdateStock([RabbitMQTrigger("stock", ConnectionStringSetting = "rabbitmq")] ProductStockDTO stock)
+        //{
+        //    _logger.LogInformation($"Updating stock for: {stock.ProductID}");
+        //    _productRepository.UpdateProductStock(stock);
+        //}
     }
 }

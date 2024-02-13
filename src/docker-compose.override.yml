@@ -45,8 +45,7 @@ services:
   basket-processor:
     container_name: basket-processor
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - REDIS_URL=basket-db:6379
+      - DOTNET_ENVIRONMENT=Development
     networks:
       - backend
       
@@ -84,3 +83,4 @@ services:
       - backend
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+  

@@ -1,8 +1,6 @@
 ﻿using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Application.Interfaces.Data;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Application.Interfaces.Services;
 
 namespace API.Controllers
 {
@@ -11,10 +9,10 @@ namespace API.Controllers
     public class ProductController : ControllerBase
     {
 
-        private readonly IProductsRepository _db;
-        public ProductController(IProductsRepository productRepository)
+        private readonly IProductService _productService;
+        public ProductController(IProductService productService)
         {
-            _db = productRepository;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -22,7 +20,7 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _db.GetAllAsync());
+                return Ok(await _productService.GetAllAsync());
             }
             catch (Exception ex)
             {
@@ -40,7 +38,7 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _db.GetByIdAsync(id));
+                return Ok(await _productService.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
@@ -57,7 +55,7 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await _db.GetMostExpensive());
+                return Ok(await _productService.GetMostExpensive());
             }
             catch (Exception ex)
             {
@@ -73,7 +71,7 @@ namespace API.Controllers
 
             try
             {
-                await _db.AddAsync(product);
+                await _productService.AddOrUpdateAsync(product);
                 return StatusCode(StatusCodes.Status201Created, "Product created successfully");
             }
             catch (Exception ex)
@@ -91,7 +89,7 @@ namespace API.Controllers
 
             try
             {
-                await _db.AddAsync(product);
+                await _productService.AddOrUpdateAsync(product);
 
                 return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
             }
@@ -107,11 +105,11 @@ namespace API.Controllers
         {
             try
             {
-                Product product = await _db.GetByIdAsync(id);
+                Product product = await _productService.GetByIdAsync(id);
                 if (product == null)
                     return BadRequest("Product " + id + " not found.");
 
-                await _db.DeleteAsync(product);
+                await _productService.DeleteAsync(product);
                 return StatusCode(StatusCodes.Status201Created, "Product deleted successfully");
             }
             catch (Exception ex)

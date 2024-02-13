@@ -1,5 +1,6 @@
 ﻿using Data.Interfaces;
 using Domain;
+using Domain.Entities;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
@@ -7,13 +8,13 @@ using System.Text.Json;
 
 namespace Data
 {
-    public class BasketRepository : IBasketRepository
+    public class BasketCache : IBasketCache
     {
         private IDatabase _cache;
         private const String BASKET_PREFIX = "basket:";
         private const String PRODUCT_PREFIX = "product:";
 
-        public BasketRepository(DatabaseClient database)
+        public BasketCache(DatabaseClient database)
         {
             _cache = database.GetDatabase();
         }
@@ -59,9 +60,10 @@ namespace Data
                 var productHash = productTasks[item.Product.ID].Result;
                 if(productHash != null)
                 {
+                    // ToDo: Add validation and encapsulate in automapper
                     item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString();
                     item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString());
-                    item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
+                    //item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
                 }                
             }
 

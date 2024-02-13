@@ -35,10 +35,10 @@ services:
     image: redis
        
   basket-processor:
-    image: ${DOCKER_REGISTRY-}basket-processor
+    image: ${DOCKER_REGISTRY-}eventsprocessor
     build:
       context: .
-      dockerfile: BasketService/Processor/Processor/Dockerfile
+      dockerfile: BasketService/EventsProcessor/EventsProcessor/Dockerfile
     depends_on:
       - basket-db
       - rabbitmq

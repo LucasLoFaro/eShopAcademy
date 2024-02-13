@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
 
-namespace Data
+namespace Infrastructure.Data
 {
     public class StockDbContext: DbContext
     {

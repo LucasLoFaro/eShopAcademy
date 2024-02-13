@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "gRPC.Protos";
+option csharp_namespace = "StockGrpcClient.Protos";
 
 import "google/protobuf/empty.proto";
 
@@ -51,3 +51,21 @@ message IncreaseStockResponse {
 message DecreaseStockResponse {
     bool success = 1;
 }
+/*
+        [HttpGet]
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetAll()
+
+        [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
+
+
+        [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
+        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string wa
+
+
+        public async Task<ActionResult> IncreaseStock([FromForm] AlterStockDTO alterStock)
+
+
+        public async Task<ActionResult> DecreaseStock([FromForm] AlterStockDTO alterStock)
+
+        */

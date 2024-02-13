@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Data
+namespace Infrastructure.Data
 {
     public class StockRepository : IStockRepository
     {

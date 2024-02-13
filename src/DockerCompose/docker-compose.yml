@@ -2,59 +2,176 @@ name: eshopacademy
 version: '3.4'
 
 services:
+
+# Product Catalog Service
   product-api:
-    image: ${DOCKER_REGISTRY-}product-api
+    container_name: product-api
+    image: product-api
     build:
       context: .
-      dockerfile: ProductCatalogService/Presentation/API/Dockerfile
+      dockerfile: ../ProductCatalogService/Presentation/API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8001:8080"
+    networks:
+      - backend
     depends_on:
       - product-db
       - rabbitmq
   
   product-db:
+    container_name: product-db
     image: cassandra
+    ports:
+      - "8011:7000"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - backend
 
   product-grpc:
-    image: ${DOCKER_REGISTRY-}product-grpc
+    container_name: product-grpc
+    image: product-grpc
     build:
       context: .
-      dockerfile: ProductCatalogService/Presentation/gRPC/Dockerfile
+      dockerfile: ../ProductCatalogService/Presentation/gRPC/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8021:8080"
+    networks:
+      - backend
     depends_on:
       - product-db
       - rabbitmq
 
+
+# Basket Service
   basket-api:
-    image: ${DOCKER_REGISTRY-}basket-api
+    container_name: basket-api
+    image: basket-api
     build:
       context: .
-      dockerfile: BasketService/API/Dockerfile
+      dockerfile: ../BasketService/API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8004:8080"
+    networks:
+      - backend
     depends_on:
       - basket-db
 
   basket-db:
+    container_name: basket-db
     image: redis
+    networks:
+      - backend
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
        
   basket-processor:
-    image: ${DOCKER_REGISTRY-}eventsprocessor
+    container_name: basket-processor
+    image: basket-processor
     build:
       context: .
-      dockerfile: BasketService/EventsProcessor/EventsProcessor/Dockerfile
+      dockerfile: ../BasketService/EventsProcessor/EventsProcessor/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    networks:
+      - backend
     depends_on:
       - basket-db
       - rabbitmq
 
+# Stock Service
+  stock-api:
+    container_name: stock-api
+    image: stock-api
+    build:
+      context: ..
+      dockerfile: StockService/API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8002:8080"
+    depends_on:
+      - stock-db
+      - rabbitmq
+
+  stock-db:
+    container_name: stock-db
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=Passw0rd
+    networks:
+      - backend
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "8012:27017"
+
+  stock-grpc:
+    container_name: stock-grpc
+    image: stock-grpc
+    build:
+      context: ..
+      dockerfile: StockService/gRPC/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8022:8080"
+    depends_on:
+      - stock-db
+      - rabbitmq
+
+# Order Service
   order-db:
+    container_name: order-db
     image: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=Passw0rd
+    ports:
+      - "8013:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
+# Infrastructure
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq:3-management
-
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+      - "5673:5673"
+    networks:
+      - backend
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+ 
 
 volumes:
   redis_data:
   cassandra_data:
+  mongo_data:
   postgres_data:
   rabbitmq_data:
   
 networks:
   backend:
+  

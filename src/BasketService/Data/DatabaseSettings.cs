@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Data
 {
-    internal class DatabaseSettings
+    public class DatabaseSettings
     {
+        public String URL { get; set; }
     }
 }

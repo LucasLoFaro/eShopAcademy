@@ -7,10 +7,13 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ProductCatalogService/Presentation/EventsProcessor/EventsProcessor.csproj", "ProductCatalogService/Presentation/EventsProcessor/"]
-RUN dotnet restore "./ProductCatalogService/Presentation/EventsProcessor/./EventsProcessor.csproj"
+COPY ["BasketService/EventsProcessor/EventsProcessor/EventsProcessor.csproj", "BasketService/EventsProcessor/EventsProcessor/"]
+COPY ["ProductCatalogService/Core/Domain/Domain.csproj", "ProductCatalogService/Core/Domain/"]
+COPY ["BasketService/Data/Data.csproj", "BasketService/Data/"]
+COPY ["BasketService/Domain/Domain.csproj", "BasketService/Domain/"]
+RUN dotnet restore "./BasketService/EventsProcessor/EventsProcessor/./EventsProcessor.csproj"
 COPY . .
-WORKDIR "/src/ProductCatalogService/Presentation/EventsProcessor"
+WORKDIR "/src/BasketService/EventsProcessor/EventsProcessor"
 RUN dotnet build "./EventsProcessor.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

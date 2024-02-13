@@ -4,18 +4,22 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-EventsProcessor-b6c42dfd-3533-43e7-aca7-29d1dba770f6</UserSecretsId>
+    <UserSecretsId>dotnet-EventsProcessor-f1565d3e-90c6-4163-b772-ddce10bd06cf</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="MassTransit" Version="8.1.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Application\Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\..\ProductCatalogService\Core\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\Data\Data.csproj" />
+    <ProjectReference Include="..\..\Domain\Domain.csproj" />
   </ItemGroup>
 </Project>

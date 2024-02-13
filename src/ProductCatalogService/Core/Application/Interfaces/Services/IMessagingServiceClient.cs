@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Entities;
 
 namespace Services.Interfaces
 {
-    internal interface IMessagingServiceClient
+    public interface IMessagingServiceClient
     {
+        public Task SendProductUpdate(Product product);
+        public Task SendProductDelete(Product product);
     }
 }

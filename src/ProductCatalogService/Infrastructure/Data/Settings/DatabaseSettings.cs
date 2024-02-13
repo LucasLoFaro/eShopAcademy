@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data
+namespace Data.Settings
 {
     public class DatabaseSettings
     {
-        public String URL { get; set; }
+        public String Host { get; set; }
+        public String KeySpace { get; set; }
     }
 }

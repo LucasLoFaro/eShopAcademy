@@ -6,9 +6,9 @@ namespace Infrastructure.Data
     {
         Task<IReadOnlyList<Stock>> GetAllAsync();
 
-        Task<IReadOnlyList<Stock>> GetByProductGuidAsync(string productGuid);
+        Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid);
 
-        Task<Stock> GetByProductGuidAndWarehouseAsync(string productGuid, string warehouse);
+        Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, Warehouse warehouse);
 
         Task<bool> UpdateAsync(Stock stock);
         Task<Stock> AddAsync(Stock stock);

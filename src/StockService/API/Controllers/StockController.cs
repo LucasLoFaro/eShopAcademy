@@ -55,7 +55,7 @@ namespace API.Controllers
             if (stock == null)
             {
                 Stock stockToAdd = new Stock();
-                stockToAdd.ProductGuid = alterStock.ProductGuid;
+                stockToAdd.ProductID = alterStock.ProductGuid;
                 stockToAdd.Quantity = alterStock.Quantity;
                 stockToAdd.Warehouse = alterStock.Warehouse;
 
@@ -68,7 +68,7 @@ namespace API.Controllers
             }
 
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
-                ,new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse}
+                ,new { productGuid = stock.ProductID, warehouse = stock.Warehouse}
                 , stock);
         }
 
@@ -87,7 +87,7 @@ namespace API.Controllers
             await _stockRepository.UpdateAsync(stock);
 
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
-                , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }
+                , new { productGuid = stock.ProductID, warehouse = stock.Warehouse }
                 , stock);
         }
 

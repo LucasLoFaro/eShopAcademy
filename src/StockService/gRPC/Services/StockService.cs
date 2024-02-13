@@ -28,7 +28,7 @@ namespace gRPC.Services
                 var response = new StockModel()
                 {
                     Id = stock._id.ToString(),
-                    ProductGuid = stock.ProductGuid,
+                    ProductGuid = stock.ProductID,
                     Quantity = stock.Quantity,
                     Warehouse = stock.Warehouse
                 };
@@ -48,7 +48,7 @@ namespace gRPC.Services
             var response = new StockModel()
             {
                 Id = stock._id.ToString(),
-                ProductGuid = stock.ProductGuid,
+                ProductGuid = stock.ProductID,
                 Quantity = stock.Quantity,
                 Warehouse = stock.Warehouse
             };

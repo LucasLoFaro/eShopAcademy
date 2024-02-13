@@ -19,20 +19,20 @@ namespace Infrastructure.Data
             return await _context.Stocks.ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(string productGuid)
+        public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid)
         {
             IReadOnlyList<Stock> stock = await _context.Stocks.Where(
-                x => x.ProductGuid == productGuid &&
+                x => x.ProductID == productGuid &&
                 x.Quantity != 0).ToListAsync();
 
             return stock;
         }
 
-        public async Task<Stock> GetByProductGuidAndWarehouseAsync(string productGuid, string warehouse)
+        public async Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, Warehouse warehouse)
         {
             Stock stock = await _context.Stocks.Where(
-                    x => x.ProductGuid == productGuid &&
-                    x.Warehouse == warehouse &&
+                    x => x.ProductID == productGuid &&
+                    x.Warehouse.ID == warehouse.ID &&
                     x.Quantity != 0).FirstOrDefaultAsync();
             return stock;
         }

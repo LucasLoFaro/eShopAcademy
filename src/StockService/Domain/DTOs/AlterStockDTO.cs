@@ -1,9 +1,11 @@
-﻿namespace Domain.DTOs
+﻿using Domain.Entities;
+
+namespace Domain.DTOs
 {
     public class AlterStockDTO
     {
-        public string ProductGuid { get; set; }
+        public Guid ProductGuid { get; set; }
         public int Quantity { get; set; }
-        public string Warehouse { get; set; }
+        public Warehouse Warehouse { get; set; }
     }
 }

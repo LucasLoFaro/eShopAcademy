@@ -23,7 +23,7 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Stock>().ToCollection("Stocks");
+            modelBuilder.Entity<Stock>().ToCollection("stock");
         }
     }
 }

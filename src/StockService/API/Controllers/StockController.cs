@@ -24,7 +24,7 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
-        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(Guid productGuid)
         {
             IEnumerable<Stock> stockAvailable = await _stockRepository.GetByProductGuidAsync(productGuid);
             
@@ -35,7 +35,7 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
-        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string warehouse)
+        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, Warehouse warehouse)
         {
             Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(productGuid, warehouse);
 

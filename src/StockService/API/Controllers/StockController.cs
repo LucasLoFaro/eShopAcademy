@@ -71,7 +71,13 @@ namespace API.Controllers
                 await _stockRepository.UpdateAsync(stock);
             }
 
-            _messaging.SendStockUpdate(alterStock);
+            // Todo:Add automapper
+            _messaging.SendStockUpdate(new AlterStockDTO()
+            {
+                ProductGuid = stock.ProductID,
+                Quantity = stock.Quantity,
+                Warehouse = stock.Warehouse
+            });
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                 ,new { productGuid = stock.ProductID, warehouse = stock.Warehouse}
                 , stock);
@@ -91,7 +97,13 @@ namespace API.Controllers
             stock.Quantity -= alterStock.Quantity;
             await _stockRepository.UpdateAsync(stock);
 
-            _messaging.SendStockUpdate(alterStock);
+            // Todo:Add automapper
+            _messaging.SendStockUpdate(new AlterStockDTO()
+            {
+                ProductGuid = stock.ProductID,
+                Quantity = stock.Quantity,
+                Warehouse = stock.Warehouse
+            });
 
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                 , new { productGuid = stock.ProductID, warehouse = stock.Warehouse }

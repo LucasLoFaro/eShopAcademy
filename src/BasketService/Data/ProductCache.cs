@@ -32,12 +32,7 @@ namespace Data
         }
         public async Task<bool> UpdateProductStock(AlterStockDTO stock)
         {
-            HashEntry[] productStockHash = {
-                new HashEntry("ID", stock.ProductGuid.ToString()),
-                new HashEntry("Stock", stock.Quantity)
-            };
-
-            await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductGuid.ToString(), productStockHash);
+            await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductGuid.ToString(),new RedisValue("Stock"), stock.Quantity);
             return true;
         }
     }

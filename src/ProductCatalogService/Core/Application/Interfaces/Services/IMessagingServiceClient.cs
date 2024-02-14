@@ -1,6 +1,6 @@
-﻿using Domain.Entities;
+﻿using Core.Domain.Entities;
 
-namespace Services.Interfaces
+namespace Core.Application.Interfaces.Services
 {
     public interface IMessagingServiceClient
     {

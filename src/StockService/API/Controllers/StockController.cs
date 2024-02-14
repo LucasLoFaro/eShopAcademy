@@ -1,7 +1,8 @@
 ﻿using Infrastructure.Data;
-using Domain.DTOs;
-using Domain.Entities;
+using Core.Domain.DTOs;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Services.Interfaces;
 
 namespace API.Controllers
 {
@@ -10,10 +11,12 @@ namespace API.Controllers
     public class StockController : ControllerBase
     {
         public IStockRepository _stockRepository { get; }
+        private readonly IMessagingServiceClient _messaging;
 
-        public StockController(IStockRepository stockRepository)
+        public StockController(IStockRepository stockRepository, IMessagingServiceClient messagingServiceClient)
         {
             _stockRepository = stockRepository;
+            _messaging = messagingServiceClient;
         }
 
         [HttpGet]
@@ -24,7 +27,7 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
-        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(Guid productGuid)
         {
             IEnumerable<Stock> stockAvailable = await _stockRepository.GetByProductGuidAsync(productGuid);
             
@@ -35,7 +38,8 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
-        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string warehouse)
+        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, String warehouse)
+        //public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, Warehouse warehouse)
         {
             Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(productGuid, warehouse);
 
@@ -55,7 +59,7 @@ namespace API.Controllers
             if (stock == null)
             {
                 Stock stockToAdd = new Stock();
-                stockToAdd.ProductGuid = alterStock.ProductGuid;
+                stockToAdd.ProductID = alterStock.ProductGuid;
                 stockToAdd.Quantity = alterStock.Quantity;
                 stockToAdd.Warehouse = alterStock.Warehouse;
 
@@ -67,8 +71,9 @@ namespace API.Controllers
                 await _stockRepository.UpdateAsync(stock);
             }
 
+            _messaging.SendStockUpdate(alterStock);
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
-                ,new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse}
+                ,new { productGuid = stock.ProductID, warehouse = stock.Warehouse}
                 , stock);
         }
 
@@ -86,8 +91,10 @@ namespace API.Controllers
             stock.Quantity -= alterStock.Quantity;
             await _stockRepository.UpdateAsync(stock);
 
+            _messaging.SendStockUpdate(alterStock);
+
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
-                , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }
+                , new { productGuid = stock.ProductID, warehouse = stock.Warehouse }
                 , stock);
         }
 

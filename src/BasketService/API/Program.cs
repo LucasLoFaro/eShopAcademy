@@ -1,6 +1,6 @@
 using Data;
 using Data.Interfaces;
-using Domain.Entities;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);

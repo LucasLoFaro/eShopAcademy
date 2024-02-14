@@ -1,8 +1,5 @@
 ﻿using Data.Interfaces;
-using Domain;
-using Domain.Entities;
-using NRedisStack;
-using NRedisStack.RedisStackCommands;
+using Core.Domain.Entities;
 using StackExchange.Redis;
 using System.Text.Json;
 

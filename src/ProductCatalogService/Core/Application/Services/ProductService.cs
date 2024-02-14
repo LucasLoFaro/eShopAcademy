@@ -1,11 +1,10 @@
-﻿using Application.Interfaces.Data;
-using Application.Interfaces.Services;
-using Domain.Entities;
-using Domain.Events;
-using Services.Interfaces;
+﻿using Core.Application.Interfaces.Data;
+using Core.Domain.Entities;
+using Core.Domain.Events;
+using Core.Application.Interfaces.Services;
 
 
-namespace Application.Services
+namespace Core.Application.Services
 {
     public class ProductService : IProductService
     {

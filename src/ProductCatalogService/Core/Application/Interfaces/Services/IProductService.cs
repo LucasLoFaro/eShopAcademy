@@ -1,8 +1,8 @@
-﻿using Application.Interfaces.Data;
-using Application.Services;
-using Domain.Entities;
+﻿using Core.Application.Interfaces.Data;
+using Core.Application.Services;
+using Core.Domain.Entities;
 
-namespace Application.Interfaces.Services
+namespace Core.Application.Interfaces.Services
 {
     public interface IProductService
     {

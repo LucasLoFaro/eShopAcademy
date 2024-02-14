@@ -2,7 +2,7 @@
 using Cassandra.Mapping;
 using Data.Interfaces;
 using Data.Settings;
-using Domain.Entities;
+using Core.Domain.Entities;
 using Microsoft.Extensions.Options;
 
 namespace Data
@@ -33,15 +33,19 @@ namespace Data
         {
             Session = Cluster.Connect();
             Session.Execute(new SimpleStatement("CREATE KEYSPACE IF NOT EXISTS eshopacademy" +
-                " WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }"));
-            Session.Execute(new SimpleStatement("USE eshopacademy"));
+                " WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' };"));
+            Session.Execute(new SimpleStatement("USE eshopacademy;"));
             Session.Execute(new SimpleStatement("CREATE TABLE IF NOT EXISTS eshopacademy.Products(" +
                 "ID UUID PRIMARY KEY," +
                 "Name text," +
                 "Price float," +
+                "Stock int," +
                 "Description text," +
                 "Image text," +
-                "CategoryDescription text)"));
+                "CategoryName text);"));
+            Session.Execute(new SimpleStatement("CREATE TABLE IF NOT EXISTS eshopacademy.Categories(" +
+                "ID UUID PRIMARY KEY," +
+                "Name text);"));
         }
 
         public void Dispose()

@@ -1,12 +1,11 @@
-using Application.Interfaces.Data;
-using Application.Interfaces.Services;
-using Application.Services;
+using Core.Application.Interfaces.Data;
+using Core.Application.Interfaces.Services;
+using Core.Application.Services;
 using Data;
 using Data.Interfaces;
 using Data.Repositories;
 using Data.Settings;
 using Services;
-using Services.Interfaces;
 using Services.Settings;
 
 var builder = WebApplication.CreateBuilder(args);

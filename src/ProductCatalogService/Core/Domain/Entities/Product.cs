@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Entities
+namespace Core.Domain.Entities
 {
     public class Product
     {
@@ -9,8 +9,9 @@ namespace Domain.Entities
         public string Name { get; set; }
         [Required]
         public float Price { get; set; }
+        public int Stock { get; set; }
         public string Description { get; set; }
-        public string Image { get; set; }
-        public string CategoryDescription { get; set; }
+        public String Image { get; set; }
+        public String CategoryName { get; set; }
     }
 }

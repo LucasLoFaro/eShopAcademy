@@ -1,6 +1,9 @@
-using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Infrastructure.Services.Interfaces;
+using Infrastructure.Services.Settings;
+using Infrastructure.Services;
+using Infrastructure.Data;
+
 
 namespace API
 {
@@ -9,31 +12,23 @@ namespace API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             // Add services to the container.
             // TODO: Incorporar AutoMapper
             // TODO: Incorporar Serilog
-            // TODO: Parametrizar en appSettings
-
             builder.Services.AddDbContext<StockDbContext>(options =>
-                options.UseMongoDB("mongodb://admin:admin@localhost:27017/"/*Configuration.GetConnectionString("DefaultConnection"*/, "eShopAcademy")
+                options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB"), "eShopAcademy")
             );
             builder.Services.AddScoped<IStockRepository, StockRepository>();
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQSettings"));
+            builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();

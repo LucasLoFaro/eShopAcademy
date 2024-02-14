@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Domain.Entities
+﻿namespace Core.Domain.Entities
 {
     public class Product
     {

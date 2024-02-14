@@ -1,7 +1,7 @@
-﻿using Domain.Events;
-using Domain.Entities;
-using Services.Interfaces;
-using Domain.DTOs;
+﻿using Core.Domain.Events;
+using Core.Domain.Entities;
+using Core.Application.Interfaces.Services;
+using Core.Domain.DTOs;
 using Services.Settings;
 using Microsoft.Extensions.Options;
 using MassTransit;

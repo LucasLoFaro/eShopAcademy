@@ -105,6 +105,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
     ports:
       - "8002:8080"
+    networks:
+      - backend
     depends_on:
       - stock-db
       - rabbitmq
@@ -133,6 +135,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
     ports:
       - "8022:8080"
+    networks:
+      - backend
     depends_on:
       - stock-db
       - rabbitmq

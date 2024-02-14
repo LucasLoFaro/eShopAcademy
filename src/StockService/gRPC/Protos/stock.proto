@@ -21,6 +21,19 @@ message StockModel{
     string productGuid = 2;
     int32 quantity = 3;
     string warehouse = 4;
+//    WarehouseModel warehouse = 4;
+}
+
+message WarehouseModel{
+    string _id = 1;
+    string Name = 2;
+    LocationModel Location = 3;
+}
+
+message LocationModel{
+    string Address = 1;
+    float Latitude = 2;
+    float Longitude = 3;
 }
 
 message GetStockByProdGuidRequest {

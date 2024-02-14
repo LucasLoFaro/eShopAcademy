@@ -1,10 +1,11 @@
 ﻿using Data.Interfaces;
-using Domain.DTOs;
-using Domain.Entities;
+using Core.Domain.DTOs;
+using Core.Domain.Entities;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
 using System.Text.Json;
+using Domain.DTOs;
 
 namespace Data
 {
@@ -29,14 +30,14 @@ namespace Data
             await _cache.HashSetAsync(PRODUCT_PREFIX + product.ID.ToString(), productHash);
             return true;
         }
-        public async Task<bool> UpdateProductStock(ProductStockDTO stock)
+        public async Task<bool> UpdateProductStock(AlterStockDTO stock)
         {
             HashEntry[] productStockHash = {
-                new HashEntry("ID", stock.ProductID.ToString()),
-                new HashEntry("Stock", stock.Stock)
+                new HashEntry("ID", stock.ProductGuid.ToString()),
+                new HashEntry("Stock", stock.Quantity)
             };
 
-            await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductID.ToString(), productStockHash);
+            await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductGuid.ToString(), productStockHash);
             return true;
         }
     }

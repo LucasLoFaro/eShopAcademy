@@ -40,6 +40,30 @@ namespace StockGrpcClient
             Console.WriteLine("******************************");
 
 
+            Console.WriteLine("\n\n*********IncreaseStockAsync*********");
+            IncreaseStockRequest increaseStockRequest = new IncreaseStockRequest()
+            {
+                ProductGuid = "1234",
+                Quantity = 10,
+                Warehouse = "West"
+            };
+            IncreaseStockResponse increaseResponse = await client.IncreaseStockAsync(increaseStockRequest);
+            Console.WriteLine($"Response: {increaseResponse}");
+            Console.WriteLine("******************************");
+
+
+            Console.WriteLine("\n\n*********IncreaseStockAsync*********");
+            DecreaseStockRequest decreaseStockRequest = new DecreaseStockRequest()
+            {
+                ProductGuid = "1234",
+                Quantity = 5,
+                Warehouse = "West"
+            };
+            DecreaseStockResponse decreaseResponse = await client.DecreaseStockAsync(decreaseStockRequest);
+            Console.WriteLine($"Response: {decreaseResponse}");
+            Console.WriteLine("******************************");
+
+
             Console.WriteLine("\n\n*********Test()*********");
             //GetStockByProdGuidRequest getStockRequest = new GetStockByProdGuidRequest() { ProductGuid = "1234" };
             Empty testResponse = await client.TestAsync(new Empty());

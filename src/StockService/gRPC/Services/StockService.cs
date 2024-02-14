@@ -1,8 +1,10 @@
 ﻿using Data;
+using Domain.DTOs;
 using Domain.Entities;
 using Google.Protobuf.WellKnownTypes;
 using gRPC.Protos;
 using Grpc.Core;
+using Microsoft.AspNetCore.Mvc;
 
 namespace gRPC.Services
 {
@@ -53,6 +55,48 @@ namespace gRPC.Services
             };
 
             return response;
+        }
+
+
+        public override async Task<IncreaseStockResponse> IncreaseStock(IncreaseStockRequest request, ServerCallContext context)
+        {
+            if (request.Quantity <= 0) throw new RpcException(new Status(StatusCode.InvalidArgument, "The Quantity field must be greater than zero"));
+
+            Stock stockAvailable = await _stockRepository.GetByProductGuidAndWarehouseAsync(request.ProductGuid, request.Warehouse);
+
+            if (stockAvailable == null)
+            {
+                Stock stockToAdd = new Stock();
+                stockToAdd.ProductGuid = request.ProductGuid;
+                stockToAdd.Quantity = request.Quantity;
+                stockToAdd.Warehouse = request.Warehouse;
+
+                await _stockRepository.AddAsync(stockToAdd);
+            }
+            else
+            {
+                stockAvailable.Quantity += request.Quantity;
+                await _stockRepository.UpdateAsync(stockAvailable);
+            }
+            return new IncreaseStockResponse() { Success = true };
+        }
+
+
+        public override async Task<DecreaseStockResponse> DecreaseStock(DecreaseStockRequest request, ServerCallContext context)
+        {
+            if (request.Quantity <= 0) throw new RpcException(new Status(StatusCode.InvalidArgument, "The Quantity field must be greater than zero"));
+
+            Stock stockAvailable = await _stockRepository.GetByProductGuidAndWarehouseAsync(request.ProductGuid, request.Warehouse);
+
+            if (stockAvailable == null)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "The required product does not exists in stock"));
+            if (stockAvailable.Quantity < request.Quantity)
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "The required product does not have enough units"));
+
+            stockAvailable.Quantity -= request.Quantity;
+            await _stockRepository.UpdateAsync(stockAvailable);
+
+            return new DecreaseStockResponse() { Success = true };
         }
 
 

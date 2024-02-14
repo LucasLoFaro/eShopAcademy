@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StockService\gRPC\gRPC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="Protos\stock.proto" GrpcServices="Client" />
   </ItemGroup>
 

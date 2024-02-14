@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -28,11 +28,11 @@ namespace Infrastructure.Data
             return stock;
         }
 
-        public async Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, Warehouse warehouse)
+        public async Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, String warehouse)
+        //public async Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, Warehouse warehouse)
         {
             Stock stock = await _context.Stocks.Where(
                     x => x.ProductID == productGuid &&
-                    x.Warehouse.ID == warehouse.ID &&
                     x.Quantity != 0).FirstOrDefaultAsync();
             return stock;
         }

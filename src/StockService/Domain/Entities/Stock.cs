@@ -1,12 +1,13 @@
 ﻿using MongoDB.Bson;
 
-namespace Domain.Entities
+namespace Core.Domain.Entities
 {
     public class Stock
     {
         public ObjectId _id { get; set; }
         public Guid ProductID { get; set; }
         public int Quantity { get; set; }
-        public Warehouse Warehouse { get; set; }
+        public String Warehouse { get; set; }
+        //public Warehouse Warehouse { get; set; }
     }
 }

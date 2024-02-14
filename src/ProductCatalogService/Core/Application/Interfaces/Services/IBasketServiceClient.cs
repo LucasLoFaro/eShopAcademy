@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Interfaces
+namespace Core.Application.Interfaces.Services
 {
     internal interface IBasketServiceClient
     {

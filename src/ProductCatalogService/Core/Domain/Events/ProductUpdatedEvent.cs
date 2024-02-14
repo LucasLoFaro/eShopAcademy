@@ -1,6 +1,6 @@
-﻿using Domain.DTOs;
+﻿using Core.Domain.DTOs;
 
-namespace Domain.Events
+namespace Core.Domain.Events
 {
     public class ProductUpdatedEvent
     {

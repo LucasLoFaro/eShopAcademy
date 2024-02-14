@@ -1,11 +1,12 @@
-﻿using Domain.DTOs;
-using Domain.Entities;
+﻿using Core.Domain.DTOs;
+using Core.Domain.Entities;
+using Domain.DTOs;
 
 namespace Data.Interfaces
 {
     public interface IProductCache
     {
         public Task<bool> AddOrUpdateProduct(ProductDTO product);
-        public Task<bool> UpdateProductStock(ProductStockDTO stock);
+        public Task<bool> UpdateProductStock(AlterStockDTO stock);
     }
 }

@@ -1,6 +1,9 @@
-using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Infrastructure.Services.Interfaces;
+using Infrastructure.Services.Settings;
+using Infrastructure.Services;
+using Infrastructure.Data;
+
 
 namespace API
 {
@@ -9,6 +12,9 @@ namespace API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             // Add services to the container.
             // TODO: Incorporar AutoMapper
@@ -17,10 +23,8 @@ namespace API
                 options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB"), "eShopAcademy")
             );
             builder.Services.AddScoped<IStockRepository, StockRepository>();
-
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQSettings"));
+            builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
 
             var app = builder.Build();
             app.UseSwagger();

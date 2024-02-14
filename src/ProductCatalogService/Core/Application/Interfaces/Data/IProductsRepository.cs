@@ -1,11 +1,11 @@
-﻿using Domain.Entities;
+﻿using Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces.Data
+namespace Core.Application.Interfaces.Data
 {
     public interface IProductsRepository
     {

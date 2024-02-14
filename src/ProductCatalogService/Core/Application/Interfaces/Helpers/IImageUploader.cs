@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces.Helpers
+namespace Core.Application.Interfaces.Services
 {
     internal interface IImageUploader
     {

@@ -1,10 +1,10 @@
-﻿using Domain.Events;
+﻿using Core.Domain.Events;
 using Data.Interfaces;
 using MassTransit;
-using Domain.DTOs;
+using Core.Domain.DTOs;
 using AutoMapper;
 
-namespace EventsProcessor
+namespace EventsProcessor.Consumers
 {
     internal class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
     {

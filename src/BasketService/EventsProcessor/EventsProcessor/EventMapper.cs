@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using Core.Domain.DTOs;
+using Core.Domain.Events;
 using Domain.DTOs;
-using Domain.Events;
 
 namespace EventsProcessor
 {
@@ -8,11 +9,14 @@ namespace EventsProcessor
     {
         public EventMapper()
         {
-            // Assuming you want to map the Product property of ProductUpdatedEvent to ProductDTO
             CreateMap<ProductUpdatedEvent, ProductDTO>()
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.Product.ID))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Product.Name))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price));
+
+            CreateMap<StockUpdatedEvent, AlterStockDTO>()
+                .ForMember(dest => dest.ProductGuid, opt => opt.MapFrom(src => src.Stock.ProductGuid))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Stock.Quantity));
         }
     }
 }

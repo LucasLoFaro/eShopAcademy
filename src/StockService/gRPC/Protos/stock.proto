@@ -20,7 +20,8 @@ message StockModel{
     string _id = 1;
     string productGuid = 2;
     int32 quantity = 3;
-    WarehouseModel warehouse = 4;
+    string warehouse = 4;
+//    WarehouseModel warehouse = 4;
 }
 
 message WarehouseModel{

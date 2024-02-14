@@ -1,6 +1,6 @@
 ﻿using Cassandra;
-using Domain.Entities;
-using Application.Interfaces.Data;
+using Core.Domain.Entities;
+using Core.Application.Interfaces.Data;
 using Data.Interfaces;
 using Cassandra.Mapping;
 using Cassandra.Data.Linq;

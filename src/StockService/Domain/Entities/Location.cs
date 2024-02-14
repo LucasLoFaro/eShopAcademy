@@ -1,6 +1,4 @@
-﻿using MongoDB.Bson;
-
-namespace Domain.Entities
+﻿namespace Core.Domain.Entities
 {
     public class Location
     {

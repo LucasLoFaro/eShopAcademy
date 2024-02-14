@@ -1,5 +1,5 @@
 ﻿using Infrastructure.Data;
-using Domain.Entities;
+using Core.Domain.Entities;
 using Google.Protobuf.WellKnownTypes;
 using gRPC.Protos;
 using Grpc.Core;
@@ -31,16 +31,16 @@ namespace gRPC.Services
                     Id = stock._id.ToString(),
                     ProductGuid = stock.ProductID.ToString(),
                     Quantity = stock.Quantity,
-                    Warehouse = new WarehouseModel(){
-                        Id = stock.Warehouse.ID.ToString(),
-                        Name = stock.Warehouse.Name,
-                        Location = new LocationModel()
-                        {
-                            Address = stock.Warehouse.Location.Address,
-                            Latitude = stock.Warehouse.Location.Latitude,
-                            Longitude = stock.Warehouse.Location.Longitude
-                        }
-                    }
+                    Warehouse = stock.Warehouse
+                    //Warehouse = new WarehouseModel(){
+                    //    Name = stock.Warehouse.Name,
+                    //    Location = new LocationModel()
+                    //    {
+                    //        Address = stock.Warehouse.Location.Address,
+                    //        Latitude = stock.Warehouse.Location.Latitude,
+                    //        Longitude = stock.Warehouse.Location.Longitude
+                    //    }
+                    //}
                 };
                 //var productModel = _mapper.Map<ProductModel>(product);
                 await responseStream.WriteAsync(response);
@@ -52,7 +52,6 @@ namespace gRPC.Services
         {
             var dummyWarehouse = new Warehouse()
             {
-                ID = new Guid(),
                 Name = "Dummy",
                 Location = new Location()
                 {
@@ -62,7 +61,8 @@ namespace gRPC.Services
                 }
             };
 
-            Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(new Guid(request.ProductGuid), dummyWarehouse);
+            //Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(new Guid(request.ProductGuid), dummyWarehouse);
+            Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(new Guid(request.ProductGuid), request.Warehouse);
 
             if (stock == null)
                 throw new RpcException(new Status(StatusCode.NotFound, $"Stock for Product with Guid={request.ProductGuid} was not found"));
@@ -72,7 +72,8 @@ namespace gRPC.Services
                 Id = stock._id.ToString(),
                 ProductGuid = stock.ProductID.ToString(),
                 Quantity = stock.Quantity,
-                Warehouse = new WarehouseModel() // ToDo: AutoMapper
+                Warehouse = stock.Warehouse
+                //Warehouse = new WarehouseModel() // ToDo: AutoMapper
             };
 
             return response;

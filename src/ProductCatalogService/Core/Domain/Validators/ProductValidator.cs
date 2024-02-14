@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Validators
+namespace Core.Domain.Validators
 {
     internal class ProductValidator
     {

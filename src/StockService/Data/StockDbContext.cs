@@ -1,7 +1,8 @@
-﻿using Domain.Entities;
+﻿using Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
+using System.ComponentModel;
 
 namespace Infrastructure.Data
 {
@@ -24,6 +25,7 @@ namespace Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Stock>().ToCollection("stock");
+            modelBuilder.Entity<Warehouse>().ToCollection("warehouses");
         }
     }
 }

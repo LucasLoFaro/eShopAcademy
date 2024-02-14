@@ -1,3 +1,4 @@
+using Application.Managers;
 using Data;
 using gRPC.Services;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<StockDbContext>(options =>
     options.UseMongoDB("mongodb://admin:admin@localhost:27017/"/*Configuration.GetConnectionString("DefaultConnection"*/, "eShopAcademy")
 );
 builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IStockManager, StockManager>();
 
 
 var app = builder.Build();

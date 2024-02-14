@@ -16,7 +16,7 @@ namespace Data
 
         public async Task<IReadOnlyList<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync();
+            return await _context.Stocks.Where(x => x.Quantity != 0).ToListAsync();
         }
 
         public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(string productGuid)

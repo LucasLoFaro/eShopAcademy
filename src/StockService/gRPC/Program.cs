@@ -1,13 +1,24 @@
-﻿using gRPC.Services;
+﻿using Azure.Identity;
+using gRPC.Services;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddAzureAppConfiguration(options =>
+    options.Connect(
+        new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
+        new DefaultAzureCredential())
+    .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+    .Select("common:*", LabelFilter.Null)
+    .Select("stock:*", LabelFilter.Null)
+    );
 
 // Add services to the container.
 builder.Services.AddGrpc(opt => { opt.EnableDetailedErrors = true; });
 builder.Services.AddDbContext<StockDbContext>(options =>
-    options.UseMongoDB("mongodb://admin:admin@localhost:27017/"/*Configuration.GetConnectionString("DefaultConnection"*/, "eShopAcademy")
+    options.UseMongoDB(builder.Configuration["stock:ConnectionStrings:MongoDB"], "eShopAcademy")
 );
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 

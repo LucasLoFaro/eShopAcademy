@@ -4,10 +4,21 @@ using AutoMapper;
 using Data.Interfaces;
 using Data;
 using EventsProcessor.Consumers;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var settings = builder.Configuration.GetSection("RabbitMQSettings").Get<RabbitMQSettings>();
+builder.Configuration.AddAzureAppConfiguration(options =>
+    options.Connect(
+        new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
+        new DefaultAzureCredential())
+    .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+    .Select("common:*", LabelFilter.Null)
+    .Select("basket:*", LabelFilter.Null)
+    );
+
+var settings = builder.Configuration.GetSection("common:RabbitMQSettings").Get<RabbitMQSettings>();
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<ProductsEventConsumer>();
     x.AddConsumer<StockEventConsumer>();
@@ -28,7 +39,7 @@ builder.Services.AddMassTransit(x => {
         });
     });
 });
-builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("Database"));
+builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("basket:Database"));
 builder.Services.AddSingleton<DatabaseClient>();
 builder.Services.AddTransient<IProductCache, ProductCache>();
 builder.Services.AddAutoMapper(typeof(Program));

@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "ProductCatalogService\Presentation\API\API.csproj", "{1243246C-5B36-4A2E-ACED-10AF81585105}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProductCatalogService", "ProductCatalogService", "{26FBDB24-B9A8-407A-B434-24C6A434D117}"
-	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{E960B17B-F432-4ED8-80BE-0911D6F21109}"
 EndProject
@@ -64,7 +61,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockGrpcClient", "StockSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "StockService\gRPC\gRPC.csproj", "{F9F99571-765D-4FA8-B243-2CF6AB81F2B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "StockService\Infrastructure\Services\Services.csproj", "{0C204D90-50B5-4CD4-AD47-878C3AE9DB93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "StockService\Infrastructure\Services\Services.csproj", "{0C204D90-50B5-4CD4-AD47-878C3AE9DB93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

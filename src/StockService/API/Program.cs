@@ -3,6 +3,8 @@ using Infrastructure.Services.Interfaces;
 using Infrastructure.Services.Settings;
 using Infrastructure.Services;
 using Infrastructure.Data;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 
 namespace API
@@ -12,6 +14,16 @@ namespace API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Configuration.AddAzureAppConfiguration(options =>
+                options.Connect(
+                    new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
+                    new DefaultAzureCredential())
+                .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+                .Select("common:*", LabelFilter.Null)
+                .Select("stock:*", LabelFilter.Null)
+                );
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -20,10 +32,10 @@ namespace API
             // TODO: Incorporar AutoMapper
             // TODO: Incorporar Serilog
             builder.Services.AddDbContext<StockDbContext>(options =>
-                options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB"), "eShopAcademy")
+                options.UseMongoDB(builder.Configuration["stock:ConnectionStrings:MongoDB"], "eShopAcademy")
             );
             builder.Services.AddScoped<IStockRepository, StockRepository>();
-            builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQSettings"));
+            builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("common:RabbitMQSettings"));
             builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
 
             var app = builder.Build();

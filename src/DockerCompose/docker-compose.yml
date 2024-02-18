@@ -13,6 +13,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=5e6023bb-fc90-4cd5-83b8-c503da5f2c59
+      - AZURE_CLIENT_SECRET=GSD8Q~EoxyueAtyR9MHaymFnx1L1bm-ysbEetcm.
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8001:8080"
     networks:
@@ -40,6 +45,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=bddb1a06-cfd9-4524-bfde-7f4d4d485288
+      - AZURE_CLIENT_SECRET=XvV8Q~kdKRmlp.jx~VVuUm4jyTnh2rtm1b5Jlc.W
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8021:8080"
     networks:
@@ -59,6 +69,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=27f4c9a6-b8b1-444a-89f4-aa0af25967eb
+      - AZURE_CLIENT_SECRET=rMZ8Q~Ho0DtF2D9Wk.oZ4bXQYXEJWEB4rMGlIbJt
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8004:8080"
     networks:
@@ -87,6 +102,11 @@ services:
       dockerfile: ../BasketService/EventsProcessor/EventsProcessor/Dockerfile
     environment:
       - DOTNET_ENVIRONMENT=Development
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=d7226736-7a38-493a-8a3c-40304c73a360
+      - AZURE_CLIENT_SECRET=jfE8Q~JfRsMU5SV.jRE1T09r~NJT6A_8Nw-4xaq0
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     networks:
       - backend
     depends_on:
@@ -103,6 +123,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=0df6486c-5f73-43ea-acb9-2e8a1a1ed6b3
+      - AZURE_CLIENT_SECRET=f_R8Q~xlJn0Epd7gfvVfzy~zfZpfiiTl-0h.4aEE
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8002:8080"
     networks:
@@ -133,6 +158,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=f30904f9-ae20-4f3e-b8ed-da3751283fc0
+      - AZURE_CLIENT_SECRET=Xfk8Q~2xwOLJrXsZVpxTyX-qLSt4VFyuL0BWNcf2
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8022:8080"
     networks:

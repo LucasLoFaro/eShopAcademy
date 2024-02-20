@@ -9,14 +9,13 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-	<PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
 	<PackageReference Include="MassTransit.RabbitMQ" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Data\Stock.Data.csproj" />
-    <ProjectReference Include="..\Application\Stock.Application.csproj" />
-    <ProjectReference Include="..\Domain\Stock.Domain.csproj" />
+    <ProjectReference Include="..\Application\StockMS.Application.csproj" />
+    <ProjectReference Include="..\Domain\StockMS.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
 
-namespace Data
+
+namespace StockMS.Data
 {
-    public class StockDbContext: DbContext
+    public class StockDbContext : DbContext
     {
         public DbSet<Stock> Stocks { get; init; }
 

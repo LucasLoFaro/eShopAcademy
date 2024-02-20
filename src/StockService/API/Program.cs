@@ -1,8 +1,7 @@
 using Application.Managers;
-using Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using StockMS.Data;
 
 namespace API
 {

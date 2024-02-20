@@ -1,5 +1,4 @@
-﻿using Data;
-using Domain.DTOs;
+﻿using Domain.DTOs;
 using Domain.Entities;
 
 namespace Application.Managers

@@ -1,8 +1,8 @@
 ﻿using Application.IntegrationEvents.Messages;
-using Data;
 using Domain.DTOs;
 using Domain.Entities;
 using MassTransit;
+using StockMS.Data;
 
 namespace Application.Managers
 {

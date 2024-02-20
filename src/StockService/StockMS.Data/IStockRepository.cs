@@ -1,6 +1,6 @@
 ﻿using Domain.Entities;
 
-namespace Data
+namespace StockMS.Data
 {
     public interface IStockRepository
     {

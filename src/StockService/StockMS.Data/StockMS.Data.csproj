@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
-    <PackageReference Include="MongoDB.EntityFrameworkCore" Version="7.0.0-preview.1" />
+	  <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
+	  <PackageReference Include="MongoDB.EntityFrameworkCore" Version="7.0.0-preview.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StockService\Domain\Stock.Domain.csproj" />
+    <ProjectReference Include="..\Domain\StockMS.Domain.csproj" />
   </ItemGroup>
 
 </Project>

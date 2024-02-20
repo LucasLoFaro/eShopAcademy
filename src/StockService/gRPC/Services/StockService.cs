@@ -21,7 +21,7 @@ namespace gRPC.Services
 
         public override async Task GetAll(GetStockByProdGuidRequest request, IServerStreamWriter<StockModel> responseStream, ServerCallContext context)
         {
-            IReadOnlyList<Domain.Entities.Stock> stockList = await _stockManager.GetAllAsync();
+            IReadOnlyList<Stock> stockList = await _stockManager.GetAllAsync();
 
             foreach (var stock in stockList)
             {

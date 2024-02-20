@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Data\Stock.Data.csproj" />
+    <ProjectReference Include="..\Domain\StockMS.Domain.csproj" />
+    <ProjectReference Include="..\StockMS.Data\StockMS.Data.csproj" />
   </ItemGroup>
 
 </Project>

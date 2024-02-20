@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Stock.Application.csproj" />
+    <ProjectReference Include="..\Application\StockMS.Application.csproj" />
+    <ProjectReference Include="..\StockMS.Data\StockMS.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 using Application.Managers;
-using Data;
+using StockMS.Data;
 using gRPC.Services;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;

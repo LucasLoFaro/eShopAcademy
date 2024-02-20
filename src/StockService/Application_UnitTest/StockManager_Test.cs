@@ -1,5 +1,4 @@
-using Application.Managers;
-using Data;
+using StockMS.Data;
 
 namespace Application_UnitTest
 {

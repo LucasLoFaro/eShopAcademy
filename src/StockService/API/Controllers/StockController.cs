@@ -1,7 +1,9 @@
 ﻿using Application.Managers;
 using Domain.DTOs;
 using Domain.Entities;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Application.IntegrationEvents.Messages;
 
 namespace API.Controllers
 {
@@ -9,11 +11,13 @@ namespace API.Controllers
     [Route("api/stock")]
     public class StockController : ControllerBase
     {
-        public IStockManager _stockManager { get; }
+        private readonly IStockManager _stockManager;
+        private readonly IBus _bus;
 
-        public StockController(IStockManager stockManager)
+        public StockController(IStockManager stockManager, IBus bus)
         {
             _stockManager = stockManager;
+            _bus = bus;
         }
 
         [HttpGet]
@@ -26,7 +30,7 @@ namespace API.Controllers
         [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
         public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
         {
-            IEnumerable<Stock> stockAvailable = await _stockManager.GetByProductGuidAsync(productGuid);
+            IReadOnlyList<Stock> stockAvailable = await _stockManager.GetByProductGuidAsync(productGuid);
             
             if (stockAvailable == null) return NotFound("No stock available in warehouses");
 
@@ -52,6 +56,9 @@ namespace API.Controllers
             {
                 Stock stock = await _stockManager.IncreaseStock(alterStock);
 
+                StockChanged stockIntegrationMessage = new StockChanged(stock.ProductGuid, stock.Quantity, stock.Warehouse);
+                await _bus.Publish(stockIntegrationMessage);
+
                 return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                     , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }
                     , stock);
@@ -69,7 +76,11 @@ namespace API.Controllers
             try
             {
                 Stock stock = await _stockManager.DecreaseStock(alterStock);
-                
+
+                //TODO: Pasar esto adentro del manager
+                StockChanged stockIntegrationMessage = new StockChanged(stock.ProductGuid, stock.Quantity, stock.Warehouse);
+                await _bus.Publish(stockIntegrationMessage);
+
                 return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                     , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }
                     , stock);

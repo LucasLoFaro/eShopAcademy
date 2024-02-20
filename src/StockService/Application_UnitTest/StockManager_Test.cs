@@ -1,19 +1,55 @@
-﻿using Data;
-using Domain.DTOs;
-using Domain.Entities;
+using Application.Managers;
+using Data;
 
-namespace Application.Managers
+namespace Application_UnitTest
 {
-    //Contorller->Manager->Repository->Context
-    public class StockManager : IStockManager
+    public class Tests: TestHelper
     {
-        private readonly IStockRepository _stockRepository;
-
-        public StockManager(IStockRepository stockRepository)
+        [SetUp]
+        public void Setup()
         {
-            _stockRepository = stockRepository;
         }
 
+        [Test]
+        public void GetAllAsync_Ok()
+        {
+            //Arrange
+            string dbName = Guid.NewGuid().ToString();
+            StockDbContext context = ContextFactory(dbName);
+            StockRepository repository = new StockRepository(context);
+            StockManager stockManager = new StockManager(repository);
+
+            Assert.Pass();
+        }
+
+
+        [Test]
+        public void GetByProductGuidAsync_Ok()
+        {
+            Assert.Pass();
+        }
+
+
+        [Test]
+        public void GetByProductGuidAndWarehouseAsync_Ok()
+        {
+            Assert.Pass();
+        }
+
+
+        [Test]
+        public void IncreaseStock_Ok()
+        {
+            Assert.Pass();
+        }
+
+
+        [Test]
+        public void DecreaseStock_Ok()
+        {
+            Assert.Pass();
+        }
+        /*
 
         public async Task<IReadOnlyList<Stock>> GetAllAsync()
         {
@@ -77,5 +113,7 @@ namespace Application.Managers
 
             return stock;
         }
+
+        */
     }
 }

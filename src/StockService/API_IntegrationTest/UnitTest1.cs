@@ -1,4 +1,4 @@
-namespace API_Test
+namespace API_IntegrationTest
 {
     public class Tests
     {

@@ -1,5 +1,4 @@
 ﻿using Application.Managers;
-using Data;
 using Domain.DTOs;
 using Domain.Entities;
 using Google.Protobuf.WellKnownTypes;
@@ -33,6 +32,7 @@ namespace gRPC.Services
                     Quantity = stock.Quantity,
                     Warehouse = stock.Warehouse
                 };
+
                 //var productModel = _mapper.Map<ProductModel>(product);
                 await responseStream.WriteAsync(response);
             }

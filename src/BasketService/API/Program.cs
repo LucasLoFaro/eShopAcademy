@@ -1,6 +1,8 @@
+using Application.IntegrationEvents.Messages;
 using Data;
 using Data.Interfaces;
 using Domain.Entities;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("Database"));
 builder.Services.AddSingleton<DatabaseClient>();
 builder.Services.AddTransient<IBasketCache, BasketCache>();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<StockChanged>();
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+});
+builder.Services.AddMassTransitHostedService();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

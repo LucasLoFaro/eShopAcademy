@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Validators\" />
+    <PackageReference Include="MassTransit" Version="7.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
+    <ProjectReference Include="..\..\Data\Stock.Data.csproj" />
   </ItemGroup>
 
 </Project>

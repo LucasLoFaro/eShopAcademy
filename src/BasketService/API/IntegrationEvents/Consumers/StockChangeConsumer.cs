@@ -3,7 +3,7 @@ using MassTransit;
 
 namespace API.IntegrationEvents.Consumers
 {
-    public class StockChangedConsumer : IConsumer<StockChanged>
+    public class StockChangedConsumer : IConsumer<StockChangedEvent>
     {
         private readonly ILogger<StockChangedConsumer> _log;
         //private readonly BasketDbContext _context;
@@ -14,7 +14,7 @@ namespace API.IntegrationEvents.Consumers
             //_context = context;
         }
 
-        public async Task Consume(ConsumeContext<StockChanged> context)
+        public async Task Consume(ConsumeContext<StockChangedEvent> context)
         {
             _log.LogInformation("Nuevo evento: Precio actualizado del producto {0}.", context.Message.ProductGuid);
             _log.LogWarning("Nuevo Stock: {0}", context.Message.Quantity);

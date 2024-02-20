@@ -3,7 +3,6 @@ using Domain.DTOs;
 using Domain.Entities;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Application.IntegrationEvents.Messages;
 
 namespace API.Controllers
 {
@@ -12,12 +11,10 @@ namespace API.Controllers
     public class StockController : ControllerBase
     {
         private readonly IStockManager _stockManager;
-        private readonly IBus _bus;
 
-        public StockController(IStockManager stockManager, IBus bus)
+        public StockController(IStockManager stockManager)
         {
             _stockManager = stockManager;
-            _bus = bus;
         }
 
         [HttpGet]
@@ -56,9 +53,6 @@ namespace API.Controllers
             {
                 Stock stock = await _stockManager.IncreaseStock(alterStock);
 
-                StockChanged stockIntegrationMessage = new StockChanged(stock.ProductGuid, stock.Quantity, stock.Warehouse);
-                await _bus.Publish(stockIntegrationMessage);
-
                 return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                     , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }
                     , stock);
@@ -76,10 +70,6 @@ namespace API.Controllers
             try
             {
                 Stock stock = await _stockManager.DecreaseStock(alterStock);
-
-                //TODO: Pasar esto adentro del manager
-                StockChanged stockIntegrationMessage = new StockChanged(stock.ProductGuid, stock.Quantity, stock.Warehouse);
-                await _bus.Publish(stockIntegrationMessage);
 
                 return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                     , new { productGuid = stock.ProductGuid, warehouse = stock.Warehouse }

@@ -17,7 +17,7 @@ namespace Application_UnitTest
             string dbName = Guid.NewGuid().ToString();
             StockDbContext context = ContextFactory(dbName);
             StockRepository repository = new StockRepository(context);
-            StockManager stockManager = new StockManager(repository);
+            //StockManager stockManager = new StockManager(repository);
 
             Assert.Pass();
         }

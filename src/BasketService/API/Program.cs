@@ -14,7 +14,7 @@ builder.Services.AddTransient<IBasketCache, BasketCache>();
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<StockChanged>();
+    x.AddConsumer<StockChangedEvent>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureEndpoints(context);

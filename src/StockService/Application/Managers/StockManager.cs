@@ -1,6 +1,8 @@
-﻿using Data;
+﻿using Application.IntegrationEvents.Messages;
+using Data;
 using Domain.DTOs;
 using Domain.Entities;
+using MassTransit;
 
 namespace Application.Managers
 {
@@ -8,10 +10,12 @@ namespace Application.Managers
     public class StockManager : IStockManager
     {
         private readonly IStockRepository _stockRepository;
+        private readonly IBus _bus;
 
-        public StockManager(IStockRepository stockRepository)
+        public StockManager(IStockRepository stockRepository, IBus bus)
         {
             _stockRepository = stockRepository;
+            _bus = bus;
         }
 
 
@@ -55,6 +59,9 @@ namespace Application.Managers
                 await _stockRepository.UpdateAsync(stock);
             }
 
+            StockChangedEvent stockChangedEvent = new(stock.ProductGuid, stock.Quantity, stock.Warehouse);
+            await _bus.Publish(stockChangedEvent);
+
             return stock;
         }
 
@@ -74,6 +81,9 @@ namespace Application.Managers
 
             stock.Quantity -= alterStock.Quantity;
             await _stockRepository.UpdateAsync(stock);
+
+            StockChangedEvent stockIntegrationMessage = new StockChangedEvent(stock.ProductGuid, stock.Quantity, stock.Warehouse);
+            await _bus.Publish(stockIntegrationMessage);
 
             return stock;
         }

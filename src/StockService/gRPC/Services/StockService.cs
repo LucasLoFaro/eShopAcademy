@@ -21,7 +21,7 @@ namespace gRPC.Services
 
         public override async Task GetAll(GetStockByProdGuidRequest request, IServerStreamWriter<StockModel> responseStream, ServerCallContext context)
         {
-            IReadOnlyList<Stock> stockList = await _stockManager.GetAllAsync();
+            IReadOnlyList<Domain.Entities.Stock> stockList = await _stockManager.GetAllAsync();
 
             foreach (var stock in stockList)
             {
@@ -42,7 +42,7 @@ namespace gRPC.Services
         public override async Task<StockModel> GetStockByProductGuidAndWarehouse(GetStockByProdAndWarehouseRequest request, ServerCallContext context)
         {
 
-            Stock stock = await _stockManager.GetByProductGuidAndWarehouseAsync(request.ProductGuid, request.Warehouse);
+            var stock = await _stockManager.GetByProductGuidAndWarehouseAsync(request.ProductGuid, request.Warehouse);
 
             if (stock == null)
                 throw new RpcException(new Status(StatusCode.NotFound, $"Stock for Product with Guid={request.ProductGuid} was not found"));
@@ -70,7 +70,7 @@ namespace gRPC.Services
                     Warehouse = request.Warehouse
                 };
 
-                Stock stockAvailable = await _stockManager.IncreaseStock(alterStock);
+                var stockAvailable = await _stockManager.IncreaseStock(alterStock);
                 return new IncreaseStockResponse() { Success = true };
             }
             catch (ArgumentException)
@@ -91,7 +91,7 @@ namespace gRPC.Services
                     Warehouse = request.Warehouse
                 };
 
-                Stock stockAvailable = await _stockManager.DecreaseStock(alterStock);
+                var stockAvailable = await _stockManager.DecreaseStock(alterStock);
                 return new DecreaseStockResponse() { Success = true };
             }
             catch (ArgumentException)

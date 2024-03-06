@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+  cassandra:
+    build:
+      context: .
+      dockerfile: ProductCatalogService\Infrastructure\Data\docker\cassandra\Dockerfile
+    ports:
+      - "9042:9042"
+    networks:
+      - my-network
+  api:
+
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: ProductCatalogService/Presentation/API/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - cassandra
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

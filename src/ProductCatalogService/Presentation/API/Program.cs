@@ -16,9 +16,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
+builder.Services.AddSingleton<IProductsRepository, ProductsRepository>();
 builder.Services.AddSingleton<ICassandraDatabaseClient, DataStaxDatabaseClient>();
 builder.Services.AddSingleton<IDatabaseSettingsProvider, FileDataBaseSettings>();
+builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("products:Database"));
 
 var app = builder.Build();
 

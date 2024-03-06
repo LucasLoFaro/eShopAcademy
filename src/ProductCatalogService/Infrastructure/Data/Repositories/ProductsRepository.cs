@@ -3,6 +3,7 @@ using Domain.Entities;
 using Application.Interfaces.Data;
 using Data.Interfaces;
 using Cassandra.Mapping;
+using Cassandra.Data.Linq;
 
 namespace Data.Repositories
 {
@@ -10,32 +11,27 @@ namespace Data.Repositories
     public class ProductsRepository : IProductsRepository
     {
         ICassandraDatabaseClient _cassandraSessionProvider;
-        private readonly ISession _session;
+        private readonly Table<Product> _products;
         Mapper _mapper;
         public ProductsRepository(ICassandraDatabaseClient cassandraSessionProvider)
         {
             _cassandraSessionProvider = cassandraSessionProvider;
             _cassandraSessionProvider.OpenConnection();
-            _session = _cassandraSessionProvider.GetSession();
-            _mapper = new Mapper(_session);
+            _products = new Table<Product>(_cassandraSessionProvider.GetSession());
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            List<Product> products = _mapper.Fetch<Product>("SELECT * FROM Products").ToList();
-
-            return products;
+            return await _products.Select(p => p).ExecuteAsync();
         }
-        public async Task<Product> GetByIdAsync(string productId)
+        public async Task<Product> GetByIdAsync(Guid productId)
         {
-            IEnumerable<Product> products = _mapper.Fetch<Product>($"SELECT * FROM Products WHERE ProductId = ?", productId).ToList();
-
-            return products?.FirstOrDefault();
+            return await _products.Where(p => p.ProductId == productId).AllowFiltering().FirstOrDefault().ExecuteAsync(); //pending replace allowquery with corresponding query
         }
 
         public async Task AddAsync(Product product)
         {
-            await _mapper.InsertAsync(product);
+            await _products.Insert(product).ExecuteAsync();
         }
 
         public async Task UpdateAsync(string productId, Product updatedProduct)
@@ -47,12 +43,12 @@ namespace Data.Repositories
 
         public async Task DeleteAsync(Product product)
         {
-            await _mapper.DeleteAsync<Product>(product);
+            await _products.Where(p => p.ProductId == product.ProductId).AllowFiltering().Delete().ExecuteAsync();
         }
 
-        public Task<Product> GetMostExpensive()
+        public async Task<Product> GetMostExpensive()
         {
-            throw new NotImplementedException();
+            return await _products.OrderByDescending(p => p.Price).AllowFiltering().FirstOrDefault().ExecuteAsync();
         }
     }
 

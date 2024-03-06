@@ -9,25 +9,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProductCatalogService", "Pr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{E960B17B-F432-4ED8-80BE-0911D6F21109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPC", "ProductCatalogService\Presentation\gRPC\gRPC.csproj", "{100974FE-3453-4761-B641-E2CD659DED60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "ProductCatalogService\Presentation\gRPC\gRPC.csproj", "{100974FE-3453-4761-B641-E2CD659DED60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsProcessor", "ProductCatalogService\Presentation\EventsProcessor\EventsProcessor.csproj", "{3C8A9E59-05FF-406C-BA98-83BD4F8A50A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsProcessor", "ProductCatalogService\Presentation\EventsProcessor\EventsProcessor.csproj", "{3C8A9E59-05FF-406C-BA98-83BD4F8A50A3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F320CBBA-6ECE-424C-B34D-7E994E3389D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "ProductCatalogService\Core\Application\Application.csproj", "{E001A8E7-1280-42C6-9C2F-94B834B4CFC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "ProductCatalogService\Core\Application\Application.csproj", "{E001A8E7-1280-42C6-9C2F-94B834B4CFC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "ProductCatalogService\Core\Domain\Domain.csproj", "{65D72795-AF8B-41E9-ADB1-8361C06ABF52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "ProductCatalogService\Core\Domain\Domain.csproj", "{65D72795-AF8B-41E9-ADB1-8361C06ABF52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{D3FEACDA-081A-4CEC-92D0-97E7CF999800}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "ProductCatalogService\Infrastructure\Data\Data.csproj", "{8FD36207-38AC-4D3E-B715-0A8DD410C88E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "ProductCatalogService\Infrastructure\Data\Data.csproj", "{8FD36207-38AC-4D3E-B715-0A8DD410C88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "ProductCatalogService\Infrastructure\Services\Services.csproj", "{BAB0A0FB-DD8D-4A9A-9F01-BA89845B30BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "ProductCatalogService\Infrastructure\Services\Services.csproj", "{BAB0A0FB-DD8D-4A9A-9F01-BA89845B30BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B1C4C3B1-ACD0-49E3-88C7-2FB499255F50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "ProductCatalogService\Tests\Tests\Tests.csproj", "{68F29828-56D7-4470-901F-832633ADF39D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "ProductCatalogService\Tests\Tests\Tests.csproj", "{68F29828-56D7-4470-901F-832633ADF39D}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2C2EA5C9-53D0-4438-99E0-78FF09751C88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{68F29828-56D7-4470-901F-832633ADF39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68F29828-56D7-4470-901F-832633ADF39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68F29828-56D7-4470-901F-832633ADF39D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C2EA5C9-53D0-4438-99E0-78FF09751C88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C2EA5C9-53D0-4438-99E0-78FF09751C88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C2EA5C9-53D0-4438-99E0-78FF09751C88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2EA5C9-53D0-4438-99E0-78FF09751C88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

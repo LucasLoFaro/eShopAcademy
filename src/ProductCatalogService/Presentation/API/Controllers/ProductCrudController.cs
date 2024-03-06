@@ -37,11 +37,11 @@ namespace API.Controllers
 
         // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> Get(Guid id)
         {
             try
             {
-                return Ok(await _productsRepository.GetByIdAsync("id"));
+                return Ok(await _productsRepository.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace API.Controllers
 
         // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {

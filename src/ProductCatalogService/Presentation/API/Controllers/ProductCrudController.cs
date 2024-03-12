@@ -65,6 +65,7 @@ namespace API.Controllers
             try
             {
                 await _productsRepository.AddAsync(product);
+                
                 return StatusCode(StatusCodes.Status201Created, "Product created successfully");
             }
             catch (Exception ex)

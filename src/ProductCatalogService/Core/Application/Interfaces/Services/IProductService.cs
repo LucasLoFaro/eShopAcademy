@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.Data;
+using Domain.DTOs;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,6 @@ namespace Application.Interfaces.Services
     public interface IProductService
     {
         Task<Product> GetMostExpensiveProduct();
+        Task Create(ProductWithImage product);
     }
 }

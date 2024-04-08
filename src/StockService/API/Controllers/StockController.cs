@@ -24,9 +24,9 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
-        public async Task<ActionResult<IReadOnlyList<Domain.Entities.Stock>>> GetStockByProductGuid(string productGuid)
+        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
         {
-            IReadOnlyList<Domain.Entities.Stock> stockAvailable = await _stockManager.GetByProductGuidAsync(productGuid);
+            IReadOnlyList<Stock> stockAvailable = await _stockManager.GetByProductGuidAsync(productGuid);
             
             if (stockAvailable == null) return NotFound("No stock available in warehouses");
 
@@ -35,7 +35,7 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
-        public async Task<ActionResult<Domain.Entities.Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string warehouse)
+        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string warehouse)
         {
             var stock = await _stockManager.GetByProductGuidAndWarehouseAsync(productGuid, warehouse);
 

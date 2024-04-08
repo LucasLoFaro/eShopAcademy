@@ -13,6 +13,28 @@ services:
     volumes: 
       - rabbitmq:/var/lib/rabbitmq
 
+  mongo-db:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - ../mounth/mongo:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    ports:
+      - 27017:27017
+
+  redis:
+    image: redis
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../mounth/redis-data:/data  # Optional: Mount a volume for persistence 
+
+
 networks:
   eshopnet:
     name: eshopnet-network

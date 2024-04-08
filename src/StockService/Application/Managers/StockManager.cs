@@ -60,7 +60,7 @@ namespace Application.Managers
             }
 
             StockChangedEvent stockChangedEvent = new(stock.ProductGuid, stock.Quantity, stock.Warehouse);
-            await _bus.Publish(stockChangedEvent);
+            await _bus.Publish(stockChangedEvent, default);
 
             return stock;
         }

@@ -1,0 +1,28 @@
+Docker Compose
+docker-compose -f infrastructure.yml up
+
+
+https://stackoverflow.com/questions/60394290/mongo-db-docker-image-authentication-failed
+
+El problema es que se compartia volumen con otra base mongo instalada previamente. Cuando la de docker compose se montaba en el mismo punto, y definia el user root y su pass
+realmente este user no existia. Solo existia en las variables de entorno..
+Una solucion manual fue quitar estas variables de ambiente, volver a levantar el yml y luego entrar con mongosh, en este punto, el que entra lo hace como admin
+Luego, correr el comando para crear el usuario
+use admin
+db.createUser({user: "root", pwd: "root", roles:["root"]})
+
+Luego d eeso, se puede rehabilitar las variables de ambiente y subir y bajar el yml las veces que uno quiera.
+
+Otra solucion mas prolija es la de crear un script de inicializacion de usuario y base.
+
+
+
+Redis (Fuente: https://redis.io/docs/connect/cli/):
+
+Para entrar al shell de redis:
+\>redis-cli
+set Name pepe //graba una kv Name
+INCR myCounter  //incrementa un contador. Si no existe lo crea
+del Name   //borra la clave Name
+mset name1 luigi color green    //guarda multiples set
+mget Name color		//obtiene multiples claves

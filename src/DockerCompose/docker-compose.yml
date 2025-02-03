@@ -84,6 +84,8 @@ services:
   basket-db:
     container_name: basket-db
     image: redis
+    ports:
+      - "8014:6379"
     networks:
       - backend
     volumes:
@@ -107,6 +109,8 @@ services:
       - AZURE_CLIENT_ID=d7226736-7a38-493a-8a3c-40304c73a360
       - AZURE_CLIENT_SECRET=jfE8Q~JfRsMU5SV.jRE1T09r~NJT6A_8Nw-4xaq0
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+    ports:
+      - "8024:8080"
     networks:
       - backend
     depends_on:

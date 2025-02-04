@@ -1,0 +1,1037 @@
+{
+	"info": {
+		"_postman_id": "38cbb4b6-57be-4fb5-a849-53930ead065e",
+		"name": "eShopAcademy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6777735"
+	},
+	"item": [
+		{
+			"name": "Basket",
+			"item": [
+				{
+					"name": "/basket/clientId/add",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": \"facc151c-6753-4101-9035-e10cc34a38ab\",\n  \"quantity\": 3\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{basketBaseUrl}}/basket/clientId/add?clientID=facc151c-6753-4101-9035-e10cc34a38f3",
+							"host": [
+								"{{basketBaseUrl}}"
+							],
+							"path": [
+								"basket",
+								"clientId",
+								"add"
+							],
+							"query": [
+								{
+									"key": "clientID",
+									"value": "facc151c-6753-4101-9035-e10cc34a38f3",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"product\": {\n    \"id\": \"<uuid>\",\n    \"name\": \"<string>\",\n    \"price\": \"<double>\",\n    \"stock\": \"<integer>\"\n  },\n  \"quantity\": \"<integer>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/basket/clientId/add?clientID=<uuid>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"basket",
+										"clientId",
+										"add"
+									],
+									"query": [
+										{
+											"key": "clientID",
+											"value": "<uuid>",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/basket/clientId/remove",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": \"facc151c-6753-4101-9035-e10cc34a38ab\",\n  \"quantity\": 3\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{basketBaseUrl}}/basket/clientId/remove?clientID=facc151c-6753-4101-9035-e10cc34a38f3",
+							"host": [
+								"{{basketBaseUrl}}"
+							],
+							"path": [
+								"basket",
+								"clientId",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "clientID",
+									"value": "facc151c-6753-4101-9035-e10cc34a38f3",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"product\": {\n    \"id\": \"<uuid>\",\n    \"name\": \"<string>\",\n    \"price\": \"<double>\",\n    \"stock\": \"<integer>\"\n  },\n  \"quantity\": \"<integer>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/basket/clientId/remove?clientID=<uuid>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"basket",
+										"clientId",
+										"remove"
+									],
+									"query": [
+										{
+											"key": "clientID",
+											"value": "<uuid>",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/basket/clientId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{basketBaseUrl}}/basket/clientId?clientID=facc151c-6753-4101-9035-e10cc34a38f3",
+							"host": [
+								"{{basketBaseUrl}}"
+							],
+							"path": [
+								"basket",
+								"clientId"
+							],
+							"query": [
+								{
+									"key": "clientID",
+									"value": "facc151c-6753-4101-9035-e10cc34a38f3",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/basket/clientId?clientID=<uuid>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"basket",
+										"clientId"
+									],
+									"query": [
+										{
+											"key": "clientID",
+											"value": "<uuid>",
+											"description": "(Required) "
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Get product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product/:id",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<uuid>",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/product/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Remove a product by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product/:id",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "<uuid>",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/product/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get the most expensive product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product/MostExpensive",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product",
+								"MostExpensive"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/product/MostExpensive",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product",
+										"MostExpensive"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get all products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/product",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Create a product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"<string>\",\n  \"price\": \"<float>\",\n  \"id\": \"<uuid>\",\n  \"stock\": \"<integer>\",\n  \"description\": \"<string>\",\n  \"image\": \"<string>\",\n  \"categoryName\": \"<string>\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"<string>\",\n  \"price\": \"<float>\",\n  \"id\": \"<uuid>\",\n  \"stock\": \"<integer>\",\n  \"description\": \"<string>\",\n  \"image\": \"<string>\",\n  \"categoryName\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/product",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Modify a product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"<string>\",\n  \"price\": \"<float>\",\n  \"id\": \"<uuid>\",\n  \"stock\": \"<integer>\",\n  \"description\": \"<string>\",\n  \"image\": \"<string>\",\n  \"categoryName\": \"<string>\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseProductUrl}}/api/product",
+							"host": [
+								"{{baseProductUrl}}"
+							],
+							"path": [
+								"api",
+								"product"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"<string>\",\n  \"price\": \"<float>\",\n  \"id\": \"<uuid>\",\n  \"stock\": \"<integer>\",\n  \"description\": \"<string>\",\n  \"image\": \"<string>\",\n  \"categoryName\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/product",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"product"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Stock",
+			"item": [
+				{
+					"name": "Get Stock of a Product in all Warehouses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain"
+							}
+						],
+						"url": {
+							"raw": "{{baseStockUrl}}/api/stock/:productGuid",
+							"host": [
+								"{{baseStockUrl}}"
+							],
+							"path": [
+								"api",
+								"stock",
+								":productGuid"
+							],
+							"variable": [
+								{
+									"key": "productGuid",
+									"value": "<uuid>",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/plain"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/stock/:productGuid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"stock",
+										":productGuid"
+									],
+									"variable": [
+										{
+											"key": "productGuid"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"_id\": {\n      \"timestamp\": \"<integer>\",\n      \"machine\": \"<integer>\",\n      \"pid\": \"<integer>\",\n      \"increment\": \"<integer>\",\n      \"creationTime\": \"<dateTime>\"\n    },\n    \"productID\": \"<uuid>\",\n    \"quantity\": \"<integer>\",\n    \"warehouse\": \"<string>\"\n  },\n  {\n    \"_id\": {\n      \"timestamp\": \"<integer>\",\n      \"machine\": \"<integer>\",\n      \"pid\": \"<integer>\",\n      \"increment\": \"<integer>\",\n      \"creationTime\": \"<dateTime>\"\n    },\n    \"productID\": \"<uuid>\",\n    \"quantity\": \"<integer>\",\n    \"warehouse\": \"<string>\"\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get Stock of a Product in a Warehouse",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain"
+							}
+						],
+						"url": {
+							"raw": "{{baseStockUrl}}/api/stock/:productGuid/warehouse/:warehouse",
+							"host": [
+								"{{baseStockUrl}}"
+							],
+							"path": [
+								"api",
+								"stock",
+								":productGuid",
+								"warehouse",
+								":warehouse"
+							],
+							"variable": [
+								{
+									"key": "productGuid",
+									"value": "<uuid>",
+									"description": "(Required) "
+								},
+								{
+									"key": "warehouse",
+									"value": "<string>",
+									"description": "(Required) "
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/plain"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/stock/:productGuid/warehouse/:warehouse",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"stock",
+										":productGuid",
+										"warehouse",
+										":warehouse"
+									],
+									"variable": [
+										{
+											"key": "productGuid"
+										},
+										{
+											"key": "warehouse"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"_id\": {\n    \"timestamp\": \"<integer>\",\n    \"machine\": \"<integer>\",\n    \"pid\": \"<integer>\",\n    \"increment\": \"<integer>\",\n    \"creationTime\": \"<dateTime>\"\n  },\n  \"productID\": \"<uuid>\",\n  \"quantity\": \"<integer>\",\n  \"warehouse\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Increase Stock",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ProductGuid",
+									"value": "facc151c-6753-4101-9035-e10cc34a38ab",
+									"type": "text"
+								},
+								{
+									"key": "Quantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "Warehouse",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseStockUrl}}/api/stock/Increase",
+							"host": [
+								"{{baseStockUrl}}"
+							],
+							"path": [
+								"api",
+								"stock",
+								"Increase"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "multipart/form-data"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "ProductGuid",
+											"value": "<uuid>",
+											"type": "text"
+										},
+										{
+											"key": "Quantity",
+											"value": "<integer>",
+											"type": "text"
+										},
+										{
+											"key": "Warehouse",
+											"value": "<string>",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/stock/Increase",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"stock",
+										"Increase"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Decrease Stock",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ProductGuid",
+									"value": "facc151c-6753-4101-9035-e10cc34a38ab",
+									"type": "text"
+								},
+								{
+									"key": "Quantity",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "Warehouse",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseStockUrl}}/api/stock/Decrease",
+							"host": [
+								"{{baseStockUrl}}"
+							],
+							"path": [
+								"api",
+								"stock",
+								"Decrease"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "multipart/form-data"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "ProductGuid",
+											"value": "<uuid>",
+											"type": "text"
+										},
+										{
+											"key": "Quantity",
+											"value": "<integer>",
+											"type": "text"
+										},
+										{
+											"key": "Warehouse",
+											"value": "<string>",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/stock/Decrease",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"stock",
+										"Decrease"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Get Stock of All Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain"
+							}
+						],
+						"url": {
+							"raw": "{{baseStockUrl}}/api/stock",
+							"host": [
+								"{{baseStockUrl}}"
+							],
+							"path": [
+								"api",
+								"stock"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "text/plain"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/stock",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"stock"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"_id\": {\n      \"timestamp\": \"<integer>\",\n      \"machine\": \"<integer>\",\n      \"pid\": \"<integer>\",\n      \"increment\": \"<integer>\",\n      \"creationTime\": \"<dateTime>\"\n    },\n    \"productID\": \"<uuid>\",\n    \"quantity\": \"<integer>\",\n    \"warehouse\": \"<string>\"\n  },\n  {\n    \"_id\": {\n      \"timestamp\": \"<integer>\",\n      \"machine\": \"<integer>\",\n      \"pid\": \"<integer>\",\n      \"increment\": \"<integer>\",\n      \"creationTime\": \"<dateTime>\"\n    },\n    \"productID\": \"<uuid>\",\n    \"quantity\": \"<integer>\",\n    \"warehouse\": \"<string>\"\n  }\n]"
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "basketBaseUrl",
+			"value": "http://localhost:8004",
+			"type": "string"
+		},
+		{
+			"key": "baseProductUrl",
+			"value": "http://localhost:8001",
+			"type": "string"
+		},
+		{
+			"key": "baseStockUrl",
+			"value": "http://localhost:8002",
+			"type": "string"
+		}
+	]
+}

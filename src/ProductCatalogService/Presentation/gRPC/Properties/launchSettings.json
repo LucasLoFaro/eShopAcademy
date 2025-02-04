@@ -24,6 +24,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-grpc",
       "publishAllPorts": true
     }
   },

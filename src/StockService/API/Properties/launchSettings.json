@@ -28,6 +28,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=stock-api",
       "publishAllPorts": true,
       "useSSL": true
     }

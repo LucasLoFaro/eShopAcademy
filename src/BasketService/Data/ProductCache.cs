@@ -28,11 +28,13 @@ namespace Data
             };
 
             await _cache.HashSetAsync(PRODUCT_PREFIX + product.ID.ToString(), productHash);
+            Console.WriteLine($"Product {product.Name} updated in cache.");
             return true;
         }
         public async Task<bool> UpdateProductStock(AlterStockDTO stock)
         {
             await _cache.HashSetAsync(PRODUCT_PREFIX + stock.ProductGuid.ToString(),new RedisValue("Stock"), stock.Quantity);
+            Console.WriteLine($"Stock of {stock.ProductGuid} updated in cache.");
             return true;
         }
     }

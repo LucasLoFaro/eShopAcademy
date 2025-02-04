@@ -39,7 +39,6 @@ namespace API.Controllers
 
         [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
         public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, String warehouse)
-        //public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, Warehouse warehouse)
         {
             Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(productGuid, warehouse);
 
@@ -72,7 +71,7 @@ namespace API.Controllers
             }
 
             // Todo:Add automapper
-            _messaging.SendStockUpdate(new AlterStockDTO()
+            await _messaging.SendStockUpdate(new AlterStockDTO()
             {
                 ProductGuid = stock.ProductID,
                 Quantity = stock.Quantity,
@@ -98,7 +97,7 @@ namespace API.Controllers
             await _stockRepository.UpdateAsync(stock);
 
             // Todo:Add automapper
-            _messaging.SendStockUpdate(new AlterStockDTO()
+            await _messaging.SendStockUpdate(new AlterStockDTO()
             {
                 ProductGuid = stock.ProductID,
                 Quantity = stock.Quantity,

@@ -16,35 +16,42 @@ namespace Data
             _cache = database.GetDatabase();
         }
 
-        public async Task<Basket> GetBasketByClientId(Guid clientId)
+        public async Task<BasketWithDetails> GetBasketLoadedByClientId(Guid clientId)
         {
             Basket? basket;
             try
             {
                 var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
-                basket = JsonSerializer.Deserialize<Basket>(json);
+                basket = JsonSerializer.Deserialize<Basket>(json!)!;
             }
             catch (Exception)
             {
                 Console.WriteLine($"There was an issue while retrieving basket {clientId} from cache.", clientId);
-                return null;
+                return null!;
             }
+
 
             // Accumulate all product queries in a single bulk db interaction
             var batch = _cache.CreateBatch();
             var productTasks = new Dictionary<Guid, Task<HashEntry[]>>();
 
+            BasketWithDetails basketWithDetails = new() { ClientID = basket.ClientID };
             foreach (var item in basket.Items)
             {
-                // First initialize it with default/zero values
-                item.Product = new Product {
-                    ID = item.Product.ID,
-                    Name = "",
-                    Price = 0,
-                    Stock = 0
-                };
-                // Then query the actual name and price values from the products collection
-                productTasks[item.Product.ID] = batch.HashGetAllAsync(PRODUCT_PREFIX + item.Product.ID);
+                // First initialize products list it with default/zero values
+                basketWithDetails.Items.Add(new() { 
+                    Product = new()
+                    {
+                        ID = item.ProductID,
+                        Name = "",
+                        Price = 0,
+                        Stock = 0
+                    }, 
+                    Quantity = item.Quantity
+                });
+
+                // Then query the actual name and price values from the products collection all at once
+                productTasks[item.ProductID] = batch.HashGetAllAsync(PRODUCT_PREFIX + item.ProductID);
             }
 
             // Run all queries at once and wait for all of them to finish.
@@ -52,7 +59,7 @@ namespace Data
             await Task.WhenAll(productTasks.Values);
 
             // Load the actual name and price values in each item
-            foreach (var item in basket.Items)
+            foreach (var item in basketWithDetails.Items)
             {
                 var productHash = productTasks[item.Product.ID].Result;
                 if(productHash != null)
@@ -64,7 +71,21 @@ namespace Data
                 }                
             }
 
-            return basket;
+            return basketWithDetails;
+        }
+
+        public async Task<Basket> GetBasketByClientId(Guid clientId)
+        {
+            try
+            {
+                var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
+                return JsonSerializer.Deserialize<Basket>(json!)!;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"There was an issue while retrieving basket {clientId} from cache.", clientId);
+                return null!;
+            }
         }
 
         //ToDo: Check stock before adding to basket
@@ -81,7 +102,7 @@ namespace Data
             }
             else
             {
-                var existingItem = basket.Items.FirstOrDefault(i => i.Product.ID == item.Product.ID);
+                var existingItem = basket.Items.FirstOrDefault(i => i.ProductID == item.ProductID);
                 if (existingItem != null)
                     existingItem.Quantity += item.Quantity;
                 else
@@ -102,11 +123,11 @@ namespace Data
         }
         public async Task<bool> RemoveProductFromBasket(Guid clientId, Item item)
         {
-            var basket = await GetBasketByClientId(clientId);
+            var basket = await GetBasketLoadedByClientId(clientId);
             if (basket == null)
                 return false;
 
-            var existingItem = basket.Items.FirstOrDefault(i => i.Product.ID == item.Product.ID);
+            var existingItem = basket.Items.FirstOrDefault(i => i.Product.ID == item.ProductID);
             if (existingItem == null)
                 return false;
             

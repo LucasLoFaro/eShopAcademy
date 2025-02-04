@@ -11,7 +11,7 @@ COPY ["BasketService/EventsProcessor/EventsProcessor/EventsProcessor.csproj", "B
 COPY ["ProductCatalogService/Core/Domain/Domain.csproj", "ProductCatalogService/Core/Domain/"]
 COPY ["BasketService/Data/Data.csproj", "BasketService/Data/"]
 COPY ["BasketService/Domain/Domain.csproj", "BasketService/Domain/"]
-RUN dotnet restore "./BasketService/EventsProcessor/EventsProcessor/./EventsProcessor.csproj"
+RUN dotnet restore "./BasketService/EventsProcessor/EventsProcessor/EventsProcessor.csproj"
 COPY . .
 WORKDIR "/src/BasketService/EventsProcessor/EventsProcessor"
 RUN dotnet build "./EventsProcessor.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -20,7 +20,8 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./EventsProcessor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "EventsProcessor.dll"]
+
+ENTRYPOINT ["dotnet", "EventsProcessor.dll"].

@@ -33,7 +33,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketCache basketRepository) =>
 {
-    var basket = await basketRepository.GetBasketByClientId(clientID);
+    var basket = await basketRepository.GetBasketLoadedByClientId(clientID);
     return basket != null ? Results.Ok(basket) : Results.NotFound();
 });
 

@@ -20,7 +20,6 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
         "ASPNETCORE_HTTP_PORTS": "8080",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AZURE_CLIENT_ID": "facc151c-6753-4101-9035-e10cc34a38f3",
@@ -29,8 +28,8 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "publishAllPorts": true,
-      "useSSL": true
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-api",
+      "publishAllPorts": true
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json"

@@ -1,5 +1,4 @@
 name: eshopacademy
-version: '3.4'
 
 services:
 
@@ -8,8 +7,8 @@ services:
     container_name: product-api
     image: product-api
     build:
-      context: .
-      dockerfile: ../ProductCatalogService/Presentation/API/Dockerfile
+      context: ..
+      dockerfile: ProductCatalogService/Presentation/API/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -36,27 +35,27 @@ services:
     networks:
       - backend
 
-  product-grpc:
-    container_name: product-grpc
-    image: product-grpc
-    build:
-      context: .
-      dockerfile: ../ProductCatalogService/Presentation/gRPC/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - KEYVAULT=eshopacademy
-      - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=facc151c-6753-4101-9035-e10cc34a38f3
-      - AZURE_CLIENT_SECRET=Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3
-      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
-    ports:
-      - "8021:8080"
-    networks:
-      - backend
-    depends_on:
-      - product-db
-      - rabbitmq
+  # product-grpc:
+  #   container_name: product-grpc
+  #   image: product-grpc
+  #   build:
+  #     context: ..
+  #     dockerfile: ProductCatalogService/Presentation/gRPC/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - KEYVAULT=eshopacademy
+  #     - APPCONFIGURATION=eshopacademy
+  #     - AZURE_CLIENT_ID=facc151c-6753-4101-9035-e10cc34a38f3
+  #     - AZURE_CLIENT_SECRET=Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3
+  #     - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+  #   ports:
+  #     - "8021:8080"
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #     - product-db
+  #     - rabbitmq
 
 
 # Basket Service
@@ -64,8 +63,8 @@ services:
     container_name: basket-api
     image: basket-api
     build:
-      context: .
-      dockerfile: ../BasketService/API/Dockerfile
+      context: ..
+      dockerfile: BasketService/API/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -88,8 +87,6 @@ services:
       - "8014:6379"
     networks:
       - backend
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -102,8 +99,8 @@ services:
     container_name: basket-processor
     image: basket-processor
     build:
-      context: .
-      dockerfile: ../BasketService/EventsProcessor/EventsProcessor/Dockerfile
+      context: ..
+      dockerfile: BasketService/EventsProcessor/EventsProcessor/Dockerfile
     environment:
       - DOTNET_ENVIRONMENT=Development
       - KEYVAULT=eshopacademy
@@ -155,27 +152,27 @@ services:
     ports:
       - "8012:27017"
 
-  stock-grpc:
-    container_name: stock-grpc
-    image: stock-grpc
-    build:
-      context: ..
-      dockerfile: StockService/gRPC/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - KEYVAULT=eshopacademy
-      - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=f8414e0b-f3fc-417e-9579-dcf2522d012f
-      - AZURE_CLIENT_SECRET=5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW
-      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
-    ports:
-      - "8022:8080"
-    networks:
-      - backend
-    depends_on:
-      - stock-db
-      - rabbitmq
+  # stock-grpc:
+  #   container_name: stock-grpc
+  #   image: stock-grpc
+  #   build:
+  #     context: ...
+  #     dockerfile: StockService/gRPC/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_HTTP_PORTS=8080
+  #     - KEYVAULT=eshopacademy
+  #     - APPCONFIGURATION=eshopacademy
+  #     - AZURE_CLIENT_ID=f8414e0b-f3fc-417e-9579-dcf2522d012f
+  #     - AZURE_CLIENT_SECRET=5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW
+  #     - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+  #   ports:
+  #     - "8022:8080"
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #     - stock-db
+  #     - rabbitmq
 
 # Order Service
   #order-api:
@@ -261,4 +258,5 @@ volumes:
   
 networks:
   backend:
+    driver: bridge
   

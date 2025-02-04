@@ -15,8 +15,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=5e6023bb-fc90-4cd5-83b8-c503da5f2c59
-      - AZURE_CLIENT_SECRET=GSD8Q~EoxyueAtyR9MHaymFnx1L1bm-ysbEetcm.
+      - AZURE_CLIENT_ID=facc151c-6753-4101-9035-e10cc34a38f3
+      - AZURE_CLIENT_SECRET=Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8001:8080"
@@ -47,8 +47,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=bddb1a06-cfd9-4524-bfde-7f4d4d485288
-      - AZURE_CLIENT_SECRET=XvV8Q~kdKRmlp.jx~VVuUm4jyTnh2rtm1b5Jlc.W
+      - AZURE_CLIENT_ID=facc151c-6753-4101-9035-e10cc34a38f3
+      - AZURE_CLIENT_SECRET=Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8021:8080"
@@ -71,8 +71,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=27f4c9a6-b8b1-444a-89f4-aa0af25967eb
-      - AZURE_CLIENT_SECRET=rMZ8Q~Ho0DtF2D9Wk.oZ4bXQYXEJWEB4rMGlIbJt
+      - AZURE_CLIENT_ID=3bef33a0-5cd1-49b3-ab3b-2291145e3f2c
+      - AZURE_CLIENT_SECRET=DQe8Q~K8gDgM3vHpokpgrW3lD8au~igTkZQCxape
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8004:8080"
@@ -88,6 +88,8 @@ services:
       - "8014:6379"
     networks:
       - backend
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -106,8 +108,8 @@ services:
       - DOTNET_ENVIRONMENT=Development
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=d7226736-7a38-493a-8a3c-40304c73a360
-      - AZURE_CLIENT_SECRET=jfE8Q~JfRsMU5SV.jRE1T09r~NJT6A_8Nw-4xaq0
+      - AZURE_CLIENT_ID=3bef33a0-5cd1-49b3-ab3b-2291145e3f2c
+      - AZURE_CLIENT_SECRET=DQe8Q~K8gDgM3vHpokpgrW3lD8au~igTkZQCxape
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8024:8080"
@@ -129,8 +131,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=0df6486c-5f73-43ea-acb9-2e8a1a1ed6b3
-      - AZURE_CLIENT_SECRET=f_R8Q~xlJn0Epd7gfvVfzy~zfZpfiiTl-0h.4aEE
+      - AZURE_CLIENT_ID=f8414e0b-f3fc-417e-9579-dcf2522d012f
+      - AZURE_CLIENT_SECRET=5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8002:8080"
@@ -164,8 +166,8 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - KEYVAULT=eshopacademy
       - APPCONFIGURATION=eshopacademy
-      - AZURE_CLIENT_ID=f30904f9-ae20-4f3e-b8ed-da3751283fc0
-      - AZURE_CLIENT_SECRET=Xfk8Q~2xwOLJrXsZVpxTyX-qLSt4VFyuL0BWNcf2
+      - AZURE_CLIENT_ID=f8414e0b-f3fc-417e-9579-dcf2522d012f
+      - AZURE_CLIENT_SECRET=5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW
       - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
     ports:
       - "8022:8080"
@@ -176,6 +178,16 @@ services:
       - rabbitmq
 
 # Order Service
+  #order-api:
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_HTTP_PORTS=8080
+    #   - KEYVAULT=eshopacademy
+    #   - APPCONFIGURATION=eshopacademy
+    #   - AZURE_CLIENT_ID=31234358-e1e6-40e9-82fe-363a97801e4e
+    #   - AZURE_CLIENT_SECRET=piI8Q~iaVPv30ukYTzBXKUi4FTaxoxglI4.Buapp
+    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
   order-db:
     container_name: order-db
     image: postgres
@@ -189,6 +201,43 @@ services:
     networks:
       - backend
 
+
+# Payment Service
+  #payment-grpc
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_HTTP_PORTS=8080
+    #   - KEYVAULT=eshopacademy
+    #   - APPCONFIGURATION=eshopacademy
+    #   - AZURE_CLIENT_ID=4ac9deea-ea6d-4794-8414-dfae912b50a2
+    #   - AZURE_CLIENT_SECRET=gM88Q~-WrvT.yyZA8exq~kC6ydUTQqBZWDPioaEx
+    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
+
+# Notification Service
+  #notification-processor
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_HTTP_PORTS=8080
+    #   - KEYVAULT=eshopacademy
+    #   - APPCONFIGURATION=eshopacademy
+    #   - AZURE_CLIENT_ID=9f12ad1b-0f88-4a7b-aa38-f1590b9137e3
+    #   - AZURE_CLIENT_SECRET=NsA8Q~49rqxcw_OyUxjREY~UQfV4unrj6i5hHdpb
+    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
+
+# API Gateway
+  #gateway-api
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_HTTP_PORTS=8080
+    #   - KEYVAULT=eshopacademy
+    #   - APPCONFIGURATION=eshopacademy
+    #   - AZURE_CLIENT_ID=a99cca94-1c53-4565-b482-06fe21eea113
+    #   - AZURE_CLIENT_SECRET=ct~8Q~TpjNLCXhVfNLzVnybFt2bgNIDgKR1CtcNm
+    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
+    
 # Infrastructure
   rabbitmq:
     container_name: rabbitmq

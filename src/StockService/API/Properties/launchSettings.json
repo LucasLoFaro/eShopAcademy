@@ -5,48 +5,32 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
+        "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
+        "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
+        "APPCONFIGURATION": "eShopAcademy",
+        "KEYVAULT": "eShopAcademy"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5223"
-    },
-    "https": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7084;http://localhost:5223"
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
     },
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080",
         "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
+        "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
+        "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
+        "APPCONFIGURATION": "eShopAcademy",
+        "KEYVAULT": "eShopAcademy"
       },
       "publishAllPorts": true,
       "useSSL": true
     }
   },
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:1268",
-      "sslPort": 44304
-    }
-  }
+  "$schema": "http://json.schemastore.org/launchsettings.json"
 }

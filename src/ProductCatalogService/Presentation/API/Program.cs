@@ -20,7 +20,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     options.Connect(
         new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
         new DefaultAzureCredential())
-    .ConfigureKeyVault(kv =>{kv.SetCredential(new DefaultAzureCredential());})
+    .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
     .Select("common:*", LabelFilter.Null)
     .Select("product:*", LabelFilter.Null)
     );

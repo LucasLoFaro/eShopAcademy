@@ -1,10 +1,11 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Infrastructure.Services.Interfaces;
 using Infrastructure.Services.Settings;
+using Microsoft.EntityFrameworkCore;
 using Infrastructure.Services;
 using Infrastructure.Data;
 using Azure.Identity;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+
 
 
 namespace API
@@ -29,8 +30,8 @@ namespace API
             builder.Services.AddSwaggerGen();
 
             // Add services to the container.
-            // TODO: Incorporar AutoMapper
-            // TODO: Incorporar Serilog
+            // TODO: Add AutoMapper
+            // TODO: Add Serilog
             builder.Services.AddDbContext<StockDbContext>(options =>
                 options.UseMongoDB(builder.Configuration["stock:ConnectionStrings:MongoDB"], "eShopAcademy")
             );

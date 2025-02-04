@@ -4,12 +4,25 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
+        "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
+        "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
+        "APPCONFIGURATION": "eShopAcademy",
+        "KEYVAULT": "eShopAcademy"
       },
       "applicationUrl": "https://localhost:52572;http://localhost:52573"
     },
     "Docker": {
-      "commandName": "Docker"
+      "commandName": "Docker",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
+        "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
+        "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
+        "APPCONFIGURATION": "eShopAcademy",
+        "KEYVAULT": "eShopAcademy"
+      }
     }
   }
 }

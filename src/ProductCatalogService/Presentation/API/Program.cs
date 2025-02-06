@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Azure.Identity;
-using Core.Application.Interfaces.Data;
 using Core.Application.Interfaces.Services;
-using Core.Application.Services;
-using Data;
-using Data.Interfaces;
-using Data.Repositories;
-using Data.Settings;
-using Infrastructure.Services;
+using Core.Application.Interfaces.Data;
 using Infrastructure.Services.Settings;
+using Core.Application.Services;
+using Infrastructure.Services;
+using Data.Repositories;
+using Data.Interfaces;
+using Azure.Identity;
+using Data.Settings;
+using Data;
 
 
 var builder = WebApplication.CreateBuilder(args);

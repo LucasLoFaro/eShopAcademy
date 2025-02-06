@@ -2,8 +2,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Infrastructure.Services.Interfaces;
 using Infrastructure.Services.Settings;
 using Microsoft.EntityFrameworkCore;
-using Azure.Messaging.ServiceBus;
-using Infrastructure.Services;
 using Infrastructure.Data;
 using Azure.Identity;
 

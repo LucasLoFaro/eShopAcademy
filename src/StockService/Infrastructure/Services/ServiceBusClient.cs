@@ -1,11 +1,10 @@
-﻿using MassTransit;
-using Azure.Messaging.ServiceBus;
-using Azure.Identity;
-using Microsoft.Extensions.Options;
-using Infrastructure.Services.Interfaces;
-using Core.Domain.DTOs;
-using Core.Domain.Events;
+﻿using Infrastructure.Services.Interfaces;
 using Infrastructure.Services.Settings;
+using Microsoft.Extensions.Options;
+using Core.Domain.Events;
+using Core.Domain.DTOs;
+using Azure.Identity;
+using MassTransit;
 
 
 namespace Infrastructure.Services;

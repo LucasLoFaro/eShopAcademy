@@ -31,7 +31,7 @@ builder.Services.AddSingleton<ICassandraDatabaseClient, DataStaxDatabaseClient>(
 builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("common:RabbitMQSettings"));
-builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
+//builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
 
 var app = builder.Build();
 app.UseSwagger();

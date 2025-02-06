@@ -9,13 +9,13 @@ namespace Core.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductsRepository _productsRepository;
-        private readonly IMessagingServiceClient _messaging;
+        //private readonly IMessagingServiceClient _messaging;
 
 
-        public ProductService(IProductsRepository productsRepository, IMessagingServiceClient messagingServiceClient)
+        public ProductService(IProductsRepository productsRepository)//, IMessagingServiceClient messagingServiceClient)
         {
             _productsRepository = productsRepository;
-            _messaging = messagingServiceClient;
+            //_messaging = messagingServiceClient;
         }
 
         public async Task<IEnumerable<Product>> GetAllAsync()
@@ -36,13 +36,13 @@ namespace Core.Application.Services
         public async Task AddOrUpdateAsync(Product product)
         {
             await _productsRepository.AddAsync(product);
-            await _messaging.SendProductUpdate(product);
+            //await _messaging.SendProductUpdate(product);
         }
 
         public async Task DeleteAsync(Product product)
         {
             await _productsRepository.DeleteAsync(product);
-            await _messaging.SendProductDelete(product);
+            //await _messaging.SendProductDelete(product);
 
         }
     }

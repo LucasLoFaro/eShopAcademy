@@ -11,12 +11,12 @@ namespace API.Controllers
     public class StockController : ControllerBase
     {
         public IStockRepository _stockRepository { get; }
-        private readonly IMessagingServiceClient _messaging;
+        //private readonly IMessagingServiceClient _messaging;
 
-        public StockController(IStockRepository stockRepository, IMessagingServiceClient messagingServiceClient)
+        public StockController(IStockRepository stockRepository)//, IMessagingServiceClient messagingServiceClient)
         {
             _stockRepository = stockRepository;
-            _messaging = messagingServiceClient;
+            //_messaging = messagingServiceClient;
         }
 
         [HttpGet]
@@ -71,12 +71,12 @@ namespace API.Controllers
             }
 
             // Todo:Add automapper
-            await _messaging.SendStockUpdate(new AlterStockDTO()
-            {
-                ProductGuid = stock.ProductID,
-                Quantity = stock.Quantity,
-                Warehouse = stock.Warehouse
-            });
+            //await _messaging.SendStockUpdate(new AlterStockDTO()
+            //{
+            //    ProductGuid = stock.ProductID,
+            //    Quantity = stock.Quantity,
+            //    Warehouse = stock.Warehouse
+            //});
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                 ,new { productGuid = stock.ProductID, warehouse = stock.Warehouse}
                 , stock);
@@ -97,12 +97,12 @@ namespace API.Controllers
             await _stockRepository.UpdateAsync(stock);
 
             // Todo:Add automapper
-            await _messaging.SendStockUpdate(new AlterStockDTO()
-            {
-                ProductGuid = stock.ProductID,
-                Quantity = stock.Quantity,
-                Warehouse = stock.Warehouse
-            });
+            //await _messaging.SendStockUpdate(new AlterStockDTO()
+            //{
+            //    ProductGuid = stock.ProductID,
+            //    Quantity = stock.Quantity,
+            //    Warehouse = stock.Warehouse
+            //});
 
             return new CreatedAtRouteResult($"GetStockByProductGuidAndWarehouse"
                 , new { productGuid = stock.ProductID, warehouse = stock.Warehouse }

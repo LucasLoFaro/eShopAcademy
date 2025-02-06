@@ -65,9 +65,9 @@ namespace Data
                 if(productHash != null)
                 {
                     // ToDo: Add validation and encapsulate in automapper
-                    item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString();
-                    item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString());
-                    item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString());
+                    item.Product.Name = productHash.First(h => h.Name == "Name").ToString() ?? "";
+                    item.Product.Price = Convert.ToDouble(productHash.First(h => h.Name == "Price").Value.ToString() ?? "0");
+                    item.Product.Stock = Convert.ToInt32(productHash.First(h => h.Name == "Stock").Value.ToString() ?? "0");
                 }                
             }
 

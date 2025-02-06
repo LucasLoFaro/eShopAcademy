@@ -210,6 +210,17 @@ services:
     #   - AZURE_CLIENT_SECRET=gM88Q~-WrvT.yyZA8exq~kC6ydUTQqBZWDPioaEx
     #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
 
+# Shipping Service
+  #shipping-grpc
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_HTTP_PORTS=8080
+    #   - KEYVAULT=eshopacademy
+    #   - APPCONFIGURATION=eshopacademy
+    #   - AZURE_CLIENT_ID=bdcf29bc-ebed-428f-9b86-e3d84d9a2314
+    #   - AZURE_CLIENT_SECRET=ceL8Q~xXDZOCEjzSCB16Gv-cpDQxy7iKNcT6-cxX
+    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
 
 # Notification Service
   #notification-processor
@@ -248,6 +259,12 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
  
+
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: ..
+      dockerfile: OrderService/Presentation/API/Dockerfile
 
 volumes:
   redis_data:

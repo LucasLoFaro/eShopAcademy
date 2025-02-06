@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service ShippingGrpc {
+  rpc ProcessShipping (ShippingRequest) returns (ShippingResponse);
+}
+
+message ShippingRequest {
+  string orderId = 1;
+  string address = 2;
+}
+
+message ShippingResponse {
+  bool success = 1;
+  string trackingNumber = 2;
+}

@@ -1,34 +1,35 @@
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Azure.Messaging.ServiceBus;
+using EventsProcessor.Consumers;
+using Data.Interfaces;
+using Azure.Identity;
 using MassTransit;
 using Settings;
-using AutoMapper;
-using Data.Interfaces;
 using Data;
-using EventsProcessor.Consumers;
-using Azure.Identity;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+
 
 var builder = Host.CreateApplicationBuilder(args);
+
+var credential = new DefaultAzureCredential();
 
 builder.Configuration.AddAzureAppConfiguration(options =>
     options.Connect(
         new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
         new DefaultAzureCredential())
-    .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
+    .ConfigureKeyVault(kv => { kv.SetCredential(credential); })
     .Select("common:*", LabelFilter.Null)
     .Select("basket:*", LabelFilter.Null)
     );
 
-var settings = builder.Configuration.GetSection("common:RabbitMQSettings").Get<RabbitMQSettings>();
+var sbSettings = builder.Configuration.GetSection("common:ServiceBusSettings").Get<ServiceBusSettings>();
+var sbClient = new ServiceBusClient($"sb://{sbSettings!.Host}/", credential);
+
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<ProductsEventConsumer>();
     x.AddConsumer<StockEventConsumer>();
-    x.UsingRabbitMq((context, cfg) =>
+    x.UsingAzureServiceBus((context, cfg) =>
     {
-        cfg.Host(settings.Host, "/", h =>
-        {
-            h.Username(settings.Username);
-            h.Password(settings.Password);
-        });
+        cfg.Host((ServiceBusHostSettings) sbClient);
         cfg.ReceiveEndpoint("products-updated", e =>
         {
             e.ConfigureConsumer<ProductsEventConsumer>(context);

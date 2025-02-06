@@ -37,7 +37,7 @@ namespace API
             );
             builder.Services.AddScoped<IStockRepository, StockRepository>();
             builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("common:RabbitMQSettings"));
-            builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
+            //builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
 
             var app = builder.Build();
             app.UseSwagger();

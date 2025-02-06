@@ -23,7 +23,7 @@
 //            });
 //            _bus.Start();
 //        }
-        
+
 //        public async Task SendProductUpdate(Product product)
 //        {
 //            await _bus.Publish(new ProductUpdatedEvent()

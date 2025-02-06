@@ -2,9 +2,11 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Infrastructure.Services.Interfaces;
 using Infrastructure.Services.Settings;
 using Microsoft.EntityFrameworkCore;
+using Azure.Messaging.ServiceBus;
 using Infrastructure.Services;
 using Infrastructure.Data;
 using Azure.Identity;
+
 
 
 
@@ -36,8 +38,8 @@ namespace API
                 options.UseMongoDB(builder.Configuration["stock:ConnectionStrings:MongoDB"], "eShopAcademy")
             );
             builder.Services.AddScoped<IStockRepository, StockRepository>();
-            builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("common:RabbitMQSettings"));
-            //builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
+            builder.Services.Configure<ServiceBusSettings>(builder.Configuration.GetSection("common:ServiceBusSettings"));
+            builder.Services.AddTransient<IMessagingServiceClient, Infrastructure.Services.ServiceBusClient>();
 
             var app = builder.Build();
             app.UseSwagger();

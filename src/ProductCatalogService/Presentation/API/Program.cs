@@ -7,8 +7,8 @@ using Data;
 using Data.Interfaces;
 using Data.Repositories;
 using Data.Settings;
-using Services;
-using Services.Settings;
+using Infrastructure.Services;
+using Infrastructure.Services.Settings;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,8 +30,8 @@ builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("p
 builder.Services.AddSingleton<ICassandraDatabaseClient, DataStaxDatabaseClient>();
 builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
-builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("common:RabbitMQSettings"));
-//builder.Services.AddTransient<IMessagingServiceClient, RabbitMQClient>();
+builder.Services.Configure<ServiceBusSettings>(builder.Configuration.GetSection("common:ServiceBusSettings"));
+builder.Services.AddTransient<IMessagingServiceClient, ServiceBusClient>();
 
 var app = builder.Build();
 app.UseSwagger();

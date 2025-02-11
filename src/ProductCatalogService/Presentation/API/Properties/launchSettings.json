@@ -13,7 +13,7 @@
         "KEYVAULT": "eShopAcademy"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5139"
+      "applicationUrl": "http://localhost:8001"
     },
     "Docker": {
       "commandName": "Docker",
@@ -28,7 +28,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-api",
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-api-vs -p 8001:{ServicePort}",
       "publishAllPorts": true
     }
   },

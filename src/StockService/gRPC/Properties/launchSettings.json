@@ -11,7 +11,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "applicationUrl": "https://localhost:52572;http://localhost:52573"
+      "applicationUrl": "http://localhost:8022"
     },
     "Docker": {
       "commandName": "Docker",
@@ -23,7 +23,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=stock-grpc"
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=stock-grpc-vs -p 8022:{ServicePort}"
     }
   }
 }

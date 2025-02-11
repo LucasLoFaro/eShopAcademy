@@ -22,14 +22,16 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     );
 
 var sbSettings = builder.Configuration.GetSection("common:ServiceBusSettings").Get<ServiceBusSettings>();
-var sbClient = new ServiceBusClient($"sb://{sbSettings!.Host}/", credential);
 
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<ProductsEventConsumer>();
     x.AddConsumer<StockEventConsumer>();
     x.UsingAzureServiceBus((context, cfg) =>
     {
-        cfg.Host((ServiceBusHostSettings) sbClient);
+        cfg.Host($"sb://{sbSettings!.Host}/", h =>
+        {
+            h.TokenCredential = credential;
+        });
         cfg.ReceiveEndpoint("products-updated", e =>
         {
             e.ConfigureConsumer<ProductsEventConsumer>(context);

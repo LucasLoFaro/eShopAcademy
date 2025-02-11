@@ -11,7 +11,7 @@
         "KEYVAULT": "eShopAcademy"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5064"
+      "applicationUrl": "http://localhost:8021"
     },
     "Docker": {
       "commandName": "Docker",
@@ -24,7 +24,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-grpc",
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-grpc-vs -p 8021:{ServicePort}",
       "publishAllPorts": true
     }
   },

@@ -1,7 +1,6 @@
-﻿namespace Services
-{
-    public class BasketServiceClient
-    {
+﻿namespace Infrastructure.Services;
 
-    }
+public class BasketServiceClient
+{
+
 }

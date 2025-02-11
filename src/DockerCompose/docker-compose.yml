@@ -2,6 +2,42 @@ name: eshopacademy
 
 services:
 
+# Order Service
+  order-api:
+    container_name: order-api
+    image: order-api
+    build:
+      context: ..
+      dockerfile: OrderService/Presentation/API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - KEYVAULT=eshopacademy
+      - APPCONFIGURATION=eshopacademy
+      - AZURE_CLIENT_ID=31234358-e1e6-40e9-82fe-363a97801e4e
+      - AZURE_CLIENT_SECRET=piI8Q~iaVPv30ukYTzBXKUi4FTaxoxglI4.Buapp
+      - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+    ports:
+     - "8003:8080"
+    networks:
+     - backend
+    depends_on:
+     - order-db
+
+  order-db:
+    container_name: order-db
+    image: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=Passw0rd
+    ports:
+      - "8013:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend 
+
+
 # Product Catalog Service
   product-api:
     container_name: product-api
@@ -23,7 +59,6 @@ services:
       - backend
     depends_on:
       - product-db
-      - rabbitmq
   
   product-db:
     container_name: product-db
@@ -55,7 +90,6 @@ services:
   #     - backend
   #   depends_on:
   #     - product-db
-  #     - rabbitmq
 
 
 # Basket Service
@@ -114,7 +148,7 @@ services:
       - backend
     depends_on:
       - basket-db
-      - rabbitmq
+
 
 # Stock Service
   stock-api:
@@ -137,7 +171,6 @@ services:
       - backend
     depends_on:
       - stock-db
-      - rabbitmq
 
   stock-db:
     container_name: stock-db
@@ -151,7 +184,7 @@ services:
       - mongo_data:/data/db
     ports:
       - "8012:27017"
-
+ 
   # stock-grpc:
   #   container_name: stock-grpc
   #   image: stock-grpc
@@ -172,31 +205,6 @@ services:
   #     - backend
   #   depends_on:
   #     - stock-db
-  #     - rabbitmq
-
-# Order Service
-  #order-api:
-    # environment:
-    #   - ASPNETCORE_ENVIRONMENT=Development
-    #   - ASPNETCORE_HTTP_PORTS=8080
-    #   - KEYVAULT=eshopacademy
-    #   - APPCONFIGURATION=eshopacademy
-    #   - AZURE_CLIENT_ID=31234358-e1e6-40e9-82fe-363a97801e4e
-    #   - AZURE_CLIENT_SECRET=piI8Q~iaVPv30ukYTzBXKUi4FTaxoxglI4.Buapp
-    #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
-
-  order-db:
-    container_name: order-db
-    image: postgres
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=Passw0rd
-    ports:
-      - "8013:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend
 
 
 # Payment Service
@@ -209,6 +217,7 @@ services:
     #   - AZURE_CLIENT_ID=4ac9deea-ea6d-4794-8414-dfae912b50a2
     #   - AZURE_CLIENT_SECRET=gM88Q~-WrvT.yyZA8exq~kC6ydUTQqBZWDPioaEx
     #   - AZURE_TENANT_ID=82abd0e4-97e7-4ad4-9b49-4c93188625ed
+
 
 # Shipping Service
   #shipping-grpc
@@ -247,33 +256,15 @@ services:
 
     
 # Infrastructure
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:3-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-      - "5673:5673"
-    networks:
-      - backend
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
- 
-
-  api:
-    image: ${DOCKER_REGISTRY-}api
-    build:
-      context: ..
-      dockerfile: OrderService/Presentation/API/Dockerfile
 
 volumes:
   redis_data:
   cassandra_data:
   mongo_data:
   postgres_data:
-  rabbitmq_data:
   
 networks:
   backend:
     driver: bridge
   
+

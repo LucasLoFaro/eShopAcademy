@@ -28,7 +28,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-api-vs -p 8001:{ServicePort}",
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=product-api-vs -p 8001:8080",
       "publishAllPorts": true
     }
   },

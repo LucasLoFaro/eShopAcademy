@@ -17,51 +17,15 @@ namespace API.Controllers
 
         [HttpGet]
         async public Task<IActionResult> Get()
-        {
-            try
-            {
-                return Ok(await _productService.GetAllAsync());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        ex = ex.Message,
-                        innerEx = ex.InnerException?.Message
-                    });
-            }
-        }
+            => Ok(await _productService.GetAllAsync());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
-        {
-            try
-            {
-                return Ok(await _productService.GetByIdAsync(id));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new {
-                        ex = ex.Message,
-                        innerEx = ex.InnerException?.Message
-                    });
-            }
-        }
+            => await _productService.GetByIdAsync(id) is Product product? Ok(product) : NotFound();
 
         [HttpGet("MostExpensive")]
         async public Task<IActionResult> GetMostExpensive()
-        {
-            try
-            {
-                return Ok(await _productService.GetMostExpensive());
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
+            => Ok(await _productService.GetMostExpensive());
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Product product)
@@ -69,16 +33,8 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            try
-            {
-                await _productService.AddOrUpdateAsync(product);
-                return StatusCode(StatusCodes.Status201Created, "Product created successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while adding product: {ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to add product");
-            }
+            await _productService.AddOrUpdateAsync(product);
+            return StatusCode(StatusCodes.Status201Created, "Product created successfully");
         }
 
         [HttpPut()]
@@ -87,36 +43,20 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            try
-            {
-                await _productService.AddOrUpdateAsync(product);
-
-                return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while updating product: {ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to update product");
-            }
+           
+            await _productService.AddOrUpdateAsync(product);
+            return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
-        {
-            try
-            {
-                Product product = await _productService.GetByIdAsync(id);
-                if (product == null)
-                    return BadRequest("Product " + id + " not found.");
+        {            
+            Product product = await _productService.GetByIdAsync(id);
+            if (product == null)
+                return BadRequest("Product " + id + " not found.");
 
-                await _productService.DeleteAsync(product);
-                return StatusCode(StatusCodes.Status201Created, "Product deleted successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while deleting product: {ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to delete product");
-            }
+            await _productService.DeleteAsync(product);
+            return StatusCode(StatusCodes.Status201Created, "Product deleted successfully");
         }
     }
 }

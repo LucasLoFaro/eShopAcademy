@@ -24,7 +24,7 @@
         "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
         "APPCONFIGURATION": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=payment-grpc-vs -p 8026:{ServicePort}",
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=payment-grpc-vs -p 8026:8080",
       "publishAllPorts": true,
       "useSSL": false
     }

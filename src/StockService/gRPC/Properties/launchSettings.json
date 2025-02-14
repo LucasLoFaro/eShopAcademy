@@ -4,6 +4,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
         "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
@@ -16,6 +17,7 @@
     "Docker": {
       "commandName": "Docker",
       "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AZURE_CLIENT_ID": "f8414e0b-f3fc-417e-9579-dcf2522d012f",
         "AZURE_CLIENT_SECRET": "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW",
@@ -23,7 +25,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "DockerfileRunArguments": "--network=eshopacademy_backend --name=stock-grpc-vs -p 8022:{ServicePort}"
+      "DockerfileRunArguments": "--network=eshopacademy_backend --name=stock-grpc-vs -p 8022:8080"
     }
   }
 }

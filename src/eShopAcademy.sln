@@ -73,23 +73,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DD70DE5C-9A88-4EAE-AE6F-0CD629177850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "OrderService\Presentation\API\API.csproj", "{0A69EB77-A7BB-458F-8817-AD0BF3747729}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "OrderService\Presentation\API\API.csproj", "{0A69EB77-A7BB-458F-8817-AD0BF3747729}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "OrderService\Core\Business\Business.csproj", "{4BB76C04-44E6-46A5-AD56-392993927337}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "OrderService\Core\Business\Business.csproj", "{4BB76C04-44E6-46A5-AD56-392993927337}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "OrderService\Core\Domain\Domain.csproj", "{23EA48D6-D034-46AE-A04D-22203A6DE92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "OrderService\Core\Domain\Domain.csproj", "{23EA48D6-D034-46AE-A04D-22203A6DE92A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "OrderService\Infrastructure\Data\Data.csproj", "{50B46B4E-1D89-4400-BE6A-E6A8C8FE685B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "OrderService\Infrastructure\Data\Data.csproj", "{50B46B4E-1D89-4400-BE6A-E6A8C8FE685B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clients", "Clients\Clients.csproj", "{641C835F-AF8E-4C20-9B30-4923593E6281}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clients", "Clients\Clients.csproj", "{641C835F-AF8E-4C20-9B30-4923593E6281}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PaymentService", "PaymentService", "{5945F260-91FE-418C-B68F-314012C8F51F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPC", "PaymentService\gRPC\gRPC.csproj", "{A4BBFEC9-21F9-4EDC-B0DB-4F4D650F282F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "PaymentService\gRPC\gRPC.csproj", "{A4BBFEC9-21F9-4EDC-B0DB-4F4D650F282F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShippingService", "ShippingService", "{2441025A-2C54-446A-AFC1-F27437060FEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShippingService", "ShippingService\ShippingService\ShippingService.csproj", "{8532BFB9-33A2-4927-9B84-4A14B5301D07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShippingService", "ShippingService\ShippingService\ShippingService.csproj", "{8532BFB9-33A2-4927-9B84-4A14B5301D07}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotificationService", "NotificationService", "{9100AE9D-3B1D-425C-9BF3-150008687261}"
 EndProject

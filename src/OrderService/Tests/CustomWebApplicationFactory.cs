@@ -1,9 +1,9 @@
-using System.Linq;
+using Core.Domain.Contracts;
+using Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Core.Domain.Contracts;
-using Infrastructure.Services.Interfaces;
+using Microsoft.Extensions.Hosting;
 
 namespace Tests;
 

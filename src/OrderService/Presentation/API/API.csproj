@@ -17,6 +17,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Business\Business.csproj" />
     <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
+    <!-- Reference the infrastructure messaging services so the API can publish order commands -->
+    <ProjectReference Include="..\..\Infrastructure\Services\Services.csproj" />
   </ItemGroup>
 
 </Project>

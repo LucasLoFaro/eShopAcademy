@@ -17,7 +17,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="6.11.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0-preview.6.24305.12" />
+    <!-- Use a stable version of Microsoft.AspNetCore.Mvc.Testing compatible with .NET 8 -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>

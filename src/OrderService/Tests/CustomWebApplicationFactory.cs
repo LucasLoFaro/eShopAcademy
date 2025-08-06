@@ -35,6 +35,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton<IOrderMessagingService>(StubMessaging);
         });
     }
+
+    /// <summary>
+    /// Override CreateHost to set required environment variables before the
+    /// application is built.  Without these values, the AddAzureAppConfiguration
+    /// call in Program.cs attempts to construct a Uri from an empty
+    /// APPCONFIGURATION variable, leading to an Invalid URI exception.
+    /// </summary>
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        // Ensure APPCONFIGURATION has a dummy value to produce a valid URI.  The actual
+        // connection to Azure App Configuration is not used during tests.
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPCONFIGURATION")))
+        {
+            Environment.SetEnvironmentVariable("APPCONFIGURATION", "test-config");
+        }
+        // Similarly, set a default host for ServiceBusSettings to avoid null reference
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SERVICEBUS_HOST")))
+        {
+            Environment.SetEnvironmentVariable("SERVICEBUS_HOST", "localhost");
+        }
+        return base.CreateHost(builder);
+    }
 }
 
 /// <summary>

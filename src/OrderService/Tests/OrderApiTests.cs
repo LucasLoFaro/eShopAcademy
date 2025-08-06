@@ -49,4 +49,29 @@ public class OrderApiTests : IClassFixture<CustomWebApplicationFactory>
         _factory.StubMessaging.LastRequest.Items.Should().HaveCount(request.Items.Count);
         _factory.StubMessaging.LastRequest.Items[0].Quantity.Should().Be(request.Items[0].Quantity);
     }
+
+    [Fact]
+    public async Task GetAllOrders_ReturnsEmptyArray()
+    {
+        using var client = _factory.CreateClient();
+        var response = await client.GetAsync("/orders");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var orders = await response.Content.ReadFromJsonAsync<List<Order>>();
+        orders.Should().NotBeNull();
+        orders!.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetOrder_ReturnsDefaultOrder()
+    {
+        using var client = _factory.CreateClient();
+        var orderId = Guid.NewGuid();
+        var response = await client.GetAsync($"/orders/{orderId}");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var order = await response.Content.ReadFromJsonAsync<Order>();
+        order.Should().NotBeNull();
+        // Since no persistence is implemented yet, a new Order is returned with default values
+        order!.Items.Should().BeNullOrEmpty();
+        order.CustomerId.Should().BeEmpty();
+    }
 }

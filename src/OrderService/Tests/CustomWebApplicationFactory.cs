@@ -4,24 +4,26 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 
 namespace Tests;
 
 /// <summary>
 /// Custom WebApplicationFactory used to host the Order API during integration tests.
-/// It replaces the real IOrderMessagingService with a stub implementation that
-/// captures submitted orders for verification.
+/// It replaces the real IOrderMessagingService with a mock implementation that
+/// can be inspected and verified by tests.
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     /// <summary>
-    /// Gets the stub messaging service used during tests.  This allows tests
-    /// to inspect the orders submitted by the API.
+    /// Gets the mock messaging service used during tests.  Tests can use this
+    /// mock to verify that SubmitOrder was called with the expected request.
     /// </summary>
-    public StubOrderMessagingService StubMessaging { get; } = new StubOrderMessagingService();
+    public Mock<IOrderMessagingService> MessagingServiceMock { get; } = new Mock<IOrderMessagingService>();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Development");
         builder.ConfigureServices(services =>
         {
             // Remove the existing IOrderMessagingService registration if present
@@ -31,8 +33,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 services.Remove(descriptor);
             }
-            // Register the stub implementation
-            services.AddSingleton<IOrderMessagingService>(StubMessaging);
+            // Register the mock implementation
+            services.AddSingleton<IOrderMessagingService>(provider => MessagingServiceMock.Object);
         });
     }
 
@@ -56,24 +58,5 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Environment.SetEnvironmentVariable("SERVICEBUS_HOST", "localhost");
         }
         return base.CreateHost(builder);
-    }
-}
-
-/// <summary>
-/// Stub implementation of IOrderMessagingService for use in integration tests.
-/// It stores the last order request submitted so that tests can verify the
-/// API published the expected command.
-/// </summary>
-public class StubOrderMessagingService : IOrderMessagingService
-{
-    /// <summary>
-    /// Gets the last order request submitted via this messaging service.
-    /// </summary>
-    public OrderRequest? LastRequest { get; private set; }
-
-    public Task SubmitOrder(OrderRequest orderRequest)
-    {
-        LastRequest = orderRequest;
-        return Task.CompletedTask;
     }
 }

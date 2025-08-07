@@ -1,4 +1,4 @@
-using Infrastructure.Development;
+using Infrastructure.Services.Setup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,14 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // configure Azure App Configuration, Key Vault and the real Service Bus client.
 if (builder.Environment.IsDevelopment())
 {
-    Infrastructure.Development.DevelopmentServiceConfiguration.ConfigureServices(builder.Services, builder.Configuration);
+    // In development use the in-memory transport and local messaging service
+    DevelopmentServiceConfiguration.ConfigureServices(builder.Services, builder.Configuration);
 }
 else
 {
-    // Load configuration from Azure App Configuration.  This allows the service
-    // bus settings to be centrally managed.  Keys prefaced with "common:"
-    // apply to all services, while keys prefaced with "order:" apply specifically
-    // to the order service.
+    // In production, load configuration from Azure App Configuration and register
+    // the Azure Service Bus based messaging service.
     builder.Configuration.AddAzureAppConfiguration(options =>
         options.Connect(
             new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
@@ -25,11 +24,8 @@ else
         .Select("order:*", Microsoft.Extensions.Configuration.AzureAppConfiguration.LabelFilter.Null)
         );
 
-    // Register the service bus settings and messaging client used to publish
-    // SubmitOrder commands.  The settings section is loaded above from
-    // App Configuration.
     builder.Services.Configure<Infrastructure.Services.Settings.ServiceBusSettings>(builder.Configuration.GetSection("common:ServiceBusSettings"));
-    builder.Services.AddSingleton<Infrastructure.Services.Interfaces.IOrderMessagingService, Infrastructure.Services.OrderMessageClient>();
+    ProductionServiceConfiguration.ConfigureServices(builder.Services, builder.Configuration);
 }
 
 // Add services to the container.

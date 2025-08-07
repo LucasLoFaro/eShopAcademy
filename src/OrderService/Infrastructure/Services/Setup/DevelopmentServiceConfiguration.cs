@@ -10,6 +10,7 @@ public static class DevelopmentServiceConfiguration
 {
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+        // Configure MassTransit to use the in-memory transport for local development.
         services.AddMassTransit(x =>
         {
             x.UsingInMemory((context, cfg) =>
@@ -18,7 +19,8 @@ public static class DevelopmentServiceConfiguration
             });
         });
 
-        services.AddSingleton<IOrderMessagingService, StubOrderMessagingService>();
-        services.AddSingleton<IAppConfigurationService, StubAppConfigurationService>();
+        // Register a messaging service that publishes commands via MassTransit.  When
+        // using the in-memory transport this will send messages to the local bus.
+        services.AddScoped<IOrderMessagingService, InMemoryOrderMessagingService>();
     }
 }

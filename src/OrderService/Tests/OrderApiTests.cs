@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Json;
+using Moq;
 using Core.Domain.Contracts;
 using Core.Domain.Entities;
 using FluentAssertions;
@@ -43,11 +44,11 @@ public class OrderApiTests : IClassFixture<CustomWebApplicationFactory>
         // Assert: the API should return 202 Accepted
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
 
-        // Assert: the stub messaging service should have received the request
-        _factory.StubMessaging.LastRequest.Should().NotBeNull();
-        _factory.StubMessaging.LastRequest!.CustomerId.Should().Be(request.CustomerId);
-        _factory.StubMessaging.LastRequest.Items.Should().HaveCount(request.Items.Count);
-        _factory.StubMessaging.LastRequest.Items[0].Quantity.Should().Be(request.Items[0].Quantity);
+        // Assert: the mock messaging service should have been invoked with the expected order
+        _factory.MessagingServiceMock.Verify(ms => ms.SubmitOrder(It.Is<OrderRequest>(o =>
+            o.CustomerId == request.CustomerId &&
+            o.Items.Count == request.Items.Count &&
+            o.Items[0].Quantity == request.Items[0].Quantity)), Times.Once);
     }
 
     [Fact]

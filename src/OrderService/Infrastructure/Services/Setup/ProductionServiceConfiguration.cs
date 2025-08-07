@@ -10,6 +10,8 @@ public static class ProductionServiceConfiguration
 {
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+        // Configure MassTransit to use Azure Service Bus in production.  The
+        // namespace host is configured via ServiceBusSettings.
         services.AddMassTransit(x =>
         {
             x.SetKebabCaseEndpointNameFormatter();
@@ -20,7 +22,8 @@ public static class ProductionServiceConfiguration
             });
         });
 
-        services.AddSingleton<IOrderMessagingService, AzureServiceBusPublisher>();
-        services.AddSingleton<IAppConfigurationService, AzureAppConfigurationService>();
+        // Register the messaging service implementation that publishes commands to
+        // Azure Service Bus.
+        services.AddSingleton<IOrderMessagingService, OrderMessageClient>();
     }
 }

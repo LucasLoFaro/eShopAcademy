@@ -1,0 +1,14 @@
+{
+  "name": "eShopAcademy .NET",
+  "build": { "dockerfile": "Dockerfile" },
+  "postCreateCommand": "dotnet --info && dotnet restore src/eShopAcademy.sln",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}

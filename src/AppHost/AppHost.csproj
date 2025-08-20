@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>f2823b9c-182d-463c-b73b-f8bb6a496894</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+    <PackageReference Include="Aspire.Hosting.MongoDB" Version="9.4.1" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BasketService\API\API.csproj" />
+    <ProjectReference Include="..\BasketService\EventsProcessor\EventsProcessor\EventsProcessor.csproj" />
+    <ProjectReference Include="..\OrderService\EventsProcessor\EventsProcessor\EventsProcessor.csproj" />
+    <ProjectReference Include="..\OrderService\Presentation\API\API.csproj" />
+    <ProjectReference Include="..\PaymentService\gRPC\gRPC.csproj" />
+    <ProjectReference Include="..\ProductCatalogService\Presentation\API\API.csproj" />
+    <ProjectReference Include="..\ProductCatalogService\Presentation\gRPC\gRPC.csproj" />
+    <ProjectReference Include="..\StockService\API\API.csproj" />
+    <ProjectReference Include="..\StockService\gRPC\gRPC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Mocks\psp-make-payment.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

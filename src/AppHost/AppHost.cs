@@ -1,7 +1,5 @@
 using Microsoft.Extensions.Hosting;
 using AppHost.Setup;
-using Aspire.Hosting.MongoDB;
-using Aspire.Hosting.Redis;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

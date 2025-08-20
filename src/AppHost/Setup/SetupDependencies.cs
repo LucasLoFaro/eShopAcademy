@@ -21,14 +21,13 @@ public static class SetupDependencies
 
         //api.WithReference(rabbit);
 
-        // 🔹 Cassandra
-        var cassandra = builder.AddContainer("cassandra", "cassandra", "latest")
-            .WithEndpoint(port: 9042, targetPort: 9042, name: "cql")
-            .WithEnvironment("CASSANDRA_CLUSTER_NAME", "TestCluster")
-            .WithEnvironment("CASSANDRA_START_RPC", "true");
+        // Cassandra has been moved into the AppHost so that it can be
+        // referenced by multiple microservices alongside other backing
+        // resources (Redis, MongoDB and PostgreSQL). Only the WireMock
+        // external service mock is configured here for development.
 
 
-        //api.WithReference(cassandra);
+
 
     }
 }

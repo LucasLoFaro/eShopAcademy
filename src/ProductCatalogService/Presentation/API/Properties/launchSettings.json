@@ -5,6 +5,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
+        "ASPNETCORE_URLS": "http://+:0",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AZURE_CLIENT_ID": "facc151c-6753-4101-9035-e10cc34a38f3",
         "AZURE_CLIENT_SECRET": "Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3",
@@ -12,8 +13,7 @@
         "APPCONFIGURATION": "eShopAcademy",
         "KEYVAULT": "eShopAcademy"
       },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:8001"
+      "dotnetRunMessages": true
     },
     "Docker": {
       "commandName": "Docker",

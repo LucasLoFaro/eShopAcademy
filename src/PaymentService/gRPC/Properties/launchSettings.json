@@ -3,15 +3,14 @@
     "http": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "8080",
+        "ASPNETCORE_URLS": "http://+:0",
         "KEYVAULT": "eshopacademy",
         "AZURE_CLIENT_ID": "4ac9deea-ea6d-4794-8414-dfae912b50a2",
         "AZURE_CLIENT_SECRET": "gM88Q~-WrvT.yyZA8exq~kC6ydUTQqBZWDPioaEx",
         "AZURE_TENANT_ID": "82abd0e4-97e7-4ad4-9b49-4c93188625ed",
         "APPCONFIGURATION": "eShopAcademy"
       },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:8026"
+      "dotnetRunMessages": true
     },
     "Docker": {
       "commandName": "Docker",

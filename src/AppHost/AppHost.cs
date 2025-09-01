@@ -1,10 +1,13 @@
 using Microsoft.Extensions.Hosting;
 using AppHost.Setup;
+using Aspire.Hosting.MongoDB;
+using Aspire.Hosting.PostgreSQL;
+using Aspire.Hosting.Redis;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Add API Gateway or top-level API if present
-var api = builder.AddProject("api");
+var api = builder.AddProject<Projects.API>("api");
 
 if(builder.Environment.IsDevelopment())
     SetupDependencies.AddDevelopmentEnvironment(builder, api);

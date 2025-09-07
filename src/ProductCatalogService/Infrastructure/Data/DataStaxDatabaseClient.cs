@@ -1,9 +1,7 @@
 ﻿using Cassandra;
 using Cassandra.Mapping;
 using Data.Interfaces;
-using Data.Settings;
 using Core.Domain.Entities;
-using Microsoft.Extensions.Options;
 
 namespace Data
 {
@@ -12,14 +10,14 @@ namespace Data
         private Cluster Cluster;
         public ISession Session {  get; private set; }
 
-        public DataStaxDatabaseClient(IOptionsMonitor<DatabaseSettings> dbSettings)
+        public DataStaxDatabaseClient(string connectionString, string keySpace)
         {
             Cluster = Cluster.Builder()
-                     .AddContactPoints(dbSettings.CurrentValue.Host)
+                     .AddContactPoints(connectionString)
                      .Build();
             
             SetupDBStructure();
-            Session = Cluster.Connect(dbSettings.CurrentValue.KeySpace);
+            Session = Cluster.Connect(keySpace);
 
             //This is like a db context / object relational mapping
             MappingConfiguration.Global.Define(

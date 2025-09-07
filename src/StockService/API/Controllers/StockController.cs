@@ -1,8 +1,8 @@
-﻿using Infrastructure.Data;
-using Core.Domain.DTOs;
+﻿using Core.Domain.DTOs;
 using Core.Domain.Entities;
+using Infrastructure.Data;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
-using Infrastructure.Services.Interfaces;
 
 namespace API.Controllers
 {
@@ -11,9 +11,9 @@ namespace API.Controllers
     public class StockController : ControllerBase
     {
         public IStockRepository _stockRepository { get; }
-        private readonly IMessagingServiceClient _messaging;
+        private readonly StockMessagingClient _messaging;
 
-        public StockController(IStockRepository stockRepository, IMessagingServiceClient messagingServiceClient)
+        public StockController(IStockRepository stockRepository, StockMessagingClient messagingServiceClient)
         {
             _stockRepository = stockRepository;
             _messaging = messagingServiceClient;

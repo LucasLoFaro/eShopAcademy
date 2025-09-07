@@ -1,8 +1,6 @@
-﻿using Cassandra;
-using Core.Domain.Entities;
+﻿using Core.Domain.Entities;
 using Core.Application.Interfaces.Data;
 using Data.Interfaces;
-using Cassandra.Mapping;
 using Cassandra.Data.Linq;
 
 namespace Data.Repositories

@@ -1,51 +1,24 @@
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Azure.Messaging.ServiceBus;
 using EventsProcessor.Consumers;
+using ServiceDefaults;
 using Data.Interfaces;
-using Azure.Identity;
 using MassTransit;
-using Settings;
 using Data;
 
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Environment.ApplicationName = "basket.events-processor";
+builder.AddServiceDefaults()
+    .WithMassTransit((context, cfg) =>
+    { 
+        cfg.ReceiveEndpoint("products-updated", e => e.ConfigureConsumer<ProductsEventConsumer>(context));
+        cfg.ReceiveEndpoint("stock-updated", e => e.ConfigureConsumer<StockEventConsumer>(context));
+    },
+    typeof(Program).Assembly);
 
-var credential = new DefaultAzureCredential();
-
-builder.Configuration.AddAzureAppConfiguration(options =>
-    options.Connect(
-        new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
-        new DefaultAzureCredential())
-    .ConfigureKeyVault(kv => { kv.SetCredential(credential); })
-    .Select("common:*", LabelFilter.Null)
-    .Select("basket:*", LabelFilter.Null)
-    );
-
-var sbSettings = builder.Configuration.GetSection("common:ServiceBusSettings").Get<ServiceBusSettings>();
-
-builder.Services.AddMassTransit(x => {
-    x.AddConsumer<ProductsEventConsumer>();
-    x.AddConsumer<StockEventConsumer>();
-    x.UsingAzureServiceBus((context, cfg) =>
-    {
-        cfg.Host($"sb://{sbSettings!.Host}/", h =>
-        {
-            h.TokenCredential = credential;
-        });
-        cfg.ReceiveEndpoint("products-updated", e =>
-        {
-            e.ConfigureConsumer<ProductsEventConsumer>(context);
-        });
-        cfg.ReceiveEndpoint("stock-updated", e =>
-        {
-            e.ConfigureConsumer<StockEventConsumer>(context);
-        });
-    });
-});
-builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("basket:Database"));
-builder.Services.AddSingleton<DatabaseClient>();
+//Inject services
+builder.Services.AddSingleton<IDatabaseClient>(sp => new DatabaseClient(builder.Configuration.GetConnectionString("Redis")!));
+builder.Services.AddTransient<IBasketCache, BasketCache>();
 builder.Services.AddTransient<IProductCache, ProductCache>();
-builder.Services.AddAutoMapper(typeof(Program));
 
 var host = builder.Build();
 host.Run();

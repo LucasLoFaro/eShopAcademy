@@ -15,7 +15,8 @@ public class PaymentService : PaymentGrpc.PaymentGrpcBase
     {
         _logger.LogInformation($"Processing payment for Order {request.OrderId}");
 
-        // Always return success initially
+        // Mock. Always success at first.
+        // Todo: Consume the external api mock (wiremock)
         return Task.FromResult(new PaymentResponse
         {
             Success = true,

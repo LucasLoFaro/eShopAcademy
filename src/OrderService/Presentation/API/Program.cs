@@ -3,14 +3,17 @@ using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Environment.ApplicationName = "order.api";
-
 builder.AddServiceDefaults()
-       .AddSwagger()
+       .WithSwagger()
        .WithMassTransit();
 
-builder.Services.AddSingleton<OrderMessagingClient>();
+builder.Services.AddControllers();
+
+builder.Services.AddScoped<OrderMessagingClient>();
 
 var app = builder.Build();
-app.MapDefaultEndpoints();
+app.MapControllers();
+app.UseDefaultEndpoints();
 app.Run();
+
+public partial class Program { }

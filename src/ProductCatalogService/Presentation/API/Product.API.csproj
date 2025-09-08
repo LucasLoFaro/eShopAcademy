@@ -4,28 +4,27 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>426d7720-c8ee-41ed-a880-62ae8c190259</UserSecretsId>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UserSecretsId>80c93e52-a18b-4fd7-93a6-ec3e851c064b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
     <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\Product.proto" GrpcServices="Server" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.15.0" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.71.0" />
+    <PackageReference Include="MassTransit" Version="8.5.2" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.3.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
-    <ProjectReference Include="..\..\Core\Application\Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
+    <ProjectReference Include="..\..\Core\Application\Product.Application.csproj" />
+    <ProjectReference Include="..\..\Core\Domain\Product.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Data\Product.Data.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Services\Product.Services.csproj" />
   </ItemGroup>
 
 </Project>

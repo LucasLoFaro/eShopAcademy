@@ -18,18 +18,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="8.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.8" />
-   <PackageReference Include="Moq" Version="4.20.72" />
-  
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Reference the API and domain projects to allow controllers and domain types to be used in tests -->
-    <ProjectReference Include="..\Core\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Services\Services.csproj" />
-    <ProjectReference Include="..\Presentation\API\API.csproj" />
-    <ProjectReference Include="..\EventsProcessor\EventsProcessor\EventsProcessor.csproj" />
+    <ProjectReference Include="..\API\Basket.API.csproj" />
+    <ProjectReference Include="..\Data\Basket.Data.csproj" />
+    <ProjectReference Include="..\Domain\Basket.Domain.csproj" />
+    <ProjectReference Include="..\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj" />
   </ItemGroup>
 
 </Project>

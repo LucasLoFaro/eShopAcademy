@@ -1,16 +1,17 @@
-﻿using Core.Domain.Entities;
-using Core.Domain.Events;
+﻿using Core.Application.Interfaces.Services;
 using Core.Domain.DTOs;
+using Core.Domain.Entities;
+using Core.Domain.Events;
 using MassTransit;
 
 
 namespace Infrastructure.Services;
 
-public class ProductMessagingClient
+public class ProductMessagingService : IProductMessagingService
 {
     private readonly IPublishEndpoint _publishEndpoint;
 
-    public ProductMessagingClient(IPublishEndpoint publishEndpoint)
+    public ProductMessagingService(IPublishEndpoint publishEndpoint)
     {
         _publishEndpoint = publishEndpoint;
     }

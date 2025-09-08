@@ -6,14 +6,14 @@ using Data;
 
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Environment.ApplicationName = "basket.events-processor";
+//builder.Environment.ApplicationName = "basket.events-processor";
 builder.AddServiceDefaults()
     .WithMassTransit((context, cfg) =>
     { 
         cfg.ReceiveEndpoint("products-updated", e => e.ConfigureConsumer<ProductsEventConsumer>(context));
         cfg.ReceiveEndpoint("stock-updated", e => e.ConfigureConsumer<StockEventConsumer>(context));
     },
-    typeof(Program).Assembly);
+    typeof(ProductsEventConsumer).Assembly);
 
 //Inject services
 builder.Services.AddSingleton<IDatabaseClient>(sp => new DatabaseClient(builder.Configuration.GetConnectionString("Redis")!));

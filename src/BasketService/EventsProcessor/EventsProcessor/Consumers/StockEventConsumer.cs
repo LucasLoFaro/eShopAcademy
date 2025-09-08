@@ -1,13 +1,12 @@
 ﻿using Core.Domain.Events;
 using Data.Interfaces;
 using MassTransit;
-using Core.Domain.DTOs;
 using AutoMapper;
 using Domain.DTOs;
 
 namespace EventsProcessor.Consumers
 {
-    internal class StockEventConsumer : IConsumer<StockUpdatedEvent>
+    public class StockEventConsumer : IConsumer<StockUpdatedEvent>
     {
         private readonly ILogger _logger;
         private readonly IProductCache _productCache;

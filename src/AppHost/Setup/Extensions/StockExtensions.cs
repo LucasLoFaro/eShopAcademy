@@ -10,7 +10,9 @@ public static class StockExtensions
     {
         stockApi
             .WithReference(stockdb)
+            .WaitFor(stockdb)
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithEndpoint(port: 8002, targetPort: 8080, name: "http")
             .WithEnvironment("AZURE_CLIENT_ID", "f8414e0b-f3fc-417e-9579-dcf2522d012f")
@@ -18,7 +20,9 @@ public static class StockExtensions
 
         stockGrpc
             .WithReference(stockdb)
+            .WaitFor(stockdb)
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithEndpoint(port: 8022, targetPort: 8080, name: "grpc")
             .WithEnvironment("AZURE_CLIENT_ID", "f8414e0b-f3fc-417e-9579-dcf2522d012f")

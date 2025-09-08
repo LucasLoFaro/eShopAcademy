@@ -17,10 +17,12 @@ public static partial class Extentions
         {
             config.SetKebabCaseEndpointNameFormatter();
             config.SetInMemorySagaRepositoryProvider();
-            config.AddSagaStateMachines(assemblies);
-            config.AddActivities(assemblies);
-            config.AddConsumers(assemblies);
-            config.AddSagas(assemblies);
+            if (assemblies != null && assemblies.Length > 0)
+            {
+                config.AddConsumers(assemblies);
+                config.AddSagas(assemblies);
+                config.AddSagaStateMachines(assemblies);
+            }
 
             if (builder.Environment.IsDevelopment())
             {

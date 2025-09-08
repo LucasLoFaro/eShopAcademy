@@ -2,7 +2,6 @@ using gRPC.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Environment.ApplicationName = "product.grpc";
 
 builder.AddServiceDefaults();
 

@@ -3,31 +3,36 @@ using AppHost.Setup;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+//var api = builder.AddProject<Projects.AppHost>("api");
+
+
 // Basket
-var basketApi = builder.AddProject("eshopacademy-basket-api", "../BasketService/API/API.csproj");
-var basketEvents = builder.AddProject("eshopacademy-basket-events", "../BasketService/EventsProcessor/EventsProcessor/EventsProcessor.csproj");
+var basketApi = builder.AddProject<Projects.Basket_API>("eshopacademy-basket-api");
+var basketEvents = builder.AddProject<Projects.Basket_EventsProcessor>("eshopacademy-basket-events");
 
 // Product
-var productApi = builder.AddProject("eshopacademy-product-api", "../ProductCatalogService/Presentation/API/API.csproj");
-var productGrpc = builder.AddProject("eshopacademy-product-grpc", "../ProductCatalogService/Presentation/gRPC/gRPC.csproj");
+var productApi = builder.AddProject<Projects.Product_API>("eshopacademy-product-api");
+var productGrpc = builder.AddProject<Projects.Product_gRPC> ("eshopacademy-product-grpc");
 
 // Order
-var orderApi = builder.AddProject("eshopacademy-order-api", "../OrderService/Presentation/API/API.csproj");
-var orderEvents = builder.AddProject("eshopacademy-order-events", "../OrderService/EventsProcessor/EventsProcessor/EventsProcessor.csproj");
+var orderApi = builder.AddProject<Projects.Order_API>("eshopacademy-order-api");
+var orderEvents = builder.AddProject<Projects.Order_EventsProcessor>("eshopacademy-order-events");
 
 // Stock
-var stockApi = builder.AddProject("eshopacademy-stock-api", "../StockService/API/API.csproj");
-var stockGrpc = builder.AddProject("eshopacademy-stock-grpc", "../StockService/gRPC/gRPC.csproj");
+var stockApi = builder.AddProject<Projects.Stock_API>("eshopacademy-stock-api");
+var stockGrpc = builder.AddProject<Projects.Stock_gRPC>("eshopacademy-stock-grpc");
 
 // Payment
-var paymentGrpc = builder.AddProject("eshopacademy-payment-grpc", "../PaymentService/gRPC/gRPC.csproj");
+var paymentGrpc = builder.AddProject<Projects.Payment_gRPC>("eshopacademy-payment-grpc");
 
 // Shipping
-var shippingGrpc = builder.AddProject("eshopacademy-shipping-grpc", "../ShippingService/ShippingService/ShippingService.csproj");
+var shippingGrpc = builder.AddProject<Projects.Shipping_gRPC>("eshopacademy-shipping-grpc");
 
 
 if (builder.Environment.IsDevelopment())
     EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productApi, productGrpc, orderApi, orderEvents, stockApi, stockGrpc, paymentGrpc, shippingGrpc);
+else
+    Console.WriteLine("Running in production mode - no infrastructure will be setup by the AppHost.");
 
 // Build and run the distributed application
 builder.Build().Run();

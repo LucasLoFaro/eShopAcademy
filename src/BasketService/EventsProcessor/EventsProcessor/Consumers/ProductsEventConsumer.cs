@@ -6,7 +6,7 @@ using AutoMapper;
 
 namespace EventsProcessor.Consumers
 {
-    internal class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
+    public class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
     {
         private readonly ILogger _logger;
         private readonly IProductCache _productCache;

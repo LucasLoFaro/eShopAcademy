@@ -8,10 +8,10 @@ namespace Core.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductsRepository _productsRepository;
-        private readonly IMessagingServiceClient _messaging;
+        private readonly IProductMessagingService _messaging;
 
 
-        public ProductService(IProductsRepository productsRepository, IMessagingServiceClient messagingServiceClient)
+        public ProductService(IProductsRepository productsRepository, IProductMessagingService messagingServiceClient)
         {
             _productsRepository = productsRepository;
             _messaging = messagingServiceClient;

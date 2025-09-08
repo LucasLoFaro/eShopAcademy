@@ -28,12 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Application\Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Data\Data.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Services\Services.csproj" />
-    <ProjectReference Include="..\..\Presentation\API\API.csproj" />
-    <ProjectReference Include="..\..\Presentation\gRPC\gRPC.csproj" />
+    <ProjectReference Include="..\..\Core\Application\Product.Application.csproj" />
+    <ProjectReference Include="..\..\Core\Domain\Product.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Data\Product.Data.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Services\Product.Services.csproj" />
+    <ProjectReference Include="..\..\Presentation\API\Product.API.csproj" />
+    <ProjectReference Include="..\..\Presentation\gRPC\Product.gRPC.csproj" />
   </ItemGroup>
 
 </Project>

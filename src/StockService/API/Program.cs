@@ -11,11 +11,12 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Environment.ApplicationName = "stock.api";
 
         builder.AddServiceDefaults()
-               .AddSwagger()
+               .WithSwagger()
                .WithMassTransit();
+
+        builder.Services.AddControllers();
 
         builder.Services.AddDbContext<StockDbContext>(options =>
             options.UseMongoDB(builder.Configuration.GetConnectionString("mongodb"), "stock")
@@ -25,7 +26,8 @@ public class Program
         builder.Services.AddTransient<StockMessagingClient>();
 
         var app = builder.Build();
-        app.MapDefaultEndpoints();
+        app.MapControllers();
+        app.UseDefaultEndpoints();
         app.Run();
     }
 }

@@ -11,7 +11,7 @@ namespace Data
         private const String BASKET_PREFIX = "basket:";
         private const String PRODUCT_PREFIX = "product:";
 
-        public BasketCache(DatabaseClient database)
+        public BasketCache(IDatabaseClient database)
         {
             _cache = database.GetDatabase();
         }

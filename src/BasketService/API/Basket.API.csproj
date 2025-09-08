@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <UserSecretsId>324e47ab-717e-47e6-ac14-61bc936d69f3</UserSecretsId>
+    <UserSecretsId>6ad88070-3b08-49bf-8719-559c32d77a37</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
-    <DockerComposeProjectPath>..\..\DockerCompose\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
-    <ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Services\Services.csproj" />
+    <ProjectReference Include="..\Data\Basket.Data.csproj" />
+    <ProjectReference Include="..\Domain\Basket.Domain.csproj" />
   </ItemGroup>
 
 </Project>

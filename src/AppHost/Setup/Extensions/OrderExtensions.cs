@@ -12,7 +12,9 @@ public static class OrderExtensions
     {
         orderApi
             .WithReference(ordersdb)
+            .WaitFor(ordersdb)
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithEndpoint(port: 8003, targetPort: 8080, name: "http")
             .WithEnvironment("AZURE_CLIENT_ID", "31234358-e1e6-40e9-82fe-363a97801e4e")
@@ -20,7 +22,9 @@ public static class OrderExtensions
 
         orderEvents
             .WithReference(ordersdb)
+            .WaitFor(ordersdb)
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithEnvironment("AZURE_CLIENT_ID", "31234358-e1e6-40e9-82fe-363a97801e4e")
             .WithEnvironment("AZURE_CLIENT_SECRET", "piI8Q~iaVPv30ukYTzBXKUi4FTaxoxglI4.Buapp");

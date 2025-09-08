@@ -5,17 +5,16 @@ using Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Environment.ApplicationName = "basket.api";
 
 builder.AddServiceDefaults()
-       .AddSwagger();
+       .WithSwagger();
 
 //Inject services
 builder.Services.AddSingleton<IDatabaseClient>(sp => new DatabaseClient(builder.Configuration.GetConnectionString("Redis")!));
 builder.Services.AddTransient<IBasketCache, BasketCache>();
 
 var app = builder.Build();
-app.MapDefaultEndpoints();
+app.UseDefaultEndpoints();
 
 app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketCache basketRepository) =>
 {

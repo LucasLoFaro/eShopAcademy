@@ -1,7 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Environment.ApplicationName = "shipping.grpc";
-
 builder.AddServiceDefaults();
 builder.Services.AddGrpc();
 

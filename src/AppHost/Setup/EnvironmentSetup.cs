@@ -36,7 +36,7 @@ public static class EnvironmentSetup
 
         // External service mocks
         var mappingsPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Mocks"));
-        var wiremock = builder.AddContainer("eshopacademy-external-services-mock", "wiremock/wiremock:latest")
+        var wiremock = builder.AddContainer("eshopacademy-external-services-mocks", "wiremock/wiremock:latest")
             .WithEndpoint(8090, targetPort: 8080)
             .WithBindMount(mappingsPath, "/home/wiremock/mappings");
 

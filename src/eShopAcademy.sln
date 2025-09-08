@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "ProductCatalogService\Presentation\API\API.csproj", "{1243246C-5B36-4A2E-ACED-10AF81585105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.API", "ProductCatalogService\Presentation\API\Product.API.csproj", "{1243246C-5B36-4A2E-ACED-10AF81585105}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProductCatalogService", "ProductCatalogService", "{26FBDB24-B9A8-407A-B434-24C6A434D117}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{E960B17B-F432-4ED8-80BE-0911D6F21109}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "ProductCatalogService\Presentation\gRPC\gRPC.csproj", "{100974FE-3453-4761-B641-E2CD659DED60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.gRPC", "ProductCatalogService\Presentation\gRPC\Product.gRPC.csproj", "{100974FE-3453-4761-B641-E2CD659DED60}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F320CBBA-6ECE-424C-B34D-7E994E3389D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "ProductCatalogService\Core\Application\Application.csproj", "{E001A8E7-1280-42C6-9C2F-94B834B4CFC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Application", "ProductCatalogService\Core\Application\Product.Application.csproj", "{E001A8E7-1280-42C6-9C2F-94B834B4CFC1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "ProductCatalogService\Core\Domain\Domain.csproj", "{65D72795-AF8B-41E9-ADB1-8361C06ABF52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Domain", "ProductCatalogService\Core\Domain\Product.Domain.csproj", "{65D72795-AF8B-41E9-ADB1-8361C06ABF52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{D3FEACDA-081A-4CEC-92D0-97E7CF999800}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "ProductCatalogService\Infrastructure\Data\Data.csproj", "{8FD36207-38AC-4D3E-B715-0A8DD410C88E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Data", "ProductCatalogService\Infrastructure\Data\Product.Data.csproj", "{8FD36207-38AC-4D3E-B715-0A8DD410C88E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "ProductCatalogService\Infrastructure\Services\Services.csproj", "{BAB0A0FB-DD8D-4A9A-9F01-BA89845B30BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Services", "ProductCatalogService\Infrastructure\Services\Product.Services.csproj", "{BAB0A0FB-DD8D-4A9A-9F01-BA89845B30BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B1C4C3B1-ACD0-49E3-88C7-2FB499255F50}"
 EndProject
@@ -37,31 +37,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{20F0199D-3BA3-4584-B3A0-B25335C8F6A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "StockService\API\API.csproj", "{54C8C7F8-DC08-4F13-BD13-986BE97CDDCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.API", "StockService\API\Stock.API.csproj", "{54C8C7F8-DC08-4F13-BD13-986BE97CDDCE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "StockService\Domain\Domain.csproj", "{10E907A6-7473-4211-BA6E-665AC66606EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.Domain", "StockService\Domain\Stock.Domain.csproj", "{10E907A6-7473-4211-BA6E-665AC66606EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "StockService\Data\Data.csproj", "{A165B42E-71B2-4A3A-8590-8706E36331A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.Data", "StockService\Data\Stock.Data.csproj", "{A165B42E-71B2-4A3A-8590-8706E36331A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BasketService", "BasketService", "{A05E2327-1315-4FD3-8229-E0E90693DC73}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "BasketService\API\API.csproj", "{81D48550-7824-454F-A57B-D2047129E77F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.API", "BasketService\API\Basket.API.csproj", "{81D48550-7824-454F-A57B-D2047129E77F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "BasketService\Domain\Domain.csproj", "{44FEB554-DF16-4475-A04E-E0B201D88B29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Domain", "BasketService\Domain\Basket.Domain.csproj", "{44FEB554-DF16-4475-A04E-E0B201D88B29}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "BasketService\Data\Data.csproj", "{CCFB1EAF-BB10-4F67-BC6B-A4B4EDE50749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Data", "BasketService\Data\Basket.Data.csproj", "{CCFB1EAF-BB10-4F67-BC6B-A4B4EDE50749}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "BasketService\Tests\Tests.csproj", "{2D9EE00D-9654-404C-BB59-1330537EC710}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Tests", "BasketService\Tests\Basket.Tests.csproj", "{2D9EE00D-9654-404C-BB59-1330537EC710}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "DockerCompose\docker-compose.dcproj", "{0E7B3A9A-4046-4506-B8CE-81C5CEF567FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsProcessor", "BasketService\EventsProcessor\EventsProcessor\EventsProcessor.csproj", "{C791FFA9-FFBF-49CA-B8A9-BD7DE65D094D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.EventsProcessor", "BasketService\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj", "{C791FFA9-FFBF-49CA-B8A9-BD7DE65D094D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockGrpcClient", "StockService\Tests\StockGrpcClient\StockGrpcClient.csproj", "{A734FD85-326A-44E7-B3F7-951241B6C12E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.Tests", "StockService\Tests\StockGrpcClient\Stock.Tests.csproj", "{A734FD85-326A-44E7-B3F7-951241B6C12E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "StockService\gRPC\gRPC.csproj", "{F9F99571-765D-4FA8-B243-2CF6AB81F2B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.gRPC", "StockService\gRPC\Stock.gRPC.csproj", "{F9F99571-765D-4FA8-B243-2CF6AB81F2B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "StockService\Infrastructure\Services\Services.csproj", "{0C204D90-50B5-4CD4-AD47-878C3AE9DB93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stock.Services", "StockService\Infrastructure\Services\Stock.Services.csproj", "{0C204D90-50B5-4CD4-AD47-878C3AE9DB93}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrderService", "OrderService", "{163951A8-3FC0-4739-BF0B-75F83A96B9E2}"
 EndProject
@@ -73,35 +73,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DD70DE5C-9A88-4EAE-AE6F-0CD629177850}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "OrderService\Presentation\API\API.csproj", "{0A69EB77-A7BB-458F-8817-AD0BF3747729}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.API", "OrderService\Presentation\API\Order.API.csproj", "{0A69EB77-A7BB-458F-8817-AD0BF3747729}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "OrderService\Core\Business\Business.csproj", "{4BB76C04-44E6-46A5-AD56-392993927337}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.Domain", "OrderService\Core\Domain\Order.Domain.csproj", "{23EA48D6-D034-46AE-A04D-22203A6DE92A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "OrderService\Core\Domain\Domain.csproj", "{23EA48D6-D034-46AE-A04D-22203A6DE92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.Data", "OrderService\Infrastructure\Data\Order.Data.csproj", "{50B46B4E-1D89-4400-BE6A-E6A8C8FE685B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "OrderService\Infrastructure\Data\Data.csproj", "{50B46B4E-1D89-4400-BE6A-E6A8C8FE685B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clients", "Clients\Clients.csproj", "{641C835F-AF8E-4C20-9B30-4923593E6281}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.Clients", "Clients\Order.Clients.csproj", "{641C835F-AF8E-4C20-9B30-4923593E6281}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PaymentService", "PaymentService", "{5945F260-91FE-418C-B68F-314012C8F51F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gRPC", "PaymentService\gRPC\gRPC.csproj", "{A4BBFEC9-21F9-4EDC-B0DB-4F4D650F282F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.gRPC", "PaymentService\gRPC\Payment.gRPC.csproj", "{A4BBFEC9-21F9-4EDC-B0DB-4F4D650F282F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShippingService", "ShippingService", "{2441025A-2C54-446A-AFC1-F27437060FEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShippingService", "ShippingService\ShippingService\ShippingService.csproj", "{8532BFB9-33A2-4927-9B84-4A14B5301D07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shipping.gRPC", "ShippingService\ShippingService\Shipping.gRPC.csproj", "{8532BFB9-33A2-4927-9B84-4A14B5301D07}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotificationService", "NotificationService", "{9100AE9D-3B1D-425C-9BF3-150008687261}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "OrderService\Tests\Tests.csproj", "{C773CC8C-FE4D-B375-6ECD-10EDDCC4684D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Tests", "OrderService\Tests\Order.Tests.csproj", "{C773CC8C-FE4D-B375-6ECD-10EDDCC4684D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "OrderService\Infrastructure\Services\Services.csproj", "{8EDD877F-D07F-28E4-3C55-6B178EC59559}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Services", "OrderService\Infrastructure\Services\Order.Services.csproj", "{8EDD877F-D07F-28E4-3C55-6B178EC59559}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "AppHost\AppHost.csproj", "{703AF8D2-3EA8-4C98-9A1F-AC1856A74EC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventsProcessor", "EventsProcessor", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsProcessor", "OrderService\EventsProcessor\EventsProcessor\EventsProcessor.csproj", "{A61FC3B3-5876-C0A0-57C2-D809987FB902}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.EventsProcessor", "OrderService\EventsProcessor\EventsProcessor\Order.EventsProcessor.csproj", "{A61FC3B3-5876-C0A0-57C2-D809987FB902}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults", "ServiceDefaults\ServiceDefaults.csproj", "{9E761A76-169C-4615-873D-D5088079E291}"
 EndProject
@@ -191,10 +189,6 @@ Global
 		{0A69EB77-A7BB-458F-8817-AD0BF3747729}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A69EB77-A7BB-458F-8817-AD0BF3747729}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A69EB77-A7BB-458F-8817-AD0BF3747729}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4BB76C04-44E6-46A5-AD56-392993927337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4BB76C04-44E6-46A5-AD56-392993927337}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4BB76C04-44E6-46A5-AD56-392993927337}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4BB76C04-44E6-46A5-AD56-392993927337}.Release|Any CPU.Build.0 = Release|Any CPU
 		{23EA48D6-D034-46AE-A04D-22203A6DE92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{23EA48D6-D034-46AE-A04D-22203A6DE92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23EA48D6-D034-46AE-A04D-22203A6DE92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -271,7 +265,6 @@ Global
 		{866B0883-81A6-4A2F-AC34-F1DD3DB75595} = {163951A8-3FC0-4739-BF0B-75F83A96B9E2}
 		{DD70DE5C-9A88-4EAE-AE6F-0CD629177850} = {163951A8-3FC0-4739-BF0B-75F83A96B9E2}
 		{0A69EB77-A7BB-458F-8817-AD0BF3747729} = {866B0883-81A6-4A2F-AC34-F1DD3DB75595}
-		{4BB76C04-44E6-46A5-AD56-392993927337} = {33677080-5BF6-4B25-A932-B828164C4E5E}
 		{23EA48D6-D034-46AE-A04D-22203A6DE92A} = {33677080-5BF6-4B25-A932-B828164C4E5E}
 		{50B46B4E-1D89-4400-BE6A-E6A8C8FE685B} = {5CB64FC4-4D87-4DC3-B551-1B2B8000F63F}
 		{641C835F-AF8E-4C20-9B30-4923593E6281} = {5CB64FC4-4D87-4DC3-B551-1B2B8000F63F}

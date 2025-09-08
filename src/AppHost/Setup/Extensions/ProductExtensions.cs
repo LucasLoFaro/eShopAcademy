@@ -11,7 +11,9 @@ public static class ProductExtensions
     {
         productApi
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCassandra(cassandra)
+            .WaitFor(cassandra)
             .WithCommonEnvironments()
             .WithEndpoint(port: 8001, targetPort: 8080, name: "http")
             .WithEnvironment("AZURE_CLIENT_ID", "facc151c-6753-4101-9035-e10cc34a38f3")
@@ -19,7 +21,9 @@ public static class ProductExtensions
 
         productGrpc
             .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCassandra(cassandra)
+            .WaitFor(cassandra)
             .WithCommonEnvironments()
             .WithEndpoint(port: 8021, targetPort: 8080, name: "grpc")
             .WithEnvironment("AZURE_CLIENT_ID", "facc151c-6753-4101-9035-e10cc34a38f3")

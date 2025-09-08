@@ -5,8 +5,6 @@ using gRPC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Environment.ApplicationName = "stock.grpc";
-
 builder.AddServiceDefaults();
 
 builder.Services.AddGrpc(opt => { opt.EnableDetailedErrors = true; });

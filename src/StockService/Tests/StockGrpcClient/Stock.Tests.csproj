@@ -21,6 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\API\Stock.API.csproj" />
+    <ProjectReference Include="..\..\Data\Stock.Data.csproj" />
+    <ProjectReference Include="..\..\Domain\Stock.Domain.csproj" />
+    <ProjectReference Include="..\..\gRPC\Stock.gRPC.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Services\Stock.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="Protos\stock.proto" GrpcServices="Client" />
   </ItemGroup>
 

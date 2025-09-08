@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 
 public static partial class Extensions
 {
-    public static TBuilder AddSwagger<TBuilder>(
+    public static TBuilder WithSwagger<TBuilder>(
         this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddEndpointsApiExplorer();

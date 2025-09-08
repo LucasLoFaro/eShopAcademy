@@ -13,20 +13,18 @@ public static partial class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.Services.AddControllers();
-
         builder.AddDefaultConfiguration();
         builder.ConfigureOpenTelemetry();
         builder.AddDefaultHealthChecks();
         builder.Services.AddServiceDiscovery();
+        builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        {
+            options.AllowedSchemes = ["https"];
+        });
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
             http.AddStandardResilienceHandler();
             http.AddServiceDiscovery();
-        });
-        builder.Services.Configure<ServiceDiscoveryOptions>(options =>
-        {
-            options.AllowedSchemes = ["https"];
         });
         builder.Services.AddAutoMapper(new[] { Assembly.GetEntryAssembly() });
 
@@ -42,11 +40,9 @@ public static partial class Extensions
         return builder;
     }
 
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    public static WebApplication UseDefaultEndpoints(this WebApplication app)
     {
-        app.UseAuthorization();
-        app.MapControllers();
-        app.MapDefaultEndpoints();
+        //app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
 
         app.MapHealthChecks("/health");

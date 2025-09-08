@@ -31,8 +31,6 @@ var shippingGrpc = builder.AddProject<Projects.Shipping_gRPC>("eshopacademy-ship
 
 if (builder.Environment.IsDevelopment())
     EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productApi, productGrpc, orderApi, orderEvents, stockApi, stockGrpc, paymentGrpc, shippingGrpc);
-else
-    Console.WriteLine("Running in production mode - no infrastructure will be setup by the AppHost.");
 
 // Build and run the distributed application
 builder.Build().Run();

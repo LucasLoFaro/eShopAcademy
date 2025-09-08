@@ -14,7 +14,7 @@ public static class StockExtensions
             .WithReference(rabbit)
             .WaitFor(rabbit)
             .WithCommonEnvironments()
-            .WithEndpoint(port: 8002, targetPort: 8080, name: "http")
+            .WithHttpEndpoint(8002)
             .WithEnvironment("AZURE_CLIENT_ID", "f8414e0b-f3fc-417e-9579-dcf2522d012f")
             .WithEnvironment("AZURE_CLIENT_SECRET", "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW");
 
@@ -24,7 +24,7 @@ public static class StockExtensions
             .WithReference(rabbit)
             .WaitFor(rabbit)
             .WithCommonEnvironments()
-            .WithEndpoint(port: 8022, targetPort: 8080, name: "grpc")
+            .WithHttpEndpoint(8022)
             .WithEnvironment("AZURE_CLIENT_ID", "f8414e0b-f3fc-417e-9579-dcf2522d012f")
             .WithEnvironment("AZURE_CLIENT_SECRET", "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW");
     }

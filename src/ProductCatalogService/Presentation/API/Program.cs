@@ -1,15 +1,14 @@
-using Core.Application.Interfaces.Data;
 using Core.Application.Interfaces.Services;
+using Core.Application.Interfaces.Data;
 using Core.Application.Services;
-using Data;
-using Data.Interfaces;
-using Data.Repositories;
 using Infrastructure.Services;
+using Data.Repositories;
 using ServiceDefaults;
+using Data.Interfaces;
+using Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.AddServiceDefaults()
        .WithMassTransit()
        .WithSwagger();

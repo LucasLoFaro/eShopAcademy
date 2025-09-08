@@ -11,5 +11,5 @@ public static class CommonExtensions
 
     public static IResourceBuilder<ProjectResource> WithCassandra(this IResourceBuilder<ProjectResource> project, IResourceBuilder<ContainerResource> cassandra)
         => project.WaitFor(cassandra)
-                  .WithEnvironment("ConnectionStrings__Cassandra", "Contact Points=eshopacademy-cassandra;Port=9042;");
+                  .WithEnvironment("ConnectionStrings__Cassandra", "Contact Points=cassandra;Port=9042;");
 }

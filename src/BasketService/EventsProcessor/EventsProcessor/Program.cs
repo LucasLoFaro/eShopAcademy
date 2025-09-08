@@ -6,7 +6,7 @@ using Data;
 
 
 var builder = Host.CreateApplicationBuilder(args);
-//builder.Environment.ApplicationName = "basket.events-processor";
+
 builder.AddServiceDefaults()
     .WithMassTransit((context, cfg) =>
     { 

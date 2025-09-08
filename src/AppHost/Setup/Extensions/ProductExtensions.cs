@@ -15,7 +15,7 @@ public static class ProductExtensions
             .WithCassandra(cassandra)
             .WaitFor(cassandra)
             .WithCommonEnvironments()
-            .WithEndpoint(port: 8001, targetPort: 8080, name: "http")
+            .WithHttpEndpoint(8001)
             .WithEnvironment("AZURE_CLIENT_ID", "facc151c-6753-4101-9035-e10cc34a38f3")
             .WithEnvironment("AZURE_CLIENT_SECRET", "Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3");
 
@@ -25,7 +25,7 @@ public static class ProductExtensions
             .WithCassandra(cassandra)
             .WaitFor(cassandra)
             .WithCommonEnvironments()
-            .WithEndpoint(port: 8021, targetPort: 8080, name: "grpc")
+            .WithHttpEndpoint(8021)
             .WithEnvironment("AZURE_CLIENT_ID", "facc151c-6753-4101-9035-e10cc34a38f3")
             .WithEnvironment("AZURE_CLIENT_SECRET", "Dsq8Q~D6TAdUK9VBKYM.M67LpDyZ_kS210.33cE3");
     }

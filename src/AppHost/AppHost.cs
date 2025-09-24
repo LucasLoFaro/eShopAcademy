@@ -3,9 +3,6 @@ using AppHost.Setup;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-//var api = builder.AddProject<Projects.AppHost>("api");
-
-
 // Basket
 var basketApi = builder.AddProject<Projects.Basket_API>("eshopacademy-basket-api");
 var basketEvents = builder.AddProject<Projects.Basket_EventsProcessor>("eshopacademy-basket-events");

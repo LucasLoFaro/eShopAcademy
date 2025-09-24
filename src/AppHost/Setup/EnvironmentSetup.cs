@@ -1,4 +1,5 @@
 ﻿using AppHost.Setup.Extensions;
+using AppHost.Setup.Resources;
 
 namespace AppHost.Setup;
 
@@ -17,31 +18,41 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> paymentGrpc,
         IResourceBuilder<ProjectResource> shippingGrpc)
     {
-        var redis = builder.AddRedis("redis");
+        // CHECK NAMES! containers are being called differently.
+
+        var redis = builder.AddRedis("redis")
+            .WithDataVolume()
+            .WithLifetime(ContainerLifetime.Persistent);
 
         var stockdb = builder.AddMongoDB("mongodb")
+            .WithDataVolume()
+            .WithLifetime(ContainerLifetime.Persistent)
             .AddDatabase("stock");
 
         var ordersdb = builder.AddPostgres("postgres")
             .WithDataVolume()
             .WithPgAdmin()
+            .WithLifetime(ContainerLifetime.Persistent)
             .AddDatabase("orders");
 
-        var cassandra = builder.AddContainer("cassandra", "cassandra", "latest")
-            .WithEndpoint(port: 9042, targetPort: 9042, name: "cql");
+        var cosmosdb = builder.AddCosmosDb("cosmosdb")
+            .WithLifetime(ContainerLifetime.Persistent);
 
         var rabbit = builder.AddRabbitMQ("rabbit")
             .WithDataVolume()
-            .WithManagementPlugin(); // (user/pass: guest/guest)
+            .WithLifetime(ContainerLifetime.Persistent)
+            .WithManagementPlugin()     // (user/pass: guest/guest)
+            .WithLifetime(ContainerLifetime.Persistent);
 
         // External service mocks
         var mappingsPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Mocks"));
-        var wiremock = builder.AddContainer("eshopacademy-external-services-mocks", "wiremock/wiremock:latest")
-            .WithEndpoint(8090, targetPort: 8080)
-            .WithBindMount(mappingsPath, "/home/wiremock/mappings");
+        var wiremock = builder.AddContainer("external-services-mocks", "wiremock/wiremock:latest")
+            .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
+            .WithBindMount(mappingsPath, "/home/wiremock/mappings")
+            .WithLifetime(ContainerLifetime.Persistent);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
-        ProductExtensions.Configure(productApi, productGrpc, cassandra, rabbit);
+        ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);
         OrderExtensions.Configure(orderApi, orderEvents, ordersdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
         PaymentExtensions.Configure(paymentGrpc, wiremock);

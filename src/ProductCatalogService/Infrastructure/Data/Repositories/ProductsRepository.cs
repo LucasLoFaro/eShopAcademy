@@ -1,43 +1,49 @@
-﻿using Core.Domain.Entities;
+﻿using AutoMapper;
 using Core.Application.Interfaces.Data;
-using Data.Interfaces;
-using Cassandra.Data.Linq;
+using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Data.Repositories
+
+namespace Infrastructure.Data.Repositories;
+
+public class ProductsRepository : IProductsRepository
 {
+    private readonly ProductDbContext _context;
+    private readonly IMapper _mapper;
 
-    public class ProductsRepository : IProductsRepository
+    public ProductsRepository(ProductDbContext context, IMapper mapper)
     {
-        private readonly Table<Product> _products;
-        
-        public ProductsRepository(ICassandraDatabaseClient cassandraSessionProvider)
-        {
-            _products = new Table<Product>(cassandraSessionProvider.Session);
-        }
-
-        public async Task<IEnumerable<Product>> GetAllAsync()
-        {
-            return await _products.Select(p => p).ExecuteAsync();
-        }
-        public async Task<Product> GetByIdAsync(Guid id)
-        {
-            return await _products.Where(p => p.ID == id).FirstOrDefault().ExecuteAsync();
-        }
-
-        public async Task<Product> GetMostExpensive()
-        {
-            return await _products.OrderByDescending(p => p.Price).FirstOrDefault().ExecuteAsync();
-        }
-        
-        public async Task AddAsync(Product product)
-        {
-            await _products.Insert(product).ExecuteAsync();
-        }
-
-        public async Task DeleteAsync(Product product)
-        {
-            await _products.Where(p => p.ID == product.ID).Delete().ExecuteAsync();
-        }
+        _context = context;
+        _mapper = mapper;
     }
 
+    public async Task<IEnumerable<Product>> GetAllAsync()
+        => await _context.Products.ToListAsync();
+
+    public async Task<Product?> GetByIdAsync(Guid id)
+        => await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+    public async Task<Product?> GetMostExpensive()
+        => await _context.Products
+                .OrderByDescending(p => p.Price)
+                .FirstOrDefaultAsync();
+
+    public async Task AddOrUpdateAsync(Product product)
+    {
+        var existingProduct = await GetByIdAsync(product.Id);
+
+        if (existingProduct == null)
+            _context.Products.Add(product);
+        else
+            _mapper.Map(product, existingProduct);
+
+        await _context.SaveChangesAsync();
+    }
+
+
+    public async Task DeleteAsync(Product product)
+    {
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+    }
 }

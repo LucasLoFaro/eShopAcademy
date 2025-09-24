@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ServiceDiscovery;
 using Microsoft.AspNetCore.Builder;
-using System.Reflection;
 using ServiceDefaults;
 
 
@@ -26,7 +25,8 @@ public static partial class Extensions
             http.AddStandardResilienceHandler();
             http.AddServiceDiscovery();
         });
-        builder.Services.AddAutoMapper(new[] { Assembly.GetEntryAssembly() });
+
+        builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
         return builder;
     }

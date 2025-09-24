@@ -1,15 +1,12 @@
-﻿using Core.Application.Interfaces.Data;
-using Core.Application.Services;
-using Core.Domain.Entities;
+﻿using Core.Domain.Entities;
 
-namespace Core.Application.Interfaces.Services
+namespace Core.Application.Interfaces.Services;
+
+public interface IProductService
 {
-    public interface IProductService
-    {
-        Task AddOrUpdateAsync(Product product);
-        Task DeleteAsync(Product product);
-        Task<IEnumerable<Product>> GetAllAsync();
-        Task<Product> GetByIdAsync(Guid id);
-        Task<Product> GetMostExpensive();
-    }
+    Task AddOrUpdateAsync(Product product);
+    Task DeleteAsync(Product product);
+    Task<IEnumerable<Product>> GetAllAsync();
+    Task<Product?> GetByIdAsync(Guid id);
+    Task<Product?> GetMostExpensive();
 }

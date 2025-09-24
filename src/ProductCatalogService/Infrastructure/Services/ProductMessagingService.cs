@@ -1,7 +1,7 @@
 ﻿using Core.Application.Interfaces.Services;
-using Core.Domain.DTOs;
 using Core.Domain.Entities;
 using Core.Domain.Events;
+using Core.Domain.DTOs;
 using MassTransit;
 
 
@@ -23,7 +23,7 @@ public class ProductMessagingService : IProductMessagingService
         {
             Product = new ProductDTO()
             {
-                ID = product.ID,
+                ID = product.Id,
                 Name = product.Name,
                 Price = product.Price
             },
@@ -39,7 +39,7 @@ public class ProductMessagingService : IProductMessagingService
         {
             Product = new ProductDTO()
             {
-                ID = product.ID,
+                ID = product.Id,
                 Name = product.Name,
                 Price = product.Price
             },

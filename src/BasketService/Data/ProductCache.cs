@@ -14,7 +14,7 @@ namespace Data
         private IDatabase _cache;
         private const String PRODUCT_PREFIX = "product:";
 
-        public ProductCache(DatabaseClient database)
+        public ProductCache(IDatabaseClient database)
         {
             _cache = database.GetDatabase();
         }

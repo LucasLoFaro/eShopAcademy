@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Core.Domain.Validators;
 
-namespace Core.Domain.Validators
+internal class ProductValidator
 {
-    internal class ProductValidator
-    {
-    }
 }

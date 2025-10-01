@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Core.Domain.Entities;
 using Core.Domain.Contracts;
-using Infrastructure.Services.Interfaces;
+using Core.Domain.Entities;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace API.Controllers
@@ -10,14 +10,14 @@ namespace API.Controllers
     [Route("[controller]")]
     public class OrdersController : ControllerBase
     {
-        private readonly IOrderMessagingService _orderMessaging;
+        private readonly OrderMessagingClient _orderMessaging;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrdersController"/> class.
         /// </summary>
         /// <param name="orderMessaging">Service used to publish order commands to the
         /// message bus.</param>
-        public OrdersController(IOrderMessagingService orderMessaging)
+        public OrdersController(OrderMessagingClient orderMessaging)
         {
             _orderMessaging = orderMessaging;
         }

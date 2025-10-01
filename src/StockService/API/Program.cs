@@ -1,51 +1,44 @@
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using Infrastructure.Services.Interfaces;
-using Infrastructure.Services.Settings;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Services;
 using Infrastructure.Data;
-using Azure.Identity;
+using ServiceDefaults;
+using Data;
 
 
+namespace API;
 
-
-namespace API
+public class Program
 {
-    public class Program
+    public static async Task Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.AddServiceDefaults()
+               .WithSwagger()
+               .WithMassTransit();
+
+        builder.Services.AddControllers();
+
+        builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock"), "stock"));
+        builder.Services.AddScoped<IStockRepository, StockRepository>();
+
+        builder.Services.AddTransient<StockMessagingClient>();
+
+        var app = builder.Build();
+        if (app.Environment.IsDevelopment())
+            await SeedTestData(app);
+
+        app.MapControllers();
+        app.UseDefaultEndpoints();
+        app.Run();
+    }
+
+    private static async Task SeedTestData(WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Configuration.AddAzureAppConfiguration(options =>
-                options.Connect(
-                    new Uri($"https://{Environment.GetEnvironmentVariable("APPCONFIGURATION")}.azconfig.io"),
-                    new DefaultAzureCredential())
-                .ConfigureKeyVault(kv => { kv.SetCredential(new DefaultAzureCredential()); })
-                .Select("common:*", LabelFilter.Null)
-                .Select("stock:*", LabelFilter.Null)
-                );
-
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            // Add services to the container.
-            // TODO: Add AutoMapper
-            // TODO: Add Serilog
-            builder.Services.AddDbContext<StockDbContext>(options =>
-                options.UseMongoDB(builder.Configuration["stock:ConnectionStrings:MongoDB"], "eShopAcademy")
-            );
-            builder.Services.AddScoped<IStockRepository, StockRepository>();
-            builder.Services.Configure<ServiceBusSettings>(builder.Configuration.GetSection("common:ServiceBusSettings"));
-            builder.Services.AddTransient<IMessagingServiceClient, Infrastructure.Services.ServiceBusClient>();
-
-            var app = builder.Build();
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            app.UseHttpsRedirection();
-            app.UseAuthorization();
-            app.MapControllers();
-            app.Run();
+            var db = scope.ServiceProvider.GetRequiredService<StockDbContext>();
+            var messaging = scope.ServiceProvider.GetRequiredService<StockMessagingClient>();
+            await StockSeedData.InitializeAsync(db, messaging);
         }
     }
 }

@@ -4,29 +4,35 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>f2823b9c-182d-463c-b73b-f8bb6a496894</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
-    <PackageReference Include="Aspire.Hosting.MongoDB" Version="9.4.1" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
-    <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.1" />
+    <PackageReference Include="Aspire.Hosting" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.MongoDB" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.2" />
+    <PackageReference Include="Azure.Identity" Version="1.15.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BasketService\API\API.csproj" />
-    <ProjectReference Include="..\BasketService\EventsProcessor\EventsProcessor\EventsProcessor.csproj" />
-    <ProjectReference Include="..\OrderService\EventsProcessor\EventsProcessor\EventsProcessor.csproj" />
-    <ProjectReference Include="..\OrderService\Presentation\API\API.csproj" />
-    <ProjectReference Include="..\PaymentService\gRPC\gRPC.csproj" />
-    <ProjectReference Include="..\ProductCatalogService\Presentation\API\API.csproj" />
-    <ProjectReference Include="..\ProductCatalogService\Presentation\gRPC\gRPC.csproj" />
-    <ProjectReference Include="..\StockService\API\API.csproj" />
-    <ProjectReference Include="..\StockService\gRPC\gRPC.csproj" />
+    <ProjectReference Include="..\BasketService\API\Basket.API.csproj" />
+    <ProjectReference Include="..\BasketService\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj" />
+    <ProjectReference Include="..\OrderService\EventsProcessor\EventsProcessor\Order.EventsProcessor.csproj" />
+    <ProjectReference Include="..\OrderService\Presentation\API\Order.API.csproj" />
+    <ProjectReference Include="..\PaymentService\gRPC\Payment.gRPC.csproj" />
+    <ProjectReference Include="..\ProductCatalogService\Presentation\API\Product.API.csproj" />
+    <ProjectReference Include="..\ProductCatalogService\Presentation\gRPC\Product.gRPC.csproj" />
+    <ProjectReference Include="..\ShippingService\ShippingService\Shipping.gRPC.csproj" />
+    <ProjectReference Include="..\StockService\API\Stock.API.csproj" />
+    <ProjectReference Include="..\StockService\gRPC\Stock.gRPC.csproj" />
   </ItemGroup>
 
   <ItemGroup>

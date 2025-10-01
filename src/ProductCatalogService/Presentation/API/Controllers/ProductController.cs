@@ -51,7 +51,7 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {            
-            Product product = await _productService.GetByIdAsync(id);
+            Product? product = await _productService.GetByIdAsync(id);
             if (product == null)
                 return BadRequest("Product " + id + " not found.");
 

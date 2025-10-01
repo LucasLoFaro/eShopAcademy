@@ -1,4 +1,5 @@
 using Core.Application.Interfaces.Services;
+using Core.Application.Services;
 using Grpc.Core;
 
 
@@ -26,12 +27,12 @@ public class ProductGrpcService : ProductService.ProductServiceBase
         
         return new ProductResponse
         {
-            Id = product.ID.ToString(),
+            Id = product.Id.ToString(),
             Name = product.Name,
-            Price = product.Price,
+            Price = (double)product.Price,
             Description = product.Description ?? "",
-            Image = product.Image ?? "",
-            CategoryName = product.CategoryName ?? ""
+            ImageUrl = product.ImageUrl ?? "",
+            CategoryId = product.CategoryId
         };
     }
 }

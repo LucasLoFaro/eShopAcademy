@@ -1,6 +1,5 @@
 ﻿using Data.Interfaces;
 using StackExchange.Redis;
-using Microsoft.Extensions.Options;
 
 namespace Data
 {
@@ -9,20 +8,13 @@ namespace Data
         ConnectionMultiplexer redis;
         IDatabase db;
 
-        public DatabaseClient(IOptionsMonitor<DatabaseSettings> settings)
+        public DatabaseClient(string connectionString)
         {
-            redis = ConnectionMultiplexer.Connect(settings.CurrentValue.URL);
-            db = redis.GetDatabase();
-        }
-        public DatabaseClient(String url)
-        {
-            redis = ConnectionMultiplexer.Connect(url);
+            redis = ConnectionMultiplexer.Connect(connectionString);
             db = redis.GetDatabase();
         }
 
         public IDatabase GetDatabase()
-        {
-            return db;
-        }
+            => db;
     }
 }

@@ -13,8 +13,8 @@ message ProductRequest {
 message ProductResponse {
   string id = 1;
   string name = 2;
-  float price = 3;
+  double price = 3;
   string description = 4;
-  string image = 5;
-  string category_name = 6;
+  string image_url = 5;
+  string category_id = 6;
 }

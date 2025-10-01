@@ -1,5 +1,6 @@
 ﻿using AppHost.Setup.Extensions;
 using AppHost.Setup.Resources;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppHost.Setup;
 
@@ -57,6 +58,7 @@ public static class EnvironmentSetup
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
         PaymentExtensions.Configure(paymentGrpc, wiremock);
         ShippingExtensions.Configure(shippingGrpc, wiremock);
+
     }
 }
 

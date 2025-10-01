@@ -1,33 +1,44 @@
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Services;
 using Infrastructure.Data;
 using ServiceDefaults;
+using Data;
 
 
 namespace API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
         builder.AddServiceDefaults()
                .WithSwagger()
                .WithMassTransit();
 
         builder.Services.AddControllers();
 
-        builder.Services.AddDbContext<StockDbContext>(options =>
-            options.UseMongoDB(builder.Configuration.GetConnectionString("mongodb"), "stock")
-        );
+        builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock"), "stock"));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
-        
+
         builder.Services.AddTransient<StockMessagingClient>();
 
         var app = builder.Build();
+        if (app.Environment.IsDevelopment())
+            await SeedTestData(app);
+
         app.MapControllers();
         app.UseDefaultEndpoints();
         app.Run();
+    }
+
+    private static async Task SeedTestData(WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<StockDbContext>();
+            var messaging = scope.ServiceProvider.GetRequiredService<StockMessagingClient>();
+            await StockSeedData.InitializeAsync(db, messaging);
+        }
     }
 }

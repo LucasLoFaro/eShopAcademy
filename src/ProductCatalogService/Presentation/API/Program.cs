@@ -1,12 +1,13 @@
-using Core.Application.Interfaces.Data;
 using Core.Application.Interfaces.Services;
-using Core.Application.Services;
-using Infrastructure.Data;
+using Core.Application.Interfaces.Data;
 using Infrastructure.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Core.Application.Services;
 using Infrastructure.Services;
 using Microsoft.Azure.Cosmos;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Data;
 using ServiceDefaults;
+using Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,13 +41,22 @@ builder.Services.AddTransient<IProductService, ProductService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-    await db.Database.EnsureCreatedAsync();
-}
+if (app.Environment.IsDevelopment())
+    await SeedTestData(app);
 
 app.MapControllers();
 app.UseDefaultEndpoints();
 
 app.Run();
+
+static async Task SeedTestData(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+        await db.Database.EnsureCreatedAsync();
+
+        var messagingService = scope.ServiceProvider.GetRequiredService<IProductMessagingService>();
+        await SeedData.InitializeAsync(db, messagingService);
+    }
+}

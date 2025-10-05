@@ -1,5 +1,4 @@
-using Core.Domain.Contracts;
-using Infrastructure.Services;
+using Core.Application.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     /// Gets the mock messaging service used during tests.  Tests can use this
     /// mock to verify that SubmitOrder was called with the expected request.
     /// </summary>
-    public Mock<OrderMessagingClient> MessagingServiceMock { get; } = new Mock<OrderMessagingClient>();
+    public Mock<IOrderMessagingClient> MessagingServiceMock { get; } = new Mock<IOrderMessagingClient>();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -28,13 +27,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         {
             // Remove the existing IOrderMessagingService registration if present
             var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(OrderMessagingClient));
+                d => d.ServiceType == typeof(IOrderMessagingClient));
             if (descriptor != null)
             {
                 services.Remove(descriptor);
             }
             // Register the mock implementation
-            services.AddSingleton<OrderMessagingClient>(provider => MessagingServiceMock.Object);
+            services.AddSingleton<IOrderMessagingClient>(provider => MessagingServiceMock.Object);
         });
     }
 

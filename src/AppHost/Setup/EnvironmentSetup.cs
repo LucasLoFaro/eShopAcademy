@@ -1,5 +1,4 @@
 ﻿using AppHost.Setup.Extensions;
-using AppHost.Setup.Resources;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppHost.Setup;
@@ -16,7 +15,9 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> orderEvents,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
+        IResourceBuilder<ProjectResource> paymentApi,
         IResourceBuilder<ProjectResource> paymentGrpc,
+        IResourceBuilder<ProjectResource> shippingApi,
         IResourceBuilder<ProjectResource> shippingGrpc)
     {
         // CHECK NAMES! containers are being called differently.
@@ -56,9 +57,8 @@ public static class EnvironmentSetup
         ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);
         OrderExtensions.Configure(orderApi, orderEvents, ordersdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
-        PaymentExtensions.Configure(paymentGrpc, wiremock);
-        ShippingExtensions.Configure(shippingGrpc, wiremock);
-
+        PaymentExtensions.Configure(paymentApi, paymentGrpc, wiremock, rabbit);
+        ShippingExtensions.Configure(shippingApi, shippingGrpc, wiremock, rabbit);
     }
 }
 

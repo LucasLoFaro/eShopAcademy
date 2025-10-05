@@ -1,7 +1,7 @@
 using Core.Domain.Events;
 using Data.Interfaces;
 using MassTransit;
-using Core.Domain.DTOs;
+using Core.Domain.Contracts;
 using AutoMapper;
 
 namespace EventsProcessor.Consumers

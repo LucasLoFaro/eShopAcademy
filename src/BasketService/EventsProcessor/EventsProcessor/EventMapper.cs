@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Core.Domain.DTOs;
+using Core.Domain.Contracts;
 using Core.Domain.Events;
 using Domain.DTOs;
 

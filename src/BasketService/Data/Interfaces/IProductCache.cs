@@ -1,4 +1,4 @@
-﻿using Core.Domain.DTOs;
+﻿using Core.Domain.Contracts;
 using Core.Domain.Entities;
 using Domain.DTOs;
 

@@ -1,5 +1,5 @@
 ﻿using Data.Interfaces;
-using Core.Domain.DTOs;
+using Core.Domain.Contracts;
 using Core.Domain.Entities;
 using NRedisStack;
 using NRedisStack.RedisStackCommands;

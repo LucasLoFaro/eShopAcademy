@@ -1,7 +1,7 @@
 ﻿using Core.Application.Interfaces.Services;
 using Core.Domain.Entities;
 using Core.Domain.Events;
-using Core.Domain.DTOs;
+using Core.Domain.Contracts;
 using MassTransit;
 
 

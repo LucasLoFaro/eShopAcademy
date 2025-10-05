@@ -1,4 +1,4 @@
-﻿namespace Core.Domain.DTOs;
+﻿namespace Core.Domain.Contracts;
 
 public class ProductDTO
 {

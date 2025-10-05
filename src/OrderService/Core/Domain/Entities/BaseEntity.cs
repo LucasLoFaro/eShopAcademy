@@ -1,9 +1,8 @@
-﻿namespace Core.Domain.Entities
+﻿namespace Core.Domain.Entities;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ModifiedAt { get; set; }
-    }
+    public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
 }

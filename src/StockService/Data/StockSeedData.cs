@@ -1,4 +1,4 @@
-﻿using Core.Domain.DTOs;
+﻿using Core.Domain.Contracts;
 using Core.Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -25,7 +25,7 @@ public static class StockSeedData
             await context.Stocks.InsertManyAsync(stocks, cancellationToken: ct);
 
             foreach (var stock in stocks)
-                await messaging.SendStockUpdate(new AlterStockDTO(stock), ct);
+                await messaging.SendStockUpdate(new AlterStockRequest(stock), ct);
         }   
     }
 }

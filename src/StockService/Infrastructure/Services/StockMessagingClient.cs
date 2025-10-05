@@ -1,5 +1,5 @@
 ﻿using Core.Domain.Events;
-using Core.Domain.DTOs;
+using Core.Domain.Contracts;
 using MassTransit;
 
 
@@ -15,11 +15,11 @@ public class StockMessagingClient
     }
 
 
-    public async Task SendStockUpdate(AlterStockDTO stock, CancellationToken ct = default)
+    public async Task SendStockUpdate(AlterStockRequest stock, CancellationToken ct = default)
     {
         var command = new StockUpdatedEvent
         {
-            Stock = new AlterStockDTO
+            Stock = new AlterStockRequest
             {
                 ProductGuid = stock.ProductGuid,
                 Quantity = stock.Quantity,

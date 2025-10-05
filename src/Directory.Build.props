@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+	<Version>1.0.0</Version>
+	<InformationalVersion>$(Version)-$(SourceRevisionId)</InformationalVersion>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+</Project>

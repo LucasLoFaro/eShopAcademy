@@ -10,11 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.15.0" />
-    <PackageReference Include="MassTransit" Version="8.5.2" />
-    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MassTransit" Version="8.5.4" />
+    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.10.0">
@@ -32,8 +35,8 @@
     <ProjectReference Include="..\..\Core\Domain\Product.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Product.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Services\Product.Services.csproj" />
-    <ProjectReference Include="..\..\Presentation\API\Product.API.csproj" />
-    <ProjectReference Include="..\..\Presentation\gRPC\Product.gRPC.csproj" />
+    <ProjectReference Include="..\..\Presentation\Product.API\Product.API.csproj" />
+    <ProjectReference Include="..\..\Presentation\Product.gRPC\Product.gRPC.csproj" />
   </ItemGroup>
 
 </Project>

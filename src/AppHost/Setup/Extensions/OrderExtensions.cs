@@ -1,6 +1,4 @@
-﻿using StackExchange.Redis;
-
-namespace AppHost.Setup.Extensions;
+﻿namespace AppHost.Setup.Extensions;
 
 public static class OrderExtensions
 {

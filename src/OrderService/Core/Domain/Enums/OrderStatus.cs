@@ -3,10 +3,12 @@
 public enum OrderStatus
 {
     Created,
-    Confirmed,
     Paid,
+    Confirmed,
     Processing,
+    ReadyForPickup,
     Shipped,
     Delivered,
-    Cancelled
+    Cancelled,
+    Error
 }

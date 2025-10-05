@@ -25,7 +25,7 @@ public static partial class Extensions
             http.AddStandardResilienceHandler();
             http.AddServiceDiscovery();
         });
-
+        
         builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
         return builder;

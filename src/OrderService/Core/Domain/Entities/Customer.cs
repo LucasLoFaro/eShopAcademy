@@ -1,6 +1,6 @@
 ﻿namespace Core.Domain.Entities;
 
-public class Customer : BaseEntity
+public class Customer
 {
     public string Name { get; set; }
     public string Mail { get; set; }

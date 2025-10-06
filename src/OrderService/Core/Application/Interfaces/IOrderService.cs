@@ -10,4 +10,5 @@ public interface IOrderService
     Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request);
     Task<List<Order>> GetAllOrders();
     Task<Order?> GetOrderById(Guid id);
+    Task RemoveOrder(Guid id);
 }

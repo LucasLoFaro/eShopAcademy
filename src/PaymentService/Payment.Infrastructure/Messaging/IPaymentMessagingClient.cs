@@ -12,7 +12,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         _publishEndpoint = publishEndpoint;
     }
 
-    public async Task SendPaymentCompleted(Guid orderId, Guid paymentSessionId, CancellationToken ct = default)
+    public async Task SendPaymentCompleted(string orderId, string paymentSessionId, CancellationToken ct = default)
     {
         var evt = new PaymentCompletedEvent
         {
@@ -23,7 +23,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         await _publishEndpoint.Publish(evt, ct);
     }
 
-    public async Task SendPaymentFailed(Guid orderId, Guid paymentSessionId, string reason, CancellationToken ct = default)
+    public async Task SendPaymentFailed(string orderId, string paymentSessionId, string reason, CancellationToken ct = default)
     {
         var evt = new PaymentFailedEvent
         {
@@ -38,6 +38,6 @@ public class PaymentMessagingClient : IPaymentMessagingClient
 
 public interface IPaymentMessagingClient
 {
-    Task SendPaymentCompleted(Guid orderId, Guid paymentSessionId, CancellationToken ct = default);
-    Task SendPaymentFailed(Guid orderId, Guid paymentSessionId, string reason, CancellationToken ct = default);
+    Task SendPaymentCompleted(string orderId, string paymentSessionId, CancellationToken ct = default);
+    Task SendPaymentFailed(string orderId, string paymentSessionId, string reason, CancellationToken ct = default);
 }

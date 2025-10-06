@@ -19,8 +19,8 @@ public class PaymentServiceClient : IPaymentServiceClient
     {
         var request = new InitiatePaymentRequest
         {
-            OrderId = orderId.ToString(),
-            Amount = amount.ToString("F2", CultureInfo.InvariantCulture),
+            ExternalId = orderId.ToString(),
+            Amount = amount,
             Currency = currency,
             NotificationUrl = notificationUrl
         };
@@ -28,8 +28,8 @@ public class PaymentServiceClient : IPaymentServiceClient
         if (response != null && response.Status.Equals("Pending")) {
             return new()
             {
-                Id = new Guid(),
-                Amount = Convert.ToDouble(response.Amount),
+                Id = new Guid(response.Id),
+                Amount = response.Amount,
                 OrderId = new Guid(response.ExternalId),
                 Status = Core.Domain.Enums.PaymentStatus.Pending,
                 PaymentURL = response.Url,

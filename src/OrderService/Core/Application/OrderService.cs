@@ -69,13 +69,13 @@ public class OrderService : IOrderService
 
         order.TotalPrice = order.Items.Sum(i => i.Quantity * i.Price);
 
-        var notificationUrl = $"https://psp.com/payment/{Guid.NewGuid().ToString()}"; // TODO: Move to config
+        var notificationUrl = "http://payment-api/api/payments/webhook";
         var payment = await _paymentClient.InitPaymentAsync(order.TotalPrice, "USD", notificationUrl, order.Id);
         if (payment == null)
             throw new InvalidOperationException("There was an error creating the payment");
 
         order.PaymentId = payment.Id;
-        order.Payment = payment;
+         order.Payment = payment;
 
         var reserve = await _stockClient.ReserveStockAsync(request.Items);
         if (!reserve.IsSuccess)
@@ -94,4 +94,7 @@ public class OrderService : IOrderService
             Status = order.Status
         };
     }
+
+    public Task RemoveOrder(Guid id)
+        => _db.RemoveByIdAsync(id);
 }

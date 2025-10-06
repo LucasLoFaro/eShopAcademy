@@ -46,12 +46,9 @@ public static class EnvironmentSetup
             .WithManagementPlugin()     // (user/pass: guest/guest)
             .WithLifetime(ContainerLifetime.Persistent);
 
-        // External service mocks
-        var mappingsPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Mocks"));
-        var wiremock = builder.AddContainer("external-services-mocks", "wiremock/wiremock:latest")
-            .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
-            .WithBindMount(mappingsPath, "/home/wiremock/mappings")
-            .WithLifetime(ContainerLifetime.Persistent);
+        var wiremock = builder.AddWiremock("external-services-mocks")
+            .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks");
+            //.WithLifetime(ContainerLifetime.Persistent);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);

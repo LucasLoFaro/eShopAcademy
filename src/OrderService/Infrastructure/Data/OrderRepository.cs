@@ -28,4 +28,19 @@ public class OrderRepository : IOrderRepository
             .ThenInclude(i => i.Product)
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == id);
+
+    public async Task<bool> RemoveByIdAsync(Guid id)
+    {
+        var order = await _db.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (order is null)
+            return false;
+
+        _db.Orders.Remove(order);
+        await _db.SaveChangesAsync();
+
+        return true;
+    }
 }

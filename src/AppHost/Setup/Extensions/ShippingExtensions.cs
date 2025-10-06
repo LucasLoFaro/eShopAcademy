@@ -13,14 +13,14 @@ public static class ShippingExtensions
             .WithReference(rabbit)
             .WaitFor(rabbit)
             .WithCommonEnvironments()
-            .WithHttpEndpoint(port: 8005, name: "shipping-api")
+            .WithHttpEndpoint(port: 8007, name: "shipping-api")
             .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
             .WithEnvironment("AZURE_CLIENT_ID", "bdcf29bc-ebed-428f-9b86-e3d84d9a2314")
             .WithEnvironment("AZURE_CLIENT_SECRET", "ceL8Q~xXDZOCEjzSCB16Gv-cpDQxy7iKNcT6-cxX");
         shippingGrpc
             .WaitFor(wiremock)
             .WithCommonEnvironments()
-            .WithHttpEndpoint(port: 8025, name: "shipping-grpc")
+            .WithHttpEndpoint(port: 8027, name: "shipping-grpc")
             .WithEnvironment("WireMock__BaseUrl", "http://wiremock:8080")
             .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
             .WithEnvironment("AZURE_CLIENT_ID", "bdcf29bc-ebed-428f-9b86-e3d84d9a2314")

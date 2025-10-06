@@ -17,6 +17,7 @@ builder.AddServiceDefaults()
 builder.Services.AddControllers()
     .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(options =>
 {

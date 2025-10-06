@@ -9,17 +9,17 @@ service PaymentGrpc {
 }
 
 message InitiatePaymentRequest {
-  string order_id = 1;
-  string amount = 2;
-  string currency = 3;
+  double amount = 1;
+  string currency = 2;
+  string external_id = 3;
   string notification_url = 4;
 }
 
 message InitiatePaymentResponse {
   string id = 1;
-  string external_id = 2;
-  string amount = 3;
-  string currency = 4;
+  double amount = 2;
+  string currency = 3;
+  string external_id = 4;
   string status = 5;
   string url = 6;
 }

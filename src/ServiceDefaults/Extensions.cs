@@ -44,14 +44,14 @@ public static partial class Extensions
     {
         //app.MapDefaultEndpoints();
         app.UseHttpsRedirection();
+        app.UseRouting();
 
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/alive", new HealthCheckOptions
         {
             Predicate = r => r.Tags.Contains("live")
         });
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerIfEnabled();
 
         return app;
     }

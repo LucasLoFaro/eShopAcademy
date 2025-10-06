@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
@@ -35,5 +36,19 @@ public static partial class Extensions
         });
 
         return builder;
+    }
+
+    public static WebApplication UseSwaggerIfEnabled(this WebApplication app)
+    {
+        var hasSwagger = app.Services.GetService<Microsoft.OpenApi.Models.OpenApiInfo>() != null
+                         || app.Services.GetService<Swashbuckle.AspNetCore.Swagger.ISwaggerProvider>() != null;
+
+        if (hasSwagger)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        return app;
     }
 }

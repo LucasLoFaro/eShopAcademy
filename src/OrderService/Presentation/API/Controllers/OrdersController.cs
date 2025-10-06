@@ -33,4 +33,11 @@ public class OrdersController : ControllerBase
         var order = await _orderService.PlaceOrderAsync(request);
         return Accepted(order);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> RemoveOrder(Guid id)
+    {
+        await _orderService.RemoveOrder(id);
+        return NoContent();
+    }
 }

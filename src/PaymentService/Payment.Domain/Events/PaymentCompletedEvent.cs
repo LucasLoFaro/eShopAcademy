@@ -2,7 +2,7 @@
 
 public class PaymentCompletedEvent : BaseEvent
 {
-    public Guid OrderId { get; init; }
-    public Guid PaymentSessionId { get; init; }
+    public string OrderId { get; init; } = default!;
+    public string PaymentSessionId { get; init; } = default!;
     public string PSPReference { get; init; } = string.Empty;
 }

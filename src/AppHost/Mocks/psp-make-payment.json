@@ -6,12 +6,12 @@
   "response": {
     "status": 200,
     "jsonBody": {
-      "id": "{{randomValue length=36 type='UUID'}}",
-      "externalId": "{{jsonPath request.body '$.OrderId'}}",
-      "amount": "{{jsonPath request.body '$.Amount'}}",
-      "currency": "{{jsonPath request.body '$.Currency'}}",
-      "status": "Created"
-
+      "Id": "{{randomValue type='UUID'}}",
+      "Amount": "{{jsonPath request.body '$.Amount'}}",
+      "Currency": "{{jsonPath request.body '$.Currency'}}",
+      "Status": "Pending",
+      "ExternalId": "{{jsonPath request.body '$.ExternalId'}}",
+      "Url": "https://psp.com/payment/{{randomValue type='UUID'}}"
     },
     "transformers": [ "response-template" ]
   },
@@ -20,15 +20,34 @@
       "name": "webhook",
       "parameters": {
         "method": "POST",
-        "url": "https://webhook.site/5a8009b5-c0a4-454d-9b04-8b98239d6b99",
-        //"url": "{{jsonPath originalResponse.body '$.NotificationUrl'}}",
-        "delay": 1000,
+        //"url": "https://webhook.site/ef584cda-0fab-4669-a2da-b6097830c364",
+        "url": "{{jsonPath request.body '$.NotificationUrl'}}",
+        "delay": {
+          "type": "fixed",
+          "milliseconds": 1000
+        },
         "headers": {
           "Content-Type": "application/json",
           "X-Signature": "Signature"
         },
-        //"body": "{ \"id\": \"{{jsonPath originalRequest.body '$.id'}}\", \"status\": \"success\", \"user\": \"{{jsonPath originalRequest.body '$.user'}}\" }"
-        "body": "{ \"id\": \"{{jsonPath originalResponse.body '$.id'}}\", \"amount\": \"{{jsonPath originalRequest.body '$.Amount'}}\", \"currency\": \"{{jsonPath originalRequest.body '$.Amount'}}\", \"Status\": \"Pending\", \"OrderId\": \"{{jsonPath originalRequest.body '$.OrderId'}}\" }"
+        "body": "{ \"Id\": \"{{randomValue type='UUID'}}\", \"Amount\": \"{{jsonPath request.body '$.Amount'}}\", \"Currency\": \"{{jsonPath request.body '$.Currency'}}\", \"Status\": \"Success\", \"ExternalId\": \"{{jsonPath request.body '$.ExternalId'}}\" }"
+      }
+    },
+    {
+      "name": "webhook",
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/ef584cda-0fab-4669-a2da-b6097830c364",
+        //"url": "{{jsonPath originalRequest.body '$.NotificationUrl'}}",
+        "delay": {
+          "type": "fixed",
+          "milliseconds": 1000
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Signature": "Signature"
+        },
+        "body": "{ \"Id\": \"{{randomValue type='UUID'}}\", \"Amount\": \"{{jsonPath originalRequest.body '$.Amount'}}\", \"Currency\": \"{{jsonPath originalRequest.body '$.Currency'}}\", \"Status\": \"Success\", \"ExternalId\": \"{{jsonPath originalRequest.body '$.ExternalId'}}\" }"
       }
     }
   ]

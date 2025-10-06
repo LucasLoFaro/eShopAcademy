@@ -1,5 +1,4 @@
 using Infrastructure.Helpers;
-using System.Globalization;
 using Domain.Contracts;
 using Newtonsoft.Json;
 using System.Text;
@@ -24,8 +23,8 @@ public class PaymentService : PaymentGrpc.PaymentGrpcBase
     {
         var paymentRequest = new PaymentRequest
         {
-            OrderId = request.OrderId,
-            Amount = decimal.Parse(request.Amount, CultureInfo.InvariantCulture),
+            ExternalId = request.ExternalId,
+            Amount = request.Amount,
             Currency = request.Currency,
             NotificationUrl = request.NotificationUrl
         };
@@ -49,9 +48,9 @@ public class PaymentService : PaymentGrpc.PaymentGrpcBase
 
         return new InitiatePaymentResponse
         {
-            Id = paymentResponse.Id.ToString(),
+            Id = paymentResponse.Id,
             ExternalId = paymentResponse.ExternalId,
-            Amount = paymentResponse.Amount.ToString(CultureInfo.InvariantCulture),
+            Amount = paymentResponse.Amount,
             Currency = paymentResponse.Currency,
             Status = paymentResponse.Status,
             Url = paymentResponse.Url

@@ -1,9 +1,10 @@
-using Infrastructure.Helpers;
 using Domain.Contracts;
-using Newtonsoft.Json;
-using System.Text;
 using Grpc.Core;
+using Infrastructure.Helpers;
+using Infrastructure.Messaging;
+using Newtonsoft.Json;
 using Protos;
+using System.Text;
 
 
 namespace Services;
@@ -11,11 +12,13 @@ namespace Services;
 public class PaymentService : PaymentGrpc.PaymentGrpcBase
 {
     private readonly HttpClient _httpClient;
+    private readonly IPaymentMessagingClient _messagingClient;
     private readonly ISignatureHelper _signatureHelper;
 
-    public PaymentService(HttpClient httpClient, ISignatureHelper signatureHelper)
+    public PaymentService(HttpClient httpClient, IPaymentMessagingClient messagingClient, ISignatureHelper signatureHelper)
     {
         _httpClient = httpClient;
+        _messagingClient = messagingClient;
         _signatureHelper = signatureHelper;
     }
 
@@ -40,12 +43,14 @@ public class PaymentService : PaymentGrpc.PaymentGrpcBase
 
 
         using var response = await _httpClient.SendAsync(httpRequest, context.CancellationToken);
-        response.EnsureSuccessStatusCode();
-
         var paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>(cancellationToken: context.CancellationToken);
-        if (paymentResponse is null)
-            throw new RpcException(new Status(StatusCode.Internal, "Invalid PSP response"));
 
+        if (!response.IsSuccessStatusCode)
+            _messagingClient.SendPaymentFailed(paymentResponse!.ExternalId, paymentResponse.Id, paymentResponse.FailureReason!, context.CancellationToken).GetAwaiter().GetResult();
+
+        _messagingClient.SendPaymentCreated(paymentResponse!.ExternalId, paymentResponse.Id, context.CancellationToken).GetAwaiter().GetResult();
+
+        // TODO: Add automapper.
         return new InitiatePaymentResponse
         {
             Id = paymentResponse.Id,

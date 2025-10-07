@@ -13,12 +13,12 @@ public class StockRepository : IStockRepository
         _stocks = context.Stocks;
     }
 
-    public async Task<IReadOnlyList<Stock>> GetAllAsync()
+    public async Task<IReadOnlyList<Stock>> GetAllAsync(CancellationToken ct = default)
     {
-        return await _stocks.Find(Builders<Stock>.Filter.Empty).ToListAsync();
+        return await _stocks.Find(Builders<Stock>.Filter.Empty).ToListAsync(ct);
     }
 
-    public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid)
+    public async Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid, CancellationToken ct = default)
     {
         var filter = Builders<Stock>.Filter.And(
             Builders<Stock>.Filter.Eq(s => s.ProductID, productGuid),
@@ -27,26 +27,25 @@ public class StockRepository : IStockRepository
         return await _stocks.Find(filter).ToListAsync();
     }
 
-    public async Task<Stock?> GetByProductGuidAndWarehouseAsync(Guid productGuid, string warehouse)
+    // TODO: Filter by warehouse
+    public async Task<Stock?> GetByProductIdAsync(Guid productGuid, CancellationToken ct = default)
     {
         var filter = Builders<Stock>.Filter.And(
             Builders<Stock>.Filter.Eq(s => s.ProductID, productGuid),
-            Builders<Stock>.Filter.Eq(s => s.Warehouse, warehouse),
             Builders<Stock>.Filter.Ne(s => s.Quantity, 0)
         );
         return await _stocks.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<Stock> AddAsync(Stock stock)
+    public async Task<Stock> AddOrUpdateAsync(Stock stock, CancellationToken ct = default)
     {
-        await _stocks.InsertOneAsync(stock);
+        var filter = Builders<Stock>.Filter.Eq(s => s.ProductID, stock.ProductID);
+
+        var options = new ReplaceOptions { IsUpsert = true };
+
+        await _stocks.ReplaceOneAsync(filter, stock, options, ct);
+
         return stock;
     }
 
-    public async Task<bool> UpdateAsync(Stock stock)
-    {
-        var filter = Builders<Stock>.Filter.Eq(s => s._id, stock._id);
-        var result = await _stocks.ReplaceOneAsync(filter, stock);
-        return result.ModifiedCount > 0;
-    }
 }

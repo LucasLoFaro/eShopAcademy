@@ -12,23 +12,34 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         _publishEndpoint = publishEndpoint;
     }
 
-    public async Task SendPaymentCompleted(string orderId, string paymentSessionId, CancellationToken ct = default)
+    public async Task SendPaymentCreated(string orderId, string providerTransactionId, CancellationToken ct = default)
     {
-        var evt = new PaymentCompletedEvent
+        var evt = new PaymentCreatedEvent
         {
             OrderId = orderId,
-            PaymentSessionId = paymentSessionId
+            ProviderTransactionId = providerTransactionId
         };
 
         await _publishEndpoint.Publish(evt, ct);
     }
 
-    public async Task SendPaymentFailed(string orderId, string paymentSessionId, string reason, CancellationToken ct = default)
+    public async Task SendPaymentCompleted(string orderId, string providerTransactionId, CancellationToken ct = default)
+    {
+        var evt = new PaymentCompletedEvent
+        {
+            OrderId = orderId,
+            ProviderTransactionId = providerTransactionId
+        };
+
+        await _publishEndpoint.Publish(evt, ct);
+    }
+
+    public async Task SendPaymentFailed(string orderId, string providerTransactionId, string reason, CancellationToken ct = default)
     {
         var evt = new PaymentFailedEvent
         {
             OrderId = orderId,
-            PaymentSessionId = paymentSessionId,
+            PaymentSessionId = providerTransactionId,
             Reason = reason
         };
 
@@ -38,6 +49,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
 
 public interface IPaymentMessagingClient
 {
-    Task SendPaymentCompleted(string orderId, string paymentSessionId, CancellationToken ct = default);
-    Task SendPaymentFailed(string orderId, string paymentSessionId, string reason, CancellationToken ct = default);
+    Task SendPaymentCreated(string orderId, string providerTransactionId, CancellationToken ct = default);
+    Task SendPaymentCompleted(string orderId, string providerTransactionId, CancellationToken ct = default);
+    Task SendPaymentFailed(string orderId, string providerTransactionId, string reason, CancellationToken ct = default);
 }

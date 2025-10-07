@@ -4,15 +4,13 @@ namespace Infrastructure.Data
 {
     public interface IStockRepository
     {
-        Task<IReadOnlyList<Stock>> GetAllAsync();
+        Task<IReadOnlyList<Stock>> GetAllAsync(CancellationToken ct = default);
 
-        Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid);
+        Task<IReadOnlyList<Stock>> GetByProductGuidAsync(Guid productGuid, CancellationToken ct = default);
 
-        Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, String warehouse);
+        Task<Stock> GetByProductIdAsync(Guid productGuid, CancellationToken ct = default);
         //Task<Stock> GetByProductGuidAndWarehouseAsync(Guid productGuid, Warehouse warehouse);
 
-        Task<bool> UpdateAsync(Stock stock);
-        Task<Stock> AddAsync(Stock stock);
-
+        Task<Stock> AddOrUpdateAsync(Stock stock, CancellationToken ct = default);
     }
 }

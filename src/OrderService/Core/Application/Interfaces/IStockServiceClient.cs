@@ -5,5 +5,7 @@ namespace Core.Application.Interfaces;
 
 public interface IStockServiceClient
 {
-    Task<StockReservationResponse> ReserveStockAsync(List<Item> items);
+    Task<ReserveStockResponse> ReserveStockAsync(Guid orderId, List<Item> items, CancellationToken ct);
+    Task<CommitReservationResponse> CommitReservationAsync(Guid orderId, Guid reservationId, CancellationToken ct);
+    Task<CancelReservationResponse> CancelReservationAsync(Guid orderId, Guid reservationId, CancellationToken ct);
 }

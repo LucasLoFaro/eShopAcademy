@@ -15,4 +15,5 @@ public class StockDbContext
     }
 
     public IMongoCollection<Stock> Stocks => _database.GetCollection<Stock>("Stocks");
+    public IMongoCollection<StockReservation> Reservations => _database.GetCollection<StockReservation>("Reservations");
 }

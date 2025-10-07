@@ -19,12 +19,43 @@ public class StockMessagingClient
     {
         var command = new StockUpdatedEvent
         {
-            Stock = new AlterStockRequest
-            {
-                ProductGuid = stock.ProductGuid,
-                Quantity = stock.Quantity,
-                Warehouse = stock.Warehouse
-            }
+            ProductId = stock.ProductGuid,
+            Quantity = stock.Quantity,
+            WarehouseId = stock.Warehouse
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReserved(ReserveStockRequest request, Guid reservationId, CancellationToken ct = default)
+    {
+        var command = new StockReservationCreatedEvent
+        {
+            OrderId = request.OrderId,
+            ReservationId = reservationId
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReservationCommitted(ReserveStockRequest request, Guid reservationId, CancellationToken ct = default)
+    {
+        var command = new StockReservationCommitedEvent
+        {
+            OrderId = request.OrderId,
+            ReservationId = reservationId
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReservationCancelled(Guid orderId, Guid reservationId, string reason, CancellationToken ct = default)
+    {
+        var command = new StockReservationCancelledEvent
+        {
+            OrderId = orderId,
+            ReservationId = reservationId,
+            Reason = reason
         };
 
         await _publishEndpoint.Publish(command, ct);

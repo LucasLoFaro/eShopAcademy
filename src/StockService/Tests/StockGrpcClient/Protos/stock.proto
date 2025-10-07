@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-option csharp_namespace = "StockGrpcClient.Protos";
+option csharp_namespace = "Protos";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 package stock;
 
@@ -12,7 +13,8 @@ service StockProtoService{
     rpc GetStockByProductGuidAndWarehouse(GetStockByProdAndWarehouseRequest) returns (StockModel);
     rpc IncreaseStock(IncreaseStockRequest) returns (IncreaseStockResponse);
     rpc DecreaseStock(DecreaseStockRequest) returns (DecreaseStockResponse);
-    rpc Test (google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc ReserveStock(ReserveStockRequest) returns (ReserveStockResponse);
+    rpc CommitReservation(CommitReservationRequest) returns (CommitReservationResponse);
 }
 
 
@@ -21,6 +23,19 @@ message StockModel{
     string productGuid = 2;
     int32 quantity = 3;
     string warehouse = 4;
+//    WarehouseModel warehouse = 4;
+}
+
+message WarehouseModel{
+    string _id = 1;
+    string Name = 2;
+    LocationModel Location = 3;
+}
+
+message LocationModel{
+    string Address = 1;
+    float Latitude = 2;
+    float Longitude = 3;
 }
 
 message GetStockByProdGuidRequest {
@@ -51,21 +66,38 @@ message IncreaseStockResponse {
 message DecreaseStockResponse {
     bool success = 1;
 }
-/*
-        [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Stock>>> GetAll()
 
-        [HttpGet("{productGuid}", Name = "GetStockByProductGuid")]
-        public async Task<ActionResult<IReadOnlyList<Stock>>> GetStockByProductGuid(string productGuid)
+message StockItemModel {
+    string productGuid = 1;
+    int32 quantity = 2;
+}
 
+message ReservationItemModel {
+    string warehouse = 1;
+    repeated StockItemModel items = 2;
+}
 
-        [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
-        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(string productGuid, string wa
+message ReserveStockRequest {
+    string orderId = 1;
+    repeated ReservationItemModel stock = 2;
+    google.protobuf.Timestamp createdAt = 3;
+}
 
+message ReserveStockResponse {
+    string reservationId = 1;
+    repeated string outOfStockProducts = 2;
+    bool success = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    google.protobuf.Timestamp validUntil = 5;
+}
 
-        public async Task<ActionResult> IncreaseStock([FromForm] AlterStockDTO alterStock)
+message CommitReservationRequest {
+    string orderId = 1;
+    string reservationId = 2;
+}
 
-
-        public async Task<ActionResult> DecreaseStock([FromForm] AlterStockDTO alterStock)
-
-        */
+message CommitReservationResponse {
+    string orderId = 1;
+    string reservationId = 2;
+    bool success = 3;
+}

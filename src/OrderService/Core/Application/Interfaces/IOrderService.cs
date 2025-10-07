@@ -7,8 +7,8 @@ namespace Core.Application.Interfaces;
 
 public interface IOrderService
 {
-    Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request);
-    Task<List<Order>> GetAllOrders();
-    Task<Order?> GetOrderById(Guid id);
-    Task RemoveOrder(Guid id);
+    Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default);
+    Task<List<Order>> GetAllOrders(CancellationToken ct = default);
+    Task<Order?> GetOrderById(Guid id, CancellationToken ct = default);
+    Task RemoveOrder(Guid id, CancellationToken ct = default);
 }

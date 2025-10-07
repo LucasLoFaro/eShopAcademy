@@ -8,4 +8,5 @@ public class PaymentResponse
     public string Status { get; init; } = default!;
     public string ExternalId { get; init; } = default!;
     public string Url { get; init; } = default!;
+    public string? FailureReason { get; init; }
 }

@@ -7,8 +7,6 @@ namespace Core.Domain.Entities
     public class Stock
     {
         [BsonId]
-        public ObjectId _id { get; set; }
-
         [BsonRepresentation(BsonType.String)]
         public Guid ProductID { get; set; }
         public int Quantity { get; set; }

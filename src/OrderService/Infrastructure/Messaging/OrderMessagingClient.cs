@@ -17,5 +17,5 @@ public class OrderMessagingClient : IOrderMessagingClient
 
 
     public async Task PublishOrderSubmitted(Order order)
-        => await _publishEndpoint.Publish(new OrderSubmittedEvent(order));
+        => await _publishEndpoint.Publish(new OrderSubmittedEvent(order.Id));
 }

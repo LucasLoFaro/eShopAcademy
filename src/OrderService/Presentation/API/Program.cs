@@ -1,5 +1,5 @@
-using Core.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Core.Application.Interfaces;
 using Infrastructure.Services;
 using Infrastructure.Clients;
 using ServiceDefaults;
@@ -23,11 +23,14 @@ builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(options =>
 {
     options.Address = new Uri(builder.Configuration["services:eshopacademy-payment-grpc:payment-grpc:0"]!);
 });
-
+builder.Services.AddGrpcClient<StockProtoService.StockProtoServiceClient>(options =>
+{
+    options.Address = new Uri(builder.Configuration["services:eshopacademy-stock-grpc:stock-grpc:0"]!);
+});
 
 builder.Services.AddDbContext<OrderDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("orders")));
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IStockServiceClient, FakeStockServiceClient>();
+builder.Services.AddScoped<IStockServiceClient, StockServiceClient>();
 builder.Services.AddScoped<ICustomerServiceClient, FakeCustomerServiceClient>();
 builder.Services.AddScoped<IPaymentServiceClient, PaymentServiceClient>(); 
 builder.Services.AddScoped<IProductServiceClient, FakeProductServiceClient>();

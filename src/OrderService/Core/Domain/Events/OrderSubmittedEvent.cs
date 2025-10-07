@@ -1,14 +1,11 @@
-﻿using Core.Domain.Entities;
-
-
-namespace Core.Domain.Events;
+﻿namespace Core.Domain.Events;
 
 public class OrderSubmittedEvent : BaseEvent
 {
-    public Order Order { get; set; }
+    public Guid OrderId { get; set; }
 
-    public OrderSubmittedEvent(Order order)
+    public OrderSubmittedEvent(Guid orderId)
     {
-        Order = order;
+        OrderId = orderId;
     }
 }

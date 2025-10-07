@@ -2,8 +2,9 @@
 using Core.Domain.Contracts;
 using Core.Domain.Entities;
 using Core.Domain.Enums;
-using Data;
 using Domain.Contracts;
+using Data;
+
 
 namespace Application;
 
@@ -32,15 +33,16 @@ public class OrderService : IOrderService
         _orderMessagingClient = messagePublisher;
     }
 
-    public Task<List<Order>> GetAllOrders()
-        => _db.GetAllAsync();
+    public Task<List<Order>> GetAllOrders(CancellationToken ct = default)
+        => _db.GetAllAsync(ct);
 
-    public Task<Order?> GetOrderById(Guid id)
-        => _db.GetByIdAsync(id);
+    public Task<Order?> GetOrderById(Guid id, CancellationToken ct = default)
+        => _db.GetByIdAsync(id, ct);
 
-    // TODO: Return a custom response with the result and possible errors
+    // TODO: When success, empty basket
+    //       Return a custom response with the result and possible errors
     //       Replace mocks for real services
-    public async Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request)
+    public async Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default)
     {
         var order = new Order
         {
@@ -77,16 +79,19 @@ public class OrderService : IOrderService
         order.PaymentId = payment.Id;
          order.Payment = payment;
 
-        var reserve = await _stockClient.ReserveStockAsync(request.Items);
-        if (!reserve.IsSuccess)
+        var reserve = await _stockClient.ReserveStockAsync(order.Id, request.Items, ct);
+        if (!reserve.Success)
             throw new InvalidOperationException($"The following products have run out of stock: {string.Join(", ", reserve.OutOfStockProducts)}");
 
         order.ReservationId = (Guid) reserve.ReservationId!;
 
+        // TODO: When success, empty basket
+        
         await _db.AddAsync(order);
 
         await _orderMessagingClient.PublishOrderSubmitted(order);
 
+        // TODO: Add Automapper
         return new()
         {
             OrderId = order.Id,
@@ -95,6 +100,6 @@ public class OrderService : IOrderService
         };
     }
 
-    public Task RemoveOrder(Guid id)
-        => _db.RemoveByIdAsync(id);
+    public Task RemoveOrder(Guid id, CancellationToken ct = default)
+        => _db.RemoveByIdAsync(id, ct);
 }

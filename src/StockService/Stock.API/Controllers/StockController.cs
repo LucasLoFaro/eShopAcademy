@@ -37,12 +37,12 @@ namespace API.Controllers
 
 
         [HttpGet("{productGuid}/warehouse/{warehouse}", Name = "GetStockByProductGuidAndWarehouse")]
-        public async Task<ActionResult<Stock>> GetStockByProductGuidAndWarehouse(Guid productGuid, String warehouse)
+        public async Task<ActionResult<Stock>> GetStockByProductId(Guid productGuid)
         {
-            Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(productGuid, warehouse);
+            Stock stock = await _stockRepository.GetByProductIdAsync(productGuid);
 
             if (stock == null) 
-                return NotFound($"No stock available in warehouse {warehouse}");
+                return NotFound($"No stock available for product {productGuid}");
             
             return Ok(stock);
         }
@@ -54,7 +54,7 @@ namespace API.Controllers
             if (alterStock.Quantity <= 0) 
                 return BadRequest("The Quantity field must be greater than zero");
 
-            Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(alterStock.ProductGuid, alterStock.Warehouse);
+            Stock stock = await _stockRepository.GetByProductIdAsync(alterStock.ProductGuid);
 
             if (stock == null)
             {
@@ -63,12 +63,12 @@ namespace API.Controllers
                 stockToAdd.Quantity = alterStock.Quantity;
                 stockToAdd.Warehouse = alterStock.Warehouse;
 
-                stock = await _stockRepository.AddAsync(stockToAdd);
+                stock = await _stockRepository.AddOrUpdateAsync(stockToAdd);
             }
             else
             {
                 stock.Quantity += alterStock.Quantity;
-                await _stockRepository.UpdateAsync(stock);
+                await _stockRepository.AddOrUpdateAsync(stock);
             }
 
             // Todo:Add automapper
@@ -90,7 +90,7 @@ namespace API.Controllers
             if (alterStock.Quantity <= 0) 
                 return BadRequest("The Quantity field must be greater than zero");
 
-            Stock stock = await _stockRepository.GetByProductGuidAndWarehouseAsync(alterStock.ProductGuid, alterStock.Warehouse);
+            Stock stock = await _stockRepository.GetByProductIdAsync(alterStock.ProductGuid);
 
             if (stock == null) 
                 return BadRequest("The required product does not exists in stock");
@@ -99,7 +99,7 @@ namespace API.Controllers
                 return BadRequest("The required product does not have enough units");
             
             stock.Quantity -= alterStock.Quantity;
-            await _stockRepository.UpdateAsync(stock);
+            await _stockRepository.AddOrUpdateAsync(stock);
 
             // Todo:Add automapper
             await _messaging.SendStockUpdate(new AlterStockRequest()

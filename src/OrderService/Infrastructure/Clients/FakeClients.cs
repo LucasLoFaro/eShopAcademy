@@ -1,17 +1,8 @@
 ﻿using Core.Application.Interfaces;
 using Core.Domain.Entities;
-using Domain.Contracts;
+
 
 namespace Infrastructure.Clients;
-
-public class FakeStockServiceClient : IStockServiceClient
-{
-    public Task<StockReservationResponse> ReserveStockAsync(List<Item> items)
-        => Task.FromResult(new StockReservationResponse()
-        {
-            ReservationId = Guid.NewGuid()
-        });
-}
 
 public class FakeProductServiceClient : IProductServiceClient
 {

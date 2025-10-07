@@ -1,7 +1,6 @@
 using Infrastructure.Services;
 using Infrastructure.Data;
 using ServiceDefaults;
-using Data;
 
 
 namespace API;

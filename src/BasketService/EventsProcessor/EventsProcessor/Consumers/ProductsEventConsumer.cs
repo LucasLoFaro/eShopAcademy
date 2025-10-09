@@ -1,27 +1,25 @@
+using Core.Domain.Contracts;
 using Core.Domain.Events;
 using Data.Interfaces;
 using MassTransit;
-using Core.Domain.Contracts;
 using AutoMapper;
 
-namespace EventsProcessor.Consumers
+
+namespace Consumers;
+
+public class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
 {
-    public class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
+    private readonly IProductCache _productCache;
+    private readonly IMapper _mapper;
+
+    public ProductsEventConsumer(IProductCache productRepository, IMapper mapper)
     {
-        private readonly ILogger _logger;
-        private readonly IProductCache _productCache;
-        private readonly IMapper _mapper;
+        _productCache = productRepository;
+        _mapper = mapper;
+    }
 
-        public ProductsEventConsumer(ILoggerFactory loggerFactory, IProductCache productRepository, IMapper mapper)
-        {
-            _logger = loggerFactory.CreateLogger<ProductsEventConsumer>();
-            _productCache = productRepository;
-            _mapper = mapper;
-        }
-
-        public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
-        {
-            await _productCache.AddOrUpdateProduct(_mapper.Map<ProductDTO>(context.Message));
-        }
+    public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
+    {
+        await _productCache.AddOrUpdateProduct(_mapper.Map<ProductDTO>(context.Message));
     }
 }

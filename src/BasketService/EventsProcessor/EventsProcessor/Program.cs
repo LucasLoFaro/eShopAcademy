@@ -1,7 +1,7 @@
-using EventsProcessor.Consumers;
 using ServiceDefaults;
 using Data.Interfaces;
 using MassTransit;
+using Consumers;
 using Data;
 
 

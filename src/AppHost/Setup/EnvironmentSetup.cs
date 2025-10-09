@@ -12,7 +12,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> productApi,
         IResourceBuilder<ProjectResource> productGrpc,
         IResourceBuilder<ProjectResource> orderApi,
-        IResourceBuilder<ProjectResource> orderEvents,
+        IResourceBuilder<ProjectResource> orderOrchestration,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
         IResourceBuilder<ProjectResource> paymentApi,
@@ -52,7 +52,7 @@ public static class EnvironmentSetup
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);
-        OrderExtensions.Configure(orderApi, orderEvents, ordersdb, rabbit);
+        OrderExtensions.Configure(orderApi, orderOrchestration, ordersdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
         PaymentExtensions.Configure(paymentApi, paymentGrpc, wiremock, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingGrpc, wiremock, rabbit);

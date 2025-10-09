@@ -77,15 +77,13 @@ public class OrderService : IOrderService
             throw new InvalidOperationException("There was an error creating the payment");
 
         order.PaymentId = payment.Id;
-         order.Payment = payment;
+        order.Payment = payment;
 
         var reserve = await _stockClient.ReserveStockAsync(order.Id, request.Items, ct);
         if (!reserve.Success)
             throw new InvalidOperationException($"The following products have run out of stock: {string.Join(", ", reserve.OutOfStockProducts)}");
 
         order.ReservationId = (Guid) reserve.ReservationId!;
-
-        // TODO: When success, empty basket
         
         await _db.AddAsync(order);
 

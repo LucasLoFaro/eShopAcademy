@@ -4,7 +4,7 @@ public static class OrderExtensions
 {
     public static void Configure(
         IResourceBuilder<ProjectResource> orderApi,
-        IResourceBuilder<ProjectResource> orderEvents,
+        IResourceBuilder<ProjectResource> orderOrchestration,
         IResourceBuilder<PostgresDatabaseResource> ordersdb,
         IResourceBuilder<RabbitMQServerResource> rabbit)
     {
@@ -18,7 +18,7 @@ public static class OrderExtensions
             .WithEnvironment("AZURE_CLIENT_ID", "31234358-e1e6-40e9-82fe-363a97801e4e")
             .WithEnvironment("AZURE_CLIENT_SECRET", "piI8Q~iaVPv30ukYTzBXKUi4FTaxoxglI4.Buapp");
 
-        orderEvents
+        orderOrchestration
             .WithReference(ordersdb)
             .WaitFor(ordersdb)
             .WithReference(rabbit)

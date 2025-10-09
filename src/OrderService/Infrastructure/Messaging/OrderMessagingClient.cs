@@ -1,7 +1,7 @@
 ﻿using Core.Application.Interfaces;
+using Core.Domain.Entities;
 using Core.Domain.Events;
 using MassTransit;
-using Core.Domain.Entities;
 
 
 namespace Infrastructure.Services;
@@ -17,5 +17,10 @@ public class OrderMessagingClient : IOrderMessagingClient
 
 
     public async Task PublishOrderSubmitted(Order order)
-        => await _publishEndpoint.Publish(new OrderSubmittedEvent(order.Id));
+        => await _publishEndpoint.Publish(new OrderSubmittedEvent() 
+        {
+            OrderId = order.Id,
+            PaymentId = order.PaymentId,
+            ReservationId = order.ReservationId
+        });
 }

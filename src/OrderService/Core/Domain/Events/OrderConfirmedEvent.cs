@@ -1,6 +1,6 @@
 ﻿namespace Core.Domain.Events;
 
-public class OrderSubmittedEvent : BaseEvent
+public class OrderConfirmedEvent : BaseEvent
 {
     public Guid OrderId { get; set; }
     public Guid PaymentId { get; set; }

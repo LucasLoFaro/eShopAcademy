@@ -18,7 +18,7 @@
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.5.1" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.5.1" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="9.5.1" />
-    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="EnvDTE" Version="17.14.40260" />
     <PackageReference Include="KubernetesClient" Version="17.0.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -27,7 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BasketService\API\Basket.API.csproj" />
     <ProjectReference Include="..\BasketService\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj" />
-    <ProjectReference Include="..\OrderService\EventsProcessor\EventsProcessor\Order.EventsProcessor.csproj" />
+    <ProjectReference Include="..\OrderService\Orchestration\Order.Orchestration\Order.Orchestration.csproj" />
     <ProjectReference Include="..\OrderService\Presentation\API\Order.API.csproj" />
     <ProjectReference Include="..\PaymentService\Payment.API\Payment.API.csproj" />
     <ProjectReference Include="..\PaymentService\Payment.gRPC\Payment.gRPC.csproj" />

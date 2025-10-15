@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Json;
-using Moq;
-using Core.Domain.Contracts;
-using Core.Domain.Entities;
+using Domain.Order.Contracts;
+using Domain.Order.Entities;
 using FluentAssertions;
 using Xunit;
 

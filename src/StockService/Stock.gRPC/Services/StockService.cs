@@ -1,7 +1,7 @@
-﻿using DomainContracts = Core.Domain.Contracts;
+﻿using DomainContracts = Domain.Stock.Contracts;
 using GrpcContracts = Protos;
 using Infrastructure.Services;
-using Core.Domain.Entities;
+using Domain.Stock.Entities;
 using Infrastructure.Data;
 using Grpc.Core;
 using Protos;

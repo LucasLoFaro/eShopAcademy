@@ -1,12 +1,9 @@
-﻿using Core.Domain.Contracts;
-using Core.Domain.Entities;
-using Domain.DTOs;
+﻿using Domain.Basket.Contracts;
 
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface IProductCache
 {
-    public interface IProductCache
-    {
-        public Task<bool> AddOrUpdateProduct(ProductDTO product);
-        public Task<bool> UpdateProductStock(AlterStockDTO stock);
-    }
+    public Task<bool> AddOrUpdateProduct(ProductDTO product);
+    public Task<bool> UpdateProductStock(AlterStockDTO stock);
 }

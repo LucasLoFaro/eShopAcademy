@@ -1,7 +1,6 @@
 ﻿using Core.Application.Interfaces.Services;
-using Core.Domain.Entities;
-using Core.Domain.Events;
-using Core.Domain.Contracts;
+using Domain.Product.Entities;
+using Domain.Common.Events;
 using MassTransit;
 
 
@@ -21,12 +20,9 @@ public class ProductMessagingService : IProductMessagingService
     {
         var command = new ProductUpdatedEvent()
         {
-            Product = new ProductDTO()
-            {
-                ID = product.Id,
-                Name = product.Name,
-                Price = product.Price
-            },
+            ProductId = product.Id,
+            Name = product.Name,
+            Price = product.Price,
             EventType = ProductEventType.Updated
         };
 
@@ -37,12 +33,9 @@ public class ProductMessagingService : IProductMessagingService
     {
         var command = new ProductUpdatedEvent()
         {
-            Product = new ProductDTO()
-            {
-                ID = product.Id,
-                Name = product.Name,
-                Price = product.Price
-            },
+            ProductId = product.Id,
+            Name = product.Name,
+            Price = product.Price,
             EventType = ProductEventType.Deleted
         };
 

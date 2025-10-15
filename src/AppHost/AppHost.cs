@@ -30,10 +30,13 @@ var orderApi = builder.AddProject<Projects.Order_API>("eshopacademy-order-api")
                       .WithReference(paymentGrpc);
 var orderOrchestration = builder.AddProject<Projects.Order_Orchestration>("eshopacademy-order-orchestration");
 
+// Notification
+var notificationService = builder.AddProject<Projects.NotificationService>("eshopacademy-notificationservice");
+
 // TODO: Add CustomerService
 
 if (builder.Environment.IsDevelopment())
-    EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productApi, productGrpc, orderApi, orderOrchestration, stockApi, stockGrpc, paymentApi, paymentGrpc, shippingApi, shippingGrpc);
+    EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productApi, productGrpc, orderApi, orderOrchestration, stockApi, stockGrpc, paymentApi, paymentGrpc, shippingApi, shippingGrpc, notificationService);
 
 // Build and run the distributed application
 builder.Build().Run();

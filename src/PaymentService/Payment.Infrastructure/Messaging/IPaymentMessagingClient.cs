@@ -1,4 +1,4 @@
-﻿using Domain.Events;
+﻿using Domain.Common.Events;
 using MassTransit;
 
 namespace Infrastructure.Messaging;
@@ -12,7 +12,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         _publishEndpoint = publishEndpoint;
     }
 
-    public async Task SendPaymentCreated(string orderId, string providerTransactionId, CancellationToken ct = default)
+    public async Task SendPaymentCreated(Guid orderId, string providerTransactionId, CancellationToken ct = default)
     {
         var evt = new PaymentCreatedEvent
         {
@@ -23,7 +23,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         await _publishEndpoint.Publish(evt, ct);
     }
 
-    public async Task SendPaymentCompleted(string orderId, string providerTransactionId, CancellationToken ct = default)
+    public async Task SendPaymentCompleted(Guid orderId, string providerTransactionId, CancellationToken ct = default)
     {
         var evt = new PaymentCompletedEvent
         {
@@ -34,7 +34,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         await _publishEndpoint.Publish(evt, ct);
     }
 
-    public async Task SendPaymentFailed(string orderId, string providerTransactionId, string reason, CancellationToken ct = default)
+    public async Task SendPaymentFailed(Guid orderId, string providerTransactionId, string reason, CancellationToken ct = default)
     {
         var evt = new PaymentFailedEvent
         {
@@ -49,7 +49,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
 
 public interface IPaymentMessagingClient
 {
-    Task SendPaymentCreated(string orderId, string providerTransactionId, CancellationToken ct = default);
-    Task SendPaymentCompleted(string orderId, string providerTransactionId, CancellationToken ct = default);
-    Task SendPaymentFailed(string orderId, string providerTransactionId, string reason, CancellationToken ct = default);
+    Task SendPaymentCreated(Guid orderId, string providerTransactionId, CancellationToken ct = default);
+    Task SendPaymentCompleted(Guid orderId, string providerTransactionId, CancellationToken ct = default);
+    Task SendPaymentFailed(Guid orderId, string providerTransactionId, string reason, CancellationToken ct = default);
 }

@@ -7,12 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="Common.Domain" Version="1.0.1" />
     <PackageReference Include="MassTransit" Version="8.5.4" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Stock.Domain.csproj" />
+    <PackageReference Include="Stock.Domain" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

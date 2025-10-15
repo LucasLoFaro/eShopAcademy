@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using Core.Domain.States;
+using Domain.Order.States;
 using MassTransit;
 
 
@@ -10,11 +10,9 @@ public class OrderStateMap : SagaClassMap<OrderState>
 {
     protected override void Configure(EntityTypeBuilder<OrderState> entity, ModelBuilder model)
     {
-        entity.Property(x => x.CurrentState);
+        entity.HasKey(x => x.CorrelationId);
+        entity.Property(x => x.CurrentState).HasMaxLength(64);
         entity.Property(x => x.OrderId);
-        entity.Property(x => x.PaymentId);
-        entity.Property(x => x.ReservationId);
-        entity.Property(x => x.CreatedAt);
-        entity.Property(x => x.ExpirationToken);
+        entity.Property(x => x.CustomerEmail).HasMaxLength(256);
     }
 }

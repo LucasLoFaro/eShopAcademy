@@ -1,4 +1,4 @@
-﻿using Core.Domain.Entities;
+﻿using Domain.Product.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Interfaces.Services;
 

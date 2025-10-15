@@ -8,14 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Common.Domain" Version="1.0.1" />
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageReference Include="Order.Domain" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Core\Application\Order.Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Order.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Order.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Messaging\Order.Messaging.csproj" />
   </ItemGroup>

@@ -1,6 +1,5 @@
-﻿using Core.Domain.Contracts;
-using Core.Domain.Entities;
-using Domain.Contracts;
+﻿using Domain.Order.Contracts;
+using Domain.Order.Entities;
 
 
 namespace Core.Application.Interfaces;

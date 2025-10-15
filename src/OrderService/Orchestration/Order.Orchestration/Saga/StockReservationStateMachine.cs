@@ -1,5 +1,5 @@
-﻿using Core.Domain.Events;
-using States;
+﻿using Domain.Common.Events;
+using Domain.Common.States;
 using MassTransit;
 
 namespace Application.Saga;

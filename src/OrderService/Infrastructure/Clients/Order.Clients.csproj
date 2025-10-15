@@ -7,17 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Common.Domain" Version="1.0.1" />
     <PackageReference Include="Google.Protobuf" Version="3.32.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
     <PackageReference Include="Grpc.Tools" Version="2.72.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Order.Domain" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Application\Order.Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Order.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

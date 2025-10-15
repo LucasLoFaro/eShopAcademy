@@ -1,6 +1,6 @@
-﻿using Core.Domain.Events;
+﻿using Domain.Basket.Contracts;
+using Domain.Common.Events;
 using Data.Interfaces;
-using Domain.DTOs;
 using MassTransit;
 using AutoMapper;
 

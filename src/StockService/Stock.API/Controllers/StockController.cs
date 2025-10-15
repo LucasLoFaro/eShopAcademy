@@ -1,5 +1,5 @@
-﻿using Core.Domain.Contracts;
-using Core.Domain.Entities;
+﻿using Domain.Stock.Contracts;
+using Domain.Stock.Entities;
 using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;

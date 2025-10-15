@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Services;
-using Core.Domain.Contracts;
-using Core.Domain.Entities;
+using Domain.Stock.Contracts;
+using Domain.Stock.Entities;
 
 
 namespace Infrastructure.Data;

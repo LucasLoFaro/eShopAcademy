@@ -14,12 +14,12 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
+    <PackageReference Include="Stock.Domain" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Data\Stock.Data.csproj" />
-    <ProjectReference Include="..\Domain\Stock.Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Services\Stock.Services.csproj" />
   </ItemGroup>
 

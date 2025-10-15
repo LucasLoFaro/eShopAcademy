@@ -1,5 +1,5 @@
-﻿using Core.Domain.Events;
-using Core.Domain.Contracts;
+﻿using Domain.Stock.Contracts;
+using Domain.Common.Events;
 using MassTransit;
 
 

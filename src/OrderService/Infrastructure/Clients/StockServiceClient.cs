@@ -1,7 +1,7 @@
-﻿using DomainContracts = Domain.Contracts;
+﻿using DomainContracts = Domain.Order.Contracts;
 using Google.Protobuf.WellKnownTypes;
 using Core.Application.Interfaces;
-using Core.Domain.Entities;
+using Domain.Order.Entities;
 using Protos;
 
 

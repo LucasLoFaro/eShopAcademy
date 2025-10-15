@@ -1,7 +1,8 @@
 ﻿using Core.Application.Interfaces.Services;
-using Core.Domain.Entities;
-using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Domain.Product.Entities;
+using Infrastructure.Data;
+
 
 namespace Data;
 

@@ -1,6 +1,6 @@
 ﻿using Core.Application.Interfaces;
-using Core.Domain.Entities;
-using Core.Domain.Events;
+using Domain.Order.Entities;
+using Domain.Common.Events;
 using MassTransit;
 
 
@@ -21,6 +21,7 @@ public class OrderMessagingClient : IOrderMessagingClient
         {
             OrderId = order.Id,
             PaymentId = order.PaymentId,
+            CustomerEmail = order.Customer.Mail,
             ReservationId = order.ReservationId
         });
 }

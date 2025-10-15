@@ -1,7 +1,7 @@
 using Core.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Core.Domain.Contracts;
-using Core.Domain.Entities;
+using Domain.Order.Contracts;
+using Domain.Order.Entities;
 
 
 namespace API.Controllers;

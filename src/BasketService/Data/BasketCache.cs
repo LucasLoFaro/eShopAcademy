@@ -1,5 +1,5 @@
 ﻿using Data.Interfaces;
-using Core.Domain.Entities;
+using Domain.Basket.Entities;
 using StackExchange.Redis;
 using System.Text.Json;
 

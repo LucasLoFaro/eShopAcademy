@@ -43,7 +43,8 @@ public static partial class Extensions
     public static WebApplication UseDefaultEndpoints(this WebApplication app)
     {
         //app.MapDefaultEndpoints();
-        app.UseHttpsRedirection();
+
+        //app.UseHttpsRedirection(); // This adds a second trace id for the request redirect while testing locally. Shouldn't happen in prod if I use https only. 
         app.UseRouting();
 
         app.MapHealthChecks("/health");

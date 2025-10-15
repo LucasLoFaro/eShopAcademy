@@ -1,6 +1,6 @@
+using Domain.Payment.Contracts;
 using Infrastructure.Messaging;
 using Infrastructure.Helpers;
-using Domain.Contracts;
 using ServiceDefaults;
 
 
@@ -37,12 +37,12 @@ app.MapPost("/api/payments/webhook", async (
     switch (notification.Status.ToLowerInvariant())
     {
         case "success":
-            await messaging.SendPaymentCompleted(notification.ExternalId, notification.Id, ct);
+            await messaging.SendPaymentCompleted(new Guid(notification.ExternalId), notification.Id, ct);
             break;
 
         case "failed":
         case "cancelled":
-            await messaging.SendPaymentFailed(notification.ExternalId, notification.Id, notification.FailureReason ?? "Unknown", ct);
+            await messaging.SendPaymentFailed(new Guid(notification.ExternalId), notification.Id, notification.FailureReason ?? "Unknown", ct);
             break;
 
         default:

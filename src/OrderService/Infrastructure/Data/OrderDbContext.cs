@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore;
-using Core.Domain.Entities;
-using Core.Domain.Enums;
+using Domain.Order.Entities;
+using Domain.Order.Enums;
 
 
 namespace Data;

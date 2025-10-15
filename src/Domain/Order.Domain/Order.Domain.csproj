@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  
+	<!-- NuGet packaging -->
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageId>$(MSBuildProjectName)</PackageId>
+	<Version>1.0.0</Version>
+	<Authors>Lucas Lo Faro</Authors>
+	<Company>eShopAcademy</Company>
+	<Description>Domain models and events for the $(MSBuildProjectName) bounded context.</Description>
+	<RepositoryUrl>https://github.com/LucasLoFaro/eShopAcademy</RepositoryUrl>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageOutputPath>../../../packages</PackageOutputPath>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="MassTransit" Version="8.5.4" />
+  </ItemGroup>
+
+</Project>

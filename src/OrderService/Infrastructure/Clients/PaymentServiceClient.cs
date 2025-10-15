@@ -1,5 +1,5 @@
 ﻿using Core.Application.Interfaces;
-using Core.Domain.Entities;
+using Domain.Order.Entities;
 using Protos;
 
 
@@ -30,7 +30,7 @@ public class PaymentServiceClient : IPaymentServiceClient
                 Id = new Guid(response.Id),
                 Amount = response.Amount,
                 OrderId = new Guid(response.ExternalId),
-                Status = Core.Domain.Enums.PaymentStatus.Pending,
+                Status = Domain.Order.Enums.PaymentStatus.Pending,
                 PaymentURL = response.Url,
                 ProviderTransactionId = response.Id
             };

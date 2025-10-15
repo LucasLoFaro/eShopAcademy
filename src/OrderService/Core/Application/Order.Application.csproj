@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Common.Domain" Version="1.0.1" />
+    <PackageReference Include="Order.Domain" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Data\Order.Data.csproj" />
-    <ProjectReference Include="..\Domain\Order.Domain.csproj" />
   </ItemGroup>
 
 </Project>

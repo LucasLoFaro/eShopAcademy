@@ -1,5 +1,5 @@
 ﻿using Core.Application.Interfaces;
-using Core.Domain.Entities;
+using Domain.Order.Entities;
 
 
 namespace Infrastructure.Clients;
@@ -25,7 +25,7 @@ public class FakeCustomerServiceClient : ICustomerServiceClient
         => new Customer()
         {
             Name = "Lucas Lo Faro",
-            Mail = "lucaslofaro@hotmail.com",
+            Mail = "lucaslofaro@gmail.com",
             Phone = "1160456045",
             Address = new()
             {
@@ -46,7 +46,7 @@ public class FakePaymentGrpcClient : IPaymentServiceClient
             Id = Guid.NewGuid(),
             Amount = amount,
             OrderId = orderId,
-            Status = Core.Domain.Enums.PaymentStatus.Pending,
+            Status = Domain.Order.Enums.PaymentStatus.Pending,
             PaymentURL = $"https://psp.com/payment/{Guid.NewGuid().ToString()}",
             ProviderTransactionId = Guid.NewGuid().ToString()
         });

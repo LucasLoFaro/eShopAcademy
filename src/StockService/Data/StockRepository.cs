@@ -1,4 +1,4 @@
-﻿using Core.Domain.Entities;
+﻿using Domain.Stock.Entities;
 using MongoDB.Driver;
 
 

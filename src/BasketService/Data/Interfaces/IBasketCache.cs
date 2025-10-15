@@ -1,11 +1,10 @@
-﻿using Core.Domain.Entities;
+﻿using Domain.Basket.Entities;
 
-namespace Data.Interfaces
+namespace Data.Interfaces;
+
+public interface IBasketCache
 {
-    public interface IBasketCache
-    {
-        public Task<BasketWithDetails> GetBasketLoadedByClientId(Guid userId);
-        public Task<bool> AddProductToBasket(Guid userId, Item item);
-        public Task<bool> RemoveProductFromBasket(Guid userId, Item item);
-    }
+    public Task<BasketWithDetails> GetBasketLoadedByClientId(Guid userId);
+    public Task<bool> AddProductToBasket(Guid userId, Item item);
+    public Task<bool> RemoveProductFromBasket(Guid userId, Item item);
 }

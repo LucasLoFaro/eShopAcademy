@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -12,10 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Order.Domain" Version="1.0.0" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -25,10 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Core\Application\Order.Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Order.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Clients\Order.Clients.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Messaging\Order.Messaging.csproj" />
-    <!-- Reference the infrastructure messaging services so the API can publish order commands -->
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Core.Domain.Entities;
+using Domain.Basket.Entities;
 using Data.Interfaces;
 using Data;
 

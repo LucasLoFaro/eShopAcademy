@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using Core.Application.Interfaces.Data;
-using Core.Domain.Entities;
+﻿using Core.Application.Interfaces.Data;
 using Microsoft.EntityFrameworkCore;
+using Domain.Product.Entities;
+using AutoMapper;
 
 
 namespace Infrastructure.Data.Repositories;

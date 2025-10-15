@@ -1,5 +1,5 @@
 ﻿using Core.Application.Interfaces.Data;
-using Core.Domain.Entities;
+using Domain.Product.Entities;
 using Core.Application.Interfaces.Services;
 
 

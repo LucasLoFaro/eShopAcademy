@@ -1,8 +1,7 @@
 ﻿using Core.Application.Interfaces;
-using Core.Domain.Contracts;
-using Core.Domain.Entities;
-using Core.Domain.Enums;
-using Domain.Contracts;
+using Domain.Order.Contracts;
+using Domain.Order.Entities;
+using Domain.Order.Enums;
 using Data;
 
 

@@ -1,10 +1,10 @@
-using Domain.Contracts;
-using Grpc.Core;
-using Infrastructure.Helpers;
+using Domain.Payment.Contracts;
 using Infrastructure.Messaging;
+using Infrastructure.Helpers;
 using Newtonsoft.Json;
-using Protos;
 using System.Text;
+using Grpc.Core;
+using Protos;
 
 
 namespace Services;
@@ -46,9 +46,9 @@ public class PaymentService : PaymentGrpc.PaymentGrpcBase
         var paymentResponse = await response.Content.ReadFromJsonAsync<PaymentResponse>(cancellationToken: context.CancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            _messagingClient.SendPaymentFailed(paymentResponse!.ExternalId, paymentResponse.Id, paymentResponse.FailureReason!, context.CancellationToken).GetAwaiter().GetResult();
+            _messagingClient.SendPaymentFailed(new Guid(paymentResponse!.ExternalId), paymentResponse.Id, paymentResponse.FailureReason!, context.CancellationToken).GetAwaiter().GetResult();
 
-        _messagingClient.SendPaymentCreated(paymentResponse!.ExternalId, paymentResponse.Id, context.CancellationToken).GetAwaiter().GetResult();
+        _messagingClient.SendPaymentCreated(new Guid(paymentResponse!.ExternalId), paymentResponse.Id, context.CancellationToken).GetAwaiter().GetResult();
 
         // TODO: Add automapper.
         return new InitiatePaymentResponse

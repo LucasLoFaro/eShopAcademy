@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
-using Domain.Contracts;
+using Domain.Payment.Contracts;
 using System.Text.Json;
 using System.Text;
 

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
+    <PackageReference Include="Common.Domain" Version="1.0.1" />
     <PackageReference Include="Grpc.Tools" Version="2.72.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,11 +29,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Product.Domain" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Application\Product.Application.csproj" />
-    <ProjectReference Include="..\..\Core\Domain\Product.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Product.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Services\Product.Services.csproj" />
     <ProjectReference Include="..\..\Presentation\Product.API\Product.API.csproj" />

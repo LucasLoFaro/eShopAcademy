@@ -3,6 +3,7 @@
 
 namespace Domain.Common.States;
 
+// Unused for now.
 public class StockReservationState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }

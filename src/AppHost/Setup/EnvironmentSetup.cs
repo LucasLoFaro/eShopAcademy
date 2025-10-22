@@ -1,6 +1,6 @@
-﻿using AppHost.Setup.Extensions;
-using Aspire.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using AppHost.Setup.Extensions;
+
 
 namespace AppHost.Setup;
 
@@ -10,32 +10,39 @@ public static class EnvironmentSetup
         IDistributedApplicationBuilder builder,
         IResourceBuilder<ProjectResource> basketApi,
         IResourceBuilder<ProjectResource> basketEvents,
-        IResourceBuilder<ProjectResource> productApi,
-        IResourceBuilder<ProjectResource> productGrpc,
-        IResourceBuilder<ProjectResource> orderApi,
-        IResourceBuilder<ProjectResource> orderOrchestration,
+        IResourceBuilder<ProjectResource> productsApi,
+        IResourceBuilder<ProjectResource> productsGrpc,
+        IResourceBuilder<ProjectResource> ordersApi,
+        IResourceBuilder<ProjectResource> ordersOrchestration,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
-        IResourceBuilder<ProjectResource> paymentApi,
-        IResourceBuilder<ProjectResource> paymentGrpc,
+        IResourceBuilder<ProjectResource> paymentsApi,
+        IResourceBuilder<ProjectResource> paymentsGrpc,
         IResourceBuilder<ProjectResource> shippingApi,
-        IResourceBuilder<ProjectResource> shippingGrpc,
-        IResourceBuilder<ProjectResource> notificationService)
+        IResourceBuilder<ProjectResource> shippingService,
+        IResourceBuilder<ProjectResource> notificationService,
+        IResourceBuilder<ProjectResource> customersApi,
+        IResourceBuilder<ProjectResource> operationsApi,
+        IResourceBuilder<ProjectResource> operationsService)
     {
         var redis = builder.AddRedis("redis")
             .WithDataVolume()
             .WithLifetime(ContainerLifetime.Persistent);
 
-        var stockdb = builder.AddMongoDB("mongodb")
+        var mongo = builder.AddMongoDB("mongodb")
             .WithDataVolume("mongo-data")
-            .WithLifetime(ContainerLifetime.Persistent)
-            .AddDatabase("stock");
+            .WithLifetime(ContainerLifetime.Persistent);
+
+        var stockdb = mongo.AddDatabase("stock");
+        var customersdb = mongo.AddDatabase("customers");
 
         var postgres = builder.AddPostgres("postgres")
             .WithDataVolume("postgres-data")
             .WithLifetime(ContainerLifetime.Persistent);
 
         var ordersdb = postgres.AddDatabase("orders");
+        var orchestrationdb = postgres.AddDatabase("orchestration");
+        var operationsdb = postgres.AddDatabase("operations");
 
         postgres.WithPgAdmin()
             .WithLifetime(ContainerLifetime.Persistent);
@@ -54,12 +61,14 @@ public static class EnvironmentSetup
             .WithLifetime(ContainerLifetime.Persistent);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
-        ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);
-        OrderExtensions.Configure(orderApi, orderOrchestration, ordersdb, rabbit);
+        ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
+        OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
-        PaymentExtensions.Configure(paymentApi, paymentGrpc, wiremock, rabbit);
-        ShippingExtensions.Configure(shippingApi, shippingGrpc, wiremock, rabbit);
+        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, wiremock, rabbit);
+        ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit);
         NotificationExtensions.Configure(notificationService, rabbit);
+        CustomersExtensions.Configure(customersApi, customersdb, rabbit);
+        OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
     }
 }
 

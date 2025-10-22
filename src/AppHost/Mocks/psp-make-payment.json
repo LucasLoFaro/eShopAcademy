@@ -20,7 +20,6 @@
       "name": "webhook",
       "parameters": {
         "method": "POST",
-        //"url": "https://webhook.site/ef584cda-0fab-4669-a2da-b6097830c364",
         "url": "{{jsonPath request.body '$.NotificationUrl'}}",
         "delay": {
           "type": "fixed",
@@ -37,8 +36,7 @@
       "name": "webhook",
       "parameters": {
         "method": "POST",
-        "url": "https://webhook.site/a1ec4ca0-4068-4f80-8879-6fecf5f1c14f",
-        //"url": "{{jsonPath originalRequest.body '$.NotificationUrl'}}",
+        "url": "https://webhook.site/289ee0ae-ab10-4414-ac19-7617894991f8",
         "delay": {
           "type": "fixed",
           "milliseconds": 1000

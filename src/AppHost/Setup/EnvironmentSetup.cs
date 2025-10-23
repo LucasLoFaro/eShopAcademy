@@ -1,6 +1,6 @@
-﻿using AppHost.Setup.Extensions;
-using AppHost.Setup.Resources;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using AppHost.Setup.Extensions;
+
 
 namespace AppHost.Setup;
 
@@ -10,55 +10,65 @@ public static class EnvironmentSetup
         IDistributedApplicationBuilder builder,
         IResourceBuilder<ProjectResource> basketApi,
         IResourceBuilder<ProjectResource> basketEvents,
-        IResourceBuilder<ProjectResource> productApi,
-        IResourceBuilder<ProjectResource> productGrpc,
-        IResourceBuilder<ProjectResource> orderApi,
-        IResourceBuilder<ProjectResource> orderEvents,
+        IResourceBuilder<ProjectResource> productsApi,
+        IResourceBuilder<ProjectResource> productsGrpc,
+        IResourceBuilder<ProjectResource> ordersApi,
+        IResourceBuilder<ProjectResource> ordersOrchestration,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
-        IResourceBuilder<ProjectResource> paymentGrpc,
-        IResourceBuilder<ProjectResource> shippingGrpc)
+        IResourceBuilder<ProjectResource> paymentsApi,
+        IResourceBuilder<ProjectResource> paymentsGrpc,
+        IResourceBuilder<ProjectResource> shippingApi,
+        IResourceBuilder<ProjectResource> shippingService,
+        IResourceBuilder<ProjectResource> notificationService,
+        IResourceBuilder<ProjectResource> customersApi,
+        IResourceBuilder<ProjectResource> operationsApi,
+        IResourceBuilder<ProjectResource> operationsService)
     {
-        // CHECK NAMES! containers are being called differently.
-
         var redis = builder.AddRedis("redis")
             .WithDataVolume()
             .WithLifetime(ContainerLifetime.Persistent);
 
-        var stockdb = builder.AddMongoDB("mongodb")
-            .WithDataVolume()
-            .WithLifetime(ContainerLifetime.Persistent)
-            .AddDatabase("stock");
+        var mongo = builder.AddMongoDB("mongodb")
+            .WithDataVolume("mongo-data")
+            .WithLifetime(ContainerLifetime.Persistent);
 
-        var ordersdb = builder.AddPostgres("postgres")
-            .WithDataVolume()
-            .WithPgAdmin()
-            .WithLifetime(ContainerLifetime.Persistent)
-            .AddDatabase("orders");
+        var stockdb = mongo.AddDatabase("stock");
+        var customersdb = mongo.AddDatabase("customers");
 
+        var postgres = builder.AddPostgres("postgres")
+            .WithDataVolume("postgres-data")
+            .WithLifetime(ContainerLifetime.Persistent);
+
+        var ordersdb = postgres.AddDatabase("orders");
+        var orchestrationdb = postgres.AddDatabase("orchestration");
+        var operationsdb = postgres.AddDatabase("operations");
+
+        postgres.WithPgAdmin()
+            .WithLifetime(ContainerLifetime.Persistent);
+        
         var cosmosdb = builder.AddCosmosDb("cosmosdb")
             .WithLifetime(ContainerLifetime.Persistent);
 
         var rabbit = builder.AddRabbitMQ("rabbit")
-            .WithDataVolume()
+            .WithDataVolume("rabbit-data")
             .WithLifetime(ContainerLifetime.Persistent)
             .WithManagementPlugin()     // (user/pass: guest/guest)
             .WithLifetime(ContainerLifetime.Persistent);
 
-        // External service mocks
-        var mappingsPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Mocks"));
-        var wiremock = builder.AddContainer("external-services-mocks", "wiremock/wiremock:latest")
+        var wiremock = builder.AddWiremock("external-services-mocks")
             .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
-            .WithBindMount(mappingsPath, "/home/wiremock/mappings")
             .WithLifetime(ContainerLifetime.Persistent);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
-        ProductExtensions.Configure(productApi, productGrpc, cosmosdb, rabbit);
-        OrderExtensions.Configure(orderApi, orderEvents, ordersdb, rabbit);
+        ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
+        OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
-        PaymentExtensions.Configure(paymentGrpc, wiremock);
-        ShippingExtensions.Configure(shippingGrpc, wiremock);
-
+        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, wiremock, rabbit);
+        ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit);
+        NotificationExtensions.Configure(notificationService, rabbit);
+        CustomersExtensions.Configure(customersApi, customersdb, rabbit);
+        OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
     }
 }
 

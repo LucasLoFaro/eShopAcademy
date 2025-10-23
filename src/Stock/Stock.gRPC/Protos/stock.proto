@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+option csharp_namespace = "Protos";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package stock;
+
+service StockProtoService{
+    rpc GetAll(GetStockByProdGuidRequest) returns (stream StockModel);
+    rpc GetStockByProductGuid(GetStockByProdGuidRequest) returns (stream StockModel);
+    rpc GetStockByProductGuidAndWarehouse(GetStockByProdAndWarehouseRequest) returns (StockModel);
+    rpc IncreaseStock(IncreaseStockRequest) returns (IncreaseStockResponse);
+    rpc DecreaseStock(DecreaseStockRequest) returns (DecreaseStockResponse);
+    rpc ReserveStock(ReserveStockRequest) returns (ReserveStockResponse);
+    rpc CommitReservation(CommitReservationRequest) returns (CommitReservationResponse);
+    rpc CancelReservation(CancelReservationRequest) returns (CancelReservationResponse);
+}
+
+
+message StockModel{
+    string productGuid = 1;
+    int32 quantity = 2;
+    string warehouse = 3;
+//    WarehouseModel warehouse = 4;
+}
+
+message WarehouseModel{
+    string Id = 1;
+    string Name = 2;
+    LocationModel Location = 3;
+}
+
+message LocationModel{
+    string Address = 1;
+    float Latitude = 2;
+    float Longitude = 3;
+}
+
+message GetStockByProdGuidRequest {
+    string productGuid = 1;
+}
+
+message GetStockByProdAndWarehouseRequest {
+    string productGuid = 1;
+    string warehouse = 2;
+}
+
+message IncreaseStockRequest {
+    string productGuid = 1;
+    int32 quantity = 2;
+    string warehouse = 3;
+}
+
+message DecreaseStockRequest {
+    string productGuid = 1;
+    int32 quantity = 2;
+    string warehouse = 3;
+}
+
+message IncreaseStockResponse {
+    bool success = 1;
+}
+
+message DecreaseStockResponse {
+    bool success = 1;
+}
+
+message StockItemModel {
+    string productGuid = 1;
+    int32 quantity = 2;
+}
+
+message ReservationItemModel {
+    string warehouse = 1;
+    repeated StockItemModel items = 2;
+}
+
+message ReserveStockRequest {
+    string orderId = 1;
+    repeated ReservationItemModel stock = 2;
+    google.protobuf.Timestamp createdAt = 3;
+}
+
+message ReserveStockResponse {
+    string reservationId = 1;
+    repeated string outOfStockProducts = 2;
+    bool success = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    google.protobuf.Timestamp validUntil = 5;
+}
+
+message CommitReservationRequest {
+    string orderId = 1;
+    string reservationId = 2;
+}
+
+message CommitReservationResponse {
+    string orderId = 1;
+    string reservationId = 2;
+    bool success = 3;
+}
+
+message CancelReservationRequest {
+    string orderId = 1;
+    string reservationId = 2;
+    string reason = 3;
+}
+
+message CancelReservationResponse {
+    string orderId = 1;
+    string reservationId = 2;
+    bool success = 3;
+    string reason = 4;
+}

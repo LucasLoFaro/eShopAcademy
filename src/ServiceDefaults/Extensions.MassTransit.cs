@@ -9,14 +9,16 @@ namespace ServiceDefaults;
 public static partial class Extentions
 {
     public static TBuilder WithMassTransit<TBuilder>(
-        this TBuilder builder,
-        Action<IBusRegistrationContext, IBusFactoryConfigurator>? configureEndpoints = null,
-        params Assembly[] assemblies) where TBuilder : IHostApplicationBuilder
+    this TBuilder builder,
+    Action<IBusRegistrationContext, IBusFactoryConfigurator>? configureEndpoints = null,
+    params Assembly[] assemblies) 
+        where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddMassTransit(config =>
         {
             config.SetKebabCaseEndpointNameFormatter();
             config.SetInMemorySagaRepositoryProvider();
+
             if (assemblies != null && assemblies.Length > 0)
             {
                 config.AddConsumers(assemblies);
@@ -29,7 +31,7 @@ public static partial class Extentions
                 config.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(new Uri(builder.Configuration.GetConnectionString("rabbit")!));
-                    configureEndpoints?.Invoke(context, cfg); // Adding service-specific endpoints 
+                    configureEndpoints?.Invoke(context, cfg);
                     cfg.ConfigureEndpoints(context);
                 });
             }
@@ -38,10 +40,10 @@ public static partial class Extentions
                 config.UsingAzureServiceBus((context, cfg) =>
                 {
                     cfg.Host(builder.Configuration.GetConnectionString("servicebus"));
-                    configureEndpoints?.Invoke(context, cfg); // Adding service-specific endpoints 
+                    configureEndpoints?.Invoke(context, cfg);
                     cfg.ConfigureEndpoints(context);
                 });
-            }            
+            }
         });
 
         return builder;

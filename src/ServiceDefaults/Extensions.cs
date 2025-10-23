@@ -25,7 +25,7 @@ public static partial class Extensions
             http.AddStandardResilienceHandler();
             http.AddServiceDiscovery();
         });
-
+        
         builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
         return builder;
@@ -43,15 +43,16 @@ public static partial class Extensions
     public static WebApplication UseDefaultEndpoints(this WebApplication app)
     {
         //app.MapDefaultEndpoints();
-        app.UseHttpsRedirection();
+
+        //app.UseHttpsRedirection(); // This adds a second trace id for the request redirect while testing locally. Shouldn't happen in prod if I use https only. 
+        app.UseRouting();
 
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/alive", new HealthCheckOptions
         {
             Predicate = r => r.Tags.Contains("live")
         });
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerIfEnabled();
 
         return app;
     }

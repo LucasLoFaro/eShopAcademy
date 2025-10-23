@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "Protos";
+
+package payments;
+
+service PaymentGrpc {
+  rpc Initiate (InitiatePaymentRequest) returns (InitiatePaymentResponse);
+}
+
+message InitiatePaymentRequest {
+  double amount = 1;
+  string currency = 2;
+  string external_id = 3;
+  string notification_url = 4;
+}
+
+message InitiatePaymentResponse {
+  string id = 1;
+  double amount = 2;
+  string currency = 3;
+  string external_id = 4;
+  string status = 5;
+  string url = 6;
+}

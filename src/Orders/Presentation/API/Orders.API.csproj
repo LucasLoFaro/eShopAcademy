@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>18fea5e3-04e7-46db-bf68-32f7e00b7fe0</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.17.0" />
+    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Protobuf Include="Protos\payment.proto" GrpcServices="Server" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Core\Application\Orders.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Clients\Orders.Clients.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Messaging\Orders.Messaging.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,63 @@
+﻿using Domain.Stock.Contracts;
+using Domain.Common.Events;
+using MassTransit;
+
+
+namespace Infrastructure.Services;
+
+public class StockMessagingClient
+{
+    private readonly IPublishEndpoint _publishEndpoint;
+
+    public StockMessagingClient(IPublishEndpoint publishEndpoint)
+    {
+        _publishEndpoint = publishEndpoint;
+    }
+
+
+    public async Task SendStockUpdate(AlterStockRequest stock, CancellationToken ct = default)
+    {
+        var command = new StockUpdatedEvent
+        {
+            ProductId = stock.ProductGuid,
+            Quantity = stock.Quantity,
+            WarehouseId = stock.Warehouse
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReserved(ReserveStockRequest request, Guid reservationId, CancellationToken ct = default)
+    {
+        var command = new StockReservationCreatedEvent
+        {
+            OrderId = request.OrderId,
+            ReservationId = reservationId
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReservationCommitted(ReserveStockRequest request, Guid reservationId, CancellationToken ct = default)
+    {
+        var command = new StockReservationCommitedEvent
+        {
+            OrderId = request.OrderId,
+            ReservationId = reservationId
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+
+    public async Task SendStockReservationCancelled(Guid orderId, Guid reservationId, string reason, CancellationToken ct = default)
+    {
+        var command = new StockReservationCancelledEvent
+        {
+            OrderId = orderId,
+            ReservationId = reservationId,
+            Reason = reason
+        };
+
+        await _publishEndpoint.Publish(command, ct);
+    }
+}

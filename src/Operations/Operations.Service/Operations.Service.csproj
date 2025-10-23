@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Operations.Service-9eeb9d43-9eb5-48f9-98d8-9c0721fb074a</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+  </ItemGroup>
+</Project>

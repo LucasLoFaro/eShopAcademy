@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-OrderEventsProcessor-00000000-0000-0000-0000-000000000000</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>../../../..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="MassTransit" Version="8.5.4" />
+    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Core\Domain\Order.Domain.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Messaging\Order.Messaging.csproj" />
+    <!-- Reference infrastructure services to access ServiceBusSettings -->
+  </ItemGroup>
+
+</Project>

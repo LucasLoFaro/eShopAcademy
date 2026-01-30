@@ -12,7 +12,7 @@ public static class CosmosDbExtensions
                 .WithEnvironment("AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE", "true")
                 .WithEnvironment("COSMOSDB_DATABASE_NAME", "eShopAcademy")
                 .WithEnvironment("ENABLE_EXPLORER", "true")
-                .WithVolume("cosmosdb-data", "/data")
+                //.WithVolume("cosmosdb-data", "/data")
                 .WithHttpEndpoint(targetPort: 8081,
                                   port: 8081,
                                   name: CosmosDbResource.EndpointName)

@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Commands.Stock;
+﻿namespace Common.Domain.Commands.Operations;
 
 public record OperationsCommand : BaseCommand;
 

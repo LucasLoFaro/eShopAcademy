@@ -1,10 +1,10 @@
-using MassTransit.EntityFrameworkCoreIntegration;
-using Microsoft.EntityFrameworkCore;
-using Domain.Common.States;
-using Orchestration.Data;
 using Application.Saga;
+using Data;
+using Domain.Common.States;
 using MassTransit;
-
+using Microsoft.EntityFrameworkCore;
+using Orchestration.Data;
+using Orders.Orchestration.Consumers;
 
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -19,7 +19,13 @@ builder.Services.AddDbContext<OrderSagaDbContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
-// TODO: Move this to service defaults.
+builder.Services.AddDbContext<OrderDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("orders"));
+});
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 builder.Services.AddMassTransit(cfg =>
 {
     cfg.SetKebabCaseEndpointNameFormatter();
@@ -33,6 +39,9 @@ builder.Services.AddMassTransit(cfg =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("orchestration"));
             });
         });
+
+    cfg.AddConsumer<CancelOrderCommandConsumer>();
+
     if (builder.Environment.IsDevelopment())
     {
         cfg.UsingRabbitMq((context, bus) =>

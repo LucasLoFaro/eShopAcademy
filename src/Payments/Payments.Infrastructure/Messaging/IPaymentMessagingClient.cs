@@ -1,4 +1,4 @@
-﻿using Domain.Common.Events;
+﻿using Common.Domain.Events.Payments;
 using MassTransit;
 
 namespace Infrastructure.Messaging;
@@ -14,7 +14,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
 
     public async Task SendPaymentCreated(Guid orderId, string providerTransactionId, CancellationToken ct = default)
     {
-        var evt = new PaymentCreatedEvent
+        var evt = new PaymentInitiatedEvent
         {
             OrderId = orderId,
             ProviderTransactionId = providerTransactionId
@@ -39,7 +39,7 @@ public class PaymentMessagingClient : IPaymentMessagingClient
         var evt = new PaymentFailedEvent
         {
             OrderId = orderId,
-            PaymentSessionId = providerTransactionId,
+            ProviderTransactionId = providerTransactionId,
             Reason = reason
         };
 

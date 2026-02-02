@@ -23,7 +23,7 @@ public class BasketCache : IBasketCache
         try
         {
             var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
-            basket = JsonSerializer.Deserialize<DomainEntities.Basket>(json!)!;
+            basket = JsonSerializer.Deserialize<DomainEntities.Basket>(json.ToString())!;
         }
         catch (Exception)
         {
@@ -80,7 +80,7 @@ public class BasketCache : IBasketCache
         try
         {
             var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
-            return JsonSerializer.Deserialize<DomainEntities.Basket>(json!)!;
+            return JsonSerializer.Deserialize<DomainEntities.Basket>(json.ToString())!;
         }
         catch (Exception)
         {

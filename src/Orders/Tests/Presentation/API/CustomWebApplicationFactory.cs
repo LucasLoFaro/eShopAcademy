@@ -1,3 +1,5 @@
+extern alias OrdersApi;
+
 using Core.Application.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -12,7 +14,7 @@ namespace Orders.Tests.Presentation.API;
 /// It replaces the real IOrderMessagingService with a mock implementation that
 /// can be inspected and verified by tests.
 /// </summary>
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public class CustomWebApplicationFactory : WebApplicationFactory<OrdersApi::Program>
 {
     /// <summary>
     /// Gets the mock messaging service used during tests.  Tests can use this

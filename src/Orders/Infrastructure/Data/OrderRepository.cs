@@ -29,6 +29,12 @@ public class OrderRepository : IOrderRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Id == id, ct);
 
+    public async Task UpdateAsync(Order order, CancellationToken ct = default)
+    {
+        _db.Orders.Update(order);
+        await _db.SaveChangesAsync(ct);
+    }
+
     public async Task<bool> RemoveByIdAsync(Guid id, CancellationToken ct = default)
     {
         var order = await _db.Orders

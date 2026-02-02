@@ -2,7 +2,7 @@
 
 public abstract record BaseCommand : BaseMessage
 {
-    public Guid OrderId { get; init; }
+    public Guid OrderId { get; set; }
     public override Guid CorrelationId => OrderId;
     public virtual string CommandType => GetType().Name.Replace("Command", "");
 }

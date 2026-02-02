@@ -1,5 +1,5 @@
-﻿using Domain.Stock.Contracts;
-using Domain.Common.Events;
+﻿using Common.Domain.Events.Stock;
+using Domain.Stock.Contracts;
 using MassTransit;
 
 
@@ -40,7 +40,7 @@ public class StockMessagingClient
 
     public async Task SendStockReservationCommitted(ReserveStockRequest request, Guid reservationId, CancellationToken ct = default)
     {
-        var command = new StockReservationCommitedEvent
+        var command = new StockReservationCommittedEvent
         {
             OrderId = request.OrderId,
             ReservationId = reservationId
@@ -49,9 +49,9 @@ public class StockMessagingClient
         await _publishEndpoint.Publish(command, ct);
     }
 
-    public async Task SendStockReservationCancelled(Guid orderId, Guid reservationId, string reason, CancellationToken ct = default)
+    public async Task SendStockReleased(Guid orderId, Guid reservationId, string reason, CancellationToken ct = default)
     {
-        var command = new StockReservationCancelledEvent
+        var command = new StockReleasedEvent
         {
             OrderId = orderId,
             ReservationId = reservationId,

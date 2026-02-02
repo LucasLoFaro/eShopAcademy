@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
   </ItemGroup>
 

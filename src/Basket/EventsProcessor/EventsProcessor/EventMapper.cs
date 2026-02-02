@@ -1,6 +1,7 @@
-﻿using Domain.Basket.Contracts;
-using Domain.Common.Events;
-using AutoMapper;
+﻿using AutoMapper;
+using Common.Domain.Events.Products;
+using Common.Domain.Events.Stock;
+using Domain.Basket.Contracts;
 
 
 namespace EventsProcessor;

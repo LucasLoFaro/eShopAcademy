@@ -1,8 +1,8 @@
-﻿using Domain.Basket.Contracts;
-using Domain.Common.Events;
+﻿using AutoMapper;
+using Common.Domain.Events.Stock;
 using Data.Interfaces;
+using Domain.Basket.Contracts;
 using MassTransit;
-using AutoMapper;
 
 
 namespace Consumers;

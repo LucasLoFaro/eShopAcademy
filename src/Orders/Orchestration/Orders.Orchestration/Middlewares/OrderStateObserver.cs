@@ -1,4 +1,4 @@
-﻿using Domain.Common.Events;
+﻿using Common.Domain.Events.Orders;
 using Domain.Common.States;
 using MassTransit;
 
@@ -25,9 +25,8 @@ public class OrderStateObserver : IStateObserver<OrderState>
             return;
         }
 
-        var evt = (OrderBaseEvent)Activator.CreateInstance(eventType)!;
+        var evt = (OrderEvent)Activator.CreateInstance(eventType)!;
         evt.OrderId = context.Saga.CorrelationId;
-        evt.CustomerEmail = context.Saga.CustomerEmail;
 
         var consume = context.GetPayload<ConsumeContext>();
         await consume.Publish(evt, eventType);

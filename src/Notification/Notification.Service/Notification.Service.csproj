@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>

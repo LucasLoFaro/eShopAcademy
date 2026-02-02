@@ -1,8 +1,8 @@
-﻿using Domain.Common.Events;
+﻿using Common.Domain.Commands.Orders;
+using Common.Domain.Events.Orders;
+using Common.Domain.Events.Payments;
 using Domain.Common.States;
-using Domain.Common.Commands;
 using MassTransit;
-using Orchestration.Middlewares;
 
 
 namespace Application.Saga;
@@ -20,14 +20,9 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<PaymentCompletedEvent> PaymentCompleted { get; private set; } = null!;
     public Event<PaymentFailedEvent> PaymentFailed { get; private set; } = null!;
 
-
-
     public OrderStateMachine()
     {
         InstanceState(x => x.CurrentState);
-
-        // Mailing on status change disabled for now. The notification service is subscribed to the events directly.
-        //ConnectStateObserver(new OrderStateObserver());
 
         Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId).SelectId(m => m.Message.OrderId));
         Event(() => OrderCompleted, x => x.CorrelateById(ctx => ctx.Message.OrderId));
@@ -40,6 +35,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Then(ctx =>
                 {
                     ctx.Saga.OrderId       = ctx.Message.OrderId;
+                    ctx.Saga.CustomerName  = ctx.Message.CustomerName;
                     ctx.Saga.CustomerEmail = ctx.Message.CustomerEmail;
                     Console.WriteLine($"[Saga] Order submitted: {ctx.Saga.OrderId}");
                 })
@@ -52,11 +48,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Then(ctx =>
                 {
                     Console.WriteLine($"[Saga] Payment completed for order {ctx.Saga.CorrelationId}");
-                    // ToDo: Update status on DB. Should I?
                 })
                 .Publish(ctx => new OrderCompletedEvent
                 {
                     OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail
                 })
                 .TransitionTo(Completed)
@@ -67,6 +63,13 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     Console.WriteLine($"[Saga] Payment failed for order {ctx.Saga.CorrelationId}");
                 })
+                .Publish(ctx => new CancelOrderCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Reason = ctx.Message.Reason
+                })
                 .TransitionTo(Failed)
                 .Finalize()
         );
@@ -74,3 +77,4 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         SetCompletedWhenFinalized();
     }
 }
+

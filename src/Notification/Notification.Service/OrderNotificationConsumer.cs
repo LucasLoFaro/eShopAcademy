@@ -1,4 +1,4 @@
-﻿using Domain.Common.Events;
+﻿using Common.Domain.Events.Orders;
 using MassTransit;
 
 namespace NotificationService;
@@ -6,7 +6,8 @@ namespace NotificationService;
 public class OrderNotificationConsumer : IConsumer<OrderSubmittedEvent>, 
                                          IConsumer<OrderConfirmedEvent>,
                                          IConsumer<OrderCompletedEvent>,
-                                         IConsumer<OrderExpiredEvent>
+                                         IConsumer<OrderExpiredEvent>,
+                                         IConsumer<OrderCancelledEvent>
 {
     private readonly IEmailSender _emailSender;
     private readonly ILogger<OrderNotificationConsumer> _logger;
@@ -21,9 +22,10 @@ public class OrderNotificationConsumer : IConsumer<OrderSubmittedEvent>,
     public Task Consume(ConsumeContext<OrderConfirmedEvent> context) => HandleNotification(context);
     public Task Consume(ConsumeContext<OrderCompletedEvent> context) => HandleNotification(context);
     public Task Consume(ConsumeContext<OrderExpiredEvent> context) => HandleNotification(context);
+    public Task Consume(ConsumeContext<OrderCancelledEvent> context) => HandleNotification(context);
 
     private async Task HandleNotification<T>(ConsumeContext<T> context)
-        where T : OrderBaseEvent
+        where T : OrderEvent
     {
         var evt = context.Message;
         _logger.LogInformation("[Notification] {Event} received for Order {OrderId}, Customer: {Email}",
@@ -36,6 +38,7 @@ public class OrderNotificationConsumer : IConsumer<OrderSubmittedEvent>,
             nameof(OrderConfirmedEvent) => "Confirmed",
             nameof(OrderCompletedEvent) => "Completed",
             nameof(OrderExpiredEvent) => "Expired",
+            nameof(OrderCancelledEvent) => "Cancelled",
             _ => "Updated"
         };
 

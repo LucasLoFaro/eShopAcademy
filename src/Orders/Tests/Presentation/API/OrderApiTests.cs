@@ -5,7 +5,7 @@ using Domain.Orders.Entities;
 using FluentAssertions;
 using Xunit;
 
-namespace Tests;
+namespace Orders.Tests.Presentation.API;
 
 /// <summary>
 /// Integration tests for the OrderService API.  These tests host the API in

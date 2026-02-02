@@ -224,7 +224,7 @@ public class StockService : StockProtoService.StockProtoServiceBase
             }
         }
 
-        await _messagingClient.SendStockReservationCancelled(Guid.Parse(request.OrderId), reservationId, request.Reason, context.CancellationToken);
+        await _messagingClient.SendStockReleased(Guid.Parse(request.OrderId), reservationId, request.Reason, context.CancellationToken);
 
         reservation.IsCommitted = false;
         await _reservationRepository.UpdateAsync(reservation, context.CancellationToken);

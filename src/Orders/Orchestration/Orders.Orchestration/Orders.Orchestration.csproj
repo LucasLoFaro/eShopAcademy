@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.0" />
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>

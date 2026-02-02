@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
 
-namespace Tests;
+namespace Orders.Tests.Presentation.API;
 
 /// <summary>
 /// Custom WebApplicationFactory used to host the Order API during integration tests.

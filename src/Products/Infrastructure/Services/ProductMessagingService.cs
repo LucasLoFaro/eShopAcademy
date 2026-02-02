@@ -1,6 +1,6 @@
-﻿using Core.Application.Interfaces.Services;
+﻿using Common.Domain.Events.Products;
+using Core.Application.Interfaces.Services;
 using Domain.Products.Entities;
-using Domain.Common.Events;
 using MassTransit;
 
 
@@ -22,8 +22,7 @@ public class ProductMessagingService : IProductMessagingService
         {
             ProductId = product.Id,
             Name = product.Name,
-            Price = product.Price,
-            EventType = ProductEventType.Updated
+            Price = product.Price
         };
 
         await _publishEndpoint.Publish(command, ct);
@@ -35,8 +34,7 @@ public class ProductMessagingService : IProductMessagingService
         {
             ProductId = product.Id,
             Name = product.Name,
-            Price = product.Price,
-            EventType = ProductEventType.Deleted
+            Price = product.Price
         };
 
         await _publishEndpoint.Publish(command, ct);

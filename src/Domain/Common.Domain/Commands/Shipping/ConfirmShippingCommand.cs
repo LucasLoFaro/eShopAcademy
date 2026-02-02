@@ -1,6 +1,8 @@
-﻿namespace Common.Domain.Commands.Shipping;
+﻿using Common.Domain.Commands.Stock;
 
-public record ConfirmShippingCommand : BaseCommand
+namespace Common.Domain.Commands.Shipping;
+
+public record ConfirmShippingCommand : ShippingCommand
 {
     public Guid ShippingId { get; set; }
 }

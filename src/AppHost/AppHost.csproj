@@ -38,6 +38,7 @@
     <ProjectReference Include="..\Shipping\Shipping.Service\Shipping.Service.csproj" />
     <ProjectReference Include="..\Stock\Stock.API\Stock.API.csproj" />
     <ProjectReference Include="..\Stock\Stock.gRPC\Stock.gRPC.csproj" />
+    <ProjectReference Include="..\Stock\Stock.Messaging.Processor\Stock.Messaging.Processor.csproj" />
   </ItemGroup>
 
   <ItemGroup>

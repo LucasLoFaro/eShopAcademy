@@ -46,4 +46,8 @@ if (builder.Environment.IsDevelopment())
 
 
 // Build and run the distributed application
+builder.AddProject<Projects.Stock_Messaging_Processor>("stock-messaging-processor");
+
+
+// Build and run the distributed application
 builder.Build().Run();

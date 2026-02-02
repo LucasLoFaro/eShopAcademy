@@ -1,4 +1,5 @@
 ﻿using Common.Domain.Commands.Orders;
+using Common.Domain.Commands.Stock;
 using Common.Domain.Events.Orders;
 using Common.Domain.Events.Payments;
 using Domain.Common.States;
@@ -37,6 +38,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     ctx.Saga.OrderId       = ctx.Message.OrderId;
                     ctx.Saga.CustomerName  = ctx.Message.CustomerName;
                     ctx.Saga.CustomerEmail = ctx.Message.CustomerEmail;
+                    ctx.Saga.CustomerId    = ctx.Message.CustomerId;
+                    ctx.Saga.TotalAmount   = ctx.Message.TotalAmount;
+                    ctx.Saga.PaymentId     = ctx.Message.PaymentId;
+                    ctx.Saga.ReservationId = ctx.Message.ReservationId;
                     Console.WriteLine($"[Saga] Order submitted: {ctx.Saga.OrderId}");
                 })
                 .TransitionTo(Submitted)
@@ -48,6 +53,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Then(ctx =>
                 {
                     Console.WriteLine($"[Saga] Payment completed for order {ctx.Saga.CorrelationId}");
+                })
+                .Publish(ctx => new CommitStockReservationCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    ReservationId = ctx.Saga.ReservationId
                 })
                 .Publish(ctx => new OrderCompletedEvent
                 {

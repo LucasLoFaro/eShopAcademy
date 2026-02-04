@@ -1,4 +1,4 @@
-﻿# 🏗️ Architecture – eShopAcademy
+# 🏗️ Architecture – eShopAcademy
 
 ## 1. Purpose
 

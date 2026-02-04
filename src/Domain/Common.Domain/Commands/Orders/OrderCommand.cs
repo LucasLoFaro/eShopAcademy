@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Commands.Orders;
+namespace Common.Domain.Commands.Orders;
 
 public abstract record OrderCommand : BaseCommand
 {

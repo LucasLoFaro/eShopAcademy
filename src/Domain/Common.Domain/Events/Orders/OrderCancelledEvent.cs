@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events.Orders;
+namespace Common.Domain.Events.Orders;
 
 public record OrderCancelledEvent : OrderEvent
 {

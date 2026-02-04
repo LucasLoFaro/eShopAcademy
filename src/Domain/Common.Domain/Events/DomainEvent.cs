@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events;
+namespace Common.Domain.Events;
 
 public abstract record DomainEvent : BaseMessage
 {

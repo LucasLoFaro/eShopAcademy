@@ -1,5 +1,3 @@
-﻿using Common.Domain.Commands.Stock;
-
 namespace Common.Domain.Commands.Shipping;
 
 public record ScheduleShippingCommand : ShippingCommand

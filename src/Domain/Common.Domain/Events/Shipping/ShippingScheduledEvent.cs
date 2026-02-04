@@ -1,3 +1,3 @@
-﻿namespace Common.Domain.Events.Shipping;
+﻿namespace Domain.Common.Events.Shipping;
 
 public record ShippingScheduledEvent : ShippingEvent;

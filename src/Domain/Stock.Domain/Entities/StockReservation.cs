@@ -4,16 +4,13 @@ using MongoDB.Bson;
 
 namespace Domain.Stock.Entities;
 
-public class StockReservation
+public class StockReservation : BaseEntity
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.String)]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    
     [BsonRepresentation(BsonType.String)]
     public Guid OrderId { get; set; }
     public List<ReservationItem> Items { get; set; } = new();
     public bool IsCommitted { get; set; } = false;
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime ValidUntil { get; init; } = DateTime.UtcNow.AddMinutes(5);
     public DateTime? CommittedAt { get; set; }
 

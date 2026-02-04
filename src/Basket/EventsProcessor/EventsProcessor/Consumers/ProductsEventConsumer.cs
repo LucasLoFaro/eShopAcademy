@@ -1,5 +1,5 @@
 using AutoMapper;
-using Common.Domain.Events.Products;
+using Domain.Common.Events.Products;
 using Data.Interfaces;
 using Domain.Basket.Contracts;
 using MassTransit;

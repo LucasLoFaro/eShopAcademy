@@ -20,6 +20,8 @@ public static class ShippingExtensions
 
         shippingService
             .WaitFor(wiremock)
+            .WithReference(rabbit)
+            .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithEnvironment("WireMock__BaseUrl", "http://wiremock:8080")
             .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")

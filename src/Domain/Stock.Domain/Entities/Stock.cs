@@ -4,9 +4,8 @@ using MongoDB.Bson;
 
 namespace Domain.Stock.Entities;
 
-public class Stock
+public class Stock : BaseEntity
 {
-    [BsonId]
     [BsonRepresentation(BsonType.String)]
     public Guid ProductID { get; set; }
     public int Quantity { get; set; }

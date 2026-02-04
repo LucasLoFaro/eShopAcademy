@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events.Payments;
+﻿namespace Domain.Common.Events.Payments;
 
 public abstract record PaymentEvent : DomainEvent
 {

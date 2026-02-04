@@ -1,0 +1,10 @@
+﻿namespace Domain.Customers.Entities;
+
+public class Address
+{
+    public string Street { get; set; }
+    public string Number { get; set; }
+    public string AdditionalInformation { get; set; }
+    public string ZipCode { get; set; }
+    public string City { get; set; }
+}

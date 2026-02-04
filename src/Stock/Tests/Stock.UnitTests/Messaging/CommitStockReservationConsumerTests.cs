@@ -1,6 +1,6 @@
 using AutoFixture.Xunit2;
-using Common.Domain.Commands.Stock;
-using Common.Domain.Events.Stock;
+using Domain.Common.Commands.Stock;
+using Domain.Common.Events.Stock;
 using Domain.Stock.Entities;
 using FluentAssertions;
 using Infrastructure.Data;

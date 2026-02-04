@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events.Stock;
+﻿namespace Domain.Common.Events.Stock;
 
 public record StockReservationCommittedEvent : StockEvent
 {

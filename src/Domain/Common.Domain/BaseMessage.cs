@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Common.Domain;
+namespace Domain.Common;
 
 public abstract record BaseMessage
 {

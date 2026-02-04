@@ -1,4 +1,4 @@
-﻿using Common.Domain.Events.Orders;
+﻿using Domain.Common.Events.Orders;
 using MassTransit;
 
 namespace NotificationService;

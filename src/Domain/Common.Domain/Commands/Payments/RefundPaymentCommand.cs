@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Commands.Payments;
+﻿namespace Domain.Common.Commands.Payments;
 
 public record RefundPaymentCommand : PaymentCommand
 {

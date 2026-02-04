@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <!-- NuGet packaging -->
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageId>eShopAcademy.$(MSBuildProjectName)</PackageId>
+	  <Version>1.0.0</Version>
+	  <Authors>Lucas Lo Faro</Authors>
+	  <Company>eShopAcademy</Company>
+	  <Description>Domain models and events for the $(MSBuildProjectName) bounded context.</Description>
+	  <RepositoryUrl>https://github.com/LucasLoFaro/eShopAcademy</RepositoryUrl>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageOutputPath>../../../packages</PackageOutputPath>
+	  <PackageProjectUrl>https://github.com/LucasLoFaro/eShopAcademy</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

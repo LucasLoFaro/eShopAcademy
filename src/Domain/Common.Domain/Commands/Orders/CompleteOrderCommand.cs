@@ -1,3 +1,3 @@
-namespace Common.Domain.Commands.Orders;
+namespace Domain.Common.Commands.Orders;
 
 public record CompleteOrderCommand : OrderCommand;

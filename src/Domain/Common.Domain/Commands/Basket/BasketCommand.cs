@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Commands.Basket;
+﻿namespace Domain.Common.Commands.Basket;
 
 public record BasketCommand : BaseCommand
 {

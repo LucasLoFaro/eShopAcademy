@@ -1,8 +1,7 @@
 ﻿namespace Domain.Payments.Entities;
 
-public class Payment
+public class Payment : BaseEntity
 {
-    public Guid Id { get; set; }
     public Guid OrderId { get; set; }
     public double Amount { get; set; }
     public PaymentStatus Status { get; set; }

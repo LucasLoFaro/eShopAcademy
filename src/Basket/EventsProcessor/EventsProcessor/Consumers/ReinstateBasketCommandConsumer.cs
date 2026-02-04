@@ -1,4 +1,4 @@
-using Common.Domain.Commands.Basket;
+using Domain.Common.Commands.Basket;
 using Data.Interfaces;
 using Domain.Basket.Entities;
 using MassTransit;

@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events.Products;
+﻿namespace Domain.Common.Events.Products;
 
 public abstract record ProductEvent : DomainEvent
 {

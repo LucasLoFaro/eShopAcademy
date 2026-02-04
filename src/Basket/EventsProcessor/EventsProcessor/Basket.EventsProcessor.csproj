@@ -11,8 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.1" />
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" />
+    <PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.1" />
     <PackageReference Include="MassTransit" Version="9.0.0" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
   </ItemGroup>

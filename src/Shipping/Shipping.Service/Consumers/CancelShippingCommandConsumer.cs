@@ -1,4 +1,4 @@
-﻿using Common.Domain.Commands.Shipping;
+﻿using Domain.Common.Commands.Shipping;
 using MassTransit;
 
 namespace Shipping.Service.Consumers;

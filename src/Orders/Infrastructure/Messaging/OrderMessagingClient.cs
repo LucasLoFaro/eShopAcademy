@@ -1,5 +1,5 @@
-﻿using Common.Domain.Events.Orders;
-using Core.Application.Interfaces;
+﻿using Core.Application.Interfaces;
+using Domain.Common.Events.Orders;
 using Domain.Orders.Entities;
 using MassTransit;
 

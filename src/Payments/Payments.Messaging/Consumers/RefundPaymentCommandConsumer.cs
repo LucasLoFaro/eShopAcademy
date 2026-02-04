@@ -1,5 +1,5 @@
-﻿using Common.Domain.Commands.Payments;
-using Common.Domain.Events.Payments;
+﻿using Domain.Common.Commands.Payments;
+using Domain.Common.Events.Payments;
 using MassTransit;
 
 namespace Payments.Messaging.Consumers;

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Common.Domain.Events.Products;
-using Common.Domain.Events.Stock;
+using Domain.Common.Events.Products;
+using Domain.Common.Events.Stock;
 using Domain.Basket.Contracts;
 
 

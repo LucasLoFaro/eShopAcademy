@@ -22,8 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Domain\Stock.Domain\Stock.Domain.csproj" />
     <ProjectReference Include="..\..\Data\Stock.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Services\Stock.Services.csproj" />
     <ProjectReference Include="..\..\Stock.Messaging.Processor\Stock.Messaging.Processor.csproj" />

@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Product.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Products.Entities;
 
-public class Product
+public class Product : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
-
     [Required]
     public string Name { get; set; }
 

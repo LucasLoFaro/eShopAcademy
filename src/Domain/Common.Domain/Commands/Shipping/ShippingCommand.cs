@@ -1,3 +1,3 @@
-﻿namespace Common.Domain.Commands.Shipping;
+﻿namespace Domain.Common.Commands.Shipping;
 
 public record ShippingCommand : BaseCommand;

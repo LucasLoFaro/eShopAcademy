@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,8 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" />
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.1" />
     <PackageReference Include="MassTransit" Version="9.0.0" />
   </ItemGroup>
 

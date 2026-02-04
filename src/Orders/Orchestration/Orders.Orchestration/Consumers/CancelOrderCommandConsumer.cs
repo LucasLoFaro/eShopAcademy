@@ -1,7 +1,7 @@
-﻿using Common.Domain.Commands.Orders;
-using Common.Domain.Commands.Payments;
-using Common.Domain.Commands.Stock;
-using Common.Domain.Events.Orders;
+﻿using Domain.Common.Commands.Orders;
+using Domain.Common.Commands.Payments;
+using Domain.Common.Commands.Stock;
+using Domain.Common.Events.Orders;
 using Data;
 using Domain.Orders.Enums;
 using MassTransit;

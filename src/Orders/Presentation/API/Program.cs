@@ -19,6 +19,19 @@ builder.Services.AddControllers()
 
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
+builder.Services.AddHttpClient<ICustomerServiceClient, CustomerServiceClient>(client =>
+{
+    var baseAddress = builder.Configuration["services:eshopacademy-customers-api:customers-api:0"];
+
+    if (string.IsNullOrWhiteSpace(baseAddress))
+    {
+        throw new InvalidOperationException(
+            "Customers API base address configuration 'services:eshopacademy-customers-api:customers-api:0' is missing.");
+    }
+
+    client.BaseAddress = new Uri(baseAddress);
+});
+
 builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(options =>
 {
     options.Address = new Uri(builder.Configuration["services:eshopacademy-payments-grpc:payments-grpc:0"]!);
@@ -38,7 +51,6 @@ else
 }
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStockServiceClient, StockServiceClient>();
-builder.Services.AddScoped<ICustomerServiceClient, FakeCustomerServiceClient>();
 builder.Services.AddScoped<IPaymentServiceClient, PaymentServiceClient>(); 
 builder.Services.AddScoped<IProductServiceClient, FakeProductServiceClient>();
 builder.Services.AddScoped<IOrderMessagingClient, OrderMessagingClient>();
@@ -52,9 +64,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
     if (db.Database.IsRelational())
-    {
         db.Database.Migrate();
-    }
 }
 
 app.Run();

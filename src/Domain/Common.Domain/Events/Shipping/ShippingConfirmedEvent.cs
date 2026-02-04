@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Events.Shipping;
+﻿namespace Domain.Common.Events.Shipping;
 
 public record ShippingConfirmedEvent : ShippingEvent
 {

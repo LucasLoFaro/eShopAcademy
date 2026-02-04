@@ -1,4 +1,4 @@
-﻿using Common.Domain.Events.Stock;
+﻿using Domain.Common.Events.Stock;
 using Domain.Stock.Contracts;
 using MassTransit;
 

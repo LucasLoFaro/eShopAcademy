@@ -1,4 +1,4 @@
-﻿namespace Common.Domain.Commands.Stock;
+﻿namespace Domain.Common.Commands.Stock;
 
 public record ReleaseStockReservationCommand : StockCommand
 {

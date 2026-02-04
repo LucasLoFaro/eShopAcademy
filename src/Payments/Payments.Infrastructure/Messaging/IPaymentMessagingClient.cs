@@ -1,4 +1,4 @@
-﻿using Common.Domain.Events.Payments;
+﻿using Domain.Common.Events.Payments;
 using MassTransit;
 
 namespace Infrastructure.Messaging;

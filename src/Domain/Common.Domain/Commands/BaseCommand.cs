@@ -1,4 +1,4 @@
-namespace Common.Domain.Commands;
+namespace Domain.Common.Commands;
 
 public abstract record BaseCommand : BaseMessage
 {

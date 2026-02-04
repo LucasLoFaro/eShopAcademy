@@ -1,4 +1,4 @@
-using Common.Domain.Commands.Stock;
+using Domain.Common.Commands.Stock;
 using Infrastructure.Data;
 using Infrastructure.Services;
 using MassTransit;

@@ -1,4 +1,4 @@
-﻿using Common.Domain.Events.Products;
+﻿using Domain.Common.Events.Products;
 using Core.Application.Interfaces.Services;
 using Domain.Products.Entities;
 using MassTransit;

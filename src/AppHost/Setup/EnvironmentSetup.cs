@@ -16,8 +16,10 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> ordersOrchestration,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
+        IResourceBuilder<ProjectResource> stockMessaging,
         IResourceBuilder<ProjectResource> paymentsApi,
         IResourceBuilder<ProjectResource> paymentsGrpc,
+        IResourceBuilder<ProjectResource> paymentsMessaging,
         IResourceBuilder<ProjectResource> shippingApi,
         IResourceBuilder<ProjectResource> shippingService,
         IResourceBuilder<ProjectResource> notificationService,
@@ -63,8 +65,8 @@ public static class EnvironmentSetup
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersdb, orchestrationdb, rabbit);
-        StockExtensions.Configure(stockApi, stockGrpc, stockdb, rabbit);
-        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, wiremock, rabbit);
+        StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
+        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit);
         NotificationExtensions.Configure(notificationService, rabbit);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);

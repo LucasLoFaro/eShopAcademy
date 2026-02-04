@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" />
     <PackageReference Include="eShopAcademy.Customers.Domain" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
   </ItemGroup>

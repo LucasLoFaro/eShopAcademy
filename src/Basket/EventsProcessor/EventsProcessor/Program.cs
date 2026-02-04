@@ -1,8 +1,8 @@
-using ServiceDefaults;
+using Basket.EventsProcessor.Consumers;
+using Data;
 using Data.Interfaces;
 using MassTransit;
-using Consumers;
-using Data;
+using ServiceDefaults;
 
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -12,6 +12,8 @@ builder.AddServiceDefaults()
     { 
         cfg.ReceiveEndpoint("products-updated", e => e.ConfigureConsumer<ProductsEventConsumer>(context));
         cfg.ReceiveEndpoint("stock-updated", e => e.ConfigureConsumer<StockEventConsumer>(context));
+        cfg.ReceiveEndpoint("empty-basket", e => e.ConfigureConsumer<EmptyBasketCommandConsumer>(context));
+        cfg.ReceiveEndpoint("reinstate-basket", e => e.ConfigureConsumer<ReinstateBasketCommandConsumer>(context));
     },
     typeof(ProductsEventConsumer).Assembly);
 

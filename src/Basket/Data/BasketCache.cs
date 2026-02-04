@@ -149,4 +149,38 @@ public class BasketCache : IBasketCache
 
         return true;
     }
+
+    public async Task<bool> ReinstateBasket(Guid clientId, IReadOnlyCollection<Item> items)
+    {
+        var basket = new DomainEntities.Basket
+        {
+            ClientID = clientId,
+            Items = new List<Item>(items)
+        };
+
+        try
+        {
+            await _cache.StringSetAsync(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket));
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("There was an issue while storing the basket");
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> EmptyBasket(Guid clientId)
+    {
+        try
+        {
+            return await _cache.KeyDeleteAsync(BASKET_PREFIX + clientId);
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("There was an issue while removing the basket");
+            return false;
+        }
+    }
 }

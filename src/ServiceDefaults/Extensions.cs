@@ -47,11 +47,14 @@ public static partial class Extensions
         //app.UseHttpsRedirection(); // This adds a second trace id for the request redirect while testing locally. Shouldn't happen in prod if I use https only. 
         app.UseRouting();
 
-        app.MapHealthChecks("/health");
-        app.MapHealthChecks("/alive", new HealthCheckOptions
+        if (app.Services.GetService<HealthCheckService>() is not null)
         {
-            Predicate = r => r.Tags.Contains("live")
-        });
+            app.MapHealthChecks("/health");
+            app.MapHealthChecks("/alive", new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+        }
         app.UseSwaggerIfEnabled();
 
         return app;

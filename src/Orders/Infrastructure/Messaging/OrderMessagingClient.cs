@@ -18,7 +18,12 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
         => _publishEndpoint.Publish(new OrderSubmittedEvent
         {
             OrderId = order.Id,
-            CustomerEmail = order.Customer?.Mail ?? string.Empty
+            CustomerName = order.Customer?.Name ?? string.Empty,
+            CustomerEmail = order.Customer?.Mail ?? string.Empty,
+            CustomerId = order.CustomerId,
+            TotalAmount = Convert.ToDecimal(order.TotalPrice),
+            PaymentId = order.PaymentId,
+            ReservationId = order.ReservationId
         }, ct);
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken ct = default)

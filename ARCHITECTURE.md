@@ -215,6 +215,8 @@ Payments are treated as a **complex, isolated domain**.
 RabbitMQ is used for local development through Aspire. Azure Service Bus is intended for production use (WIP).
 
 All services must be runnable locally with minimal setup.
+Whenever a nuget project is updated, the nugets must be packed, published to the artifact feed and all consumers should be updated to the last version.
+Push command: dotnet nuget push --source Github .\packages\ --skip-duplicate
 
 ---
 

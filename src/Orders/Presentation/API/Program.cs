@@ -28,7 +28,14 @@ builder.Services.AddGrpcClient<StockProtoService.StockProtoServiceClient>(option
     options.Address = new Uri(builder.Configuration["services:eshopacademy-stock-grpc:stock-grpc:0"]!);
 });
 
-builder.Services.AddDbContext<OrderDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("orders")));
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<OrderDbContext>(opt => opt.UseInMemoryDatabase("OrdersTests"));
+}
+else
+{
+    builder.Services.AddDbContext<OrderDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("orders")));
+}
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStockServiceClient, StockServiceClient>();
 builder.Services.AddScoped<ICustomerServiceClient, FakeCustomerServiceClient>();
@@ -44,7 +51,10 @@ app.UseDefaultEndpoints();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
-    db.Database.Migrate();
+    if (db.Database.IsRelational())
+    {
+        db.Database.Migrate();
+    }
 }
 
 app.Run();

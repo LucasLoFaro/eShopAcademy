@@ -4,16 +4,17 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-Operations.Service-9eeb9d43-9eb5-48f9-98d8-9c0721fb074a</UserSecretsId>
+    <UserSecretsId>dotnet-Payments.Messaging-1cbfaf38-5ed6-47e5-b9f0-25564cb69343</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" />
-    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.1" />
+    <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Payments.Infrastructure\Payments.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

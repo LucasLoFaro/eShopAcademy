@@ -1,8 +1,10 @@
-﻿namespace Common.Domain.Commands.Basket;
+﻿using System.Collections.Generic;
+
+namespace Common.Domain.Commands.Basket;
 
 public record ReinstateBasketCommand : BasketCommand
 {
-    List<BasketItem> Items { get; init; } = new();
+    public List<BasketItem> Items { get; init; } = new();
 }
 
 public class BasketItem

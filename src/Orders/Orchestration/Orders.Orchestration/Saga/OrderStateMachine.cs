@@ -1,7 +1,12 @@
-﻿using Common.Domain.Commands.Orders;
+﻿using Common.Domain.Commands.Operations;
+using Common.Domain.Commands.Basket;
+using Common.Domain.Commands.Orders;
+using Common.Domain.Commands.Payments;
+using Common.Domain.Commands.Shipping;
 using Common.Domain.Commands.Stock;
 using Common.Domain.Events.Orders;
 using Common.Domain.Events.Payments;
+using Common.Domain.Events.Stock;
 using Domain.Common.States;
 using MassTransit;
 
@@ -20,6 +25,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<OrderCompletedEvent> OrderCompleted { get; private set; } = null!;
     public Event<PaymentCompletedEvent> PaymentCompleted { get; private set; } = null!;
     public Event<PaymentFailedEvent> PaymentFailed { get; private set; } = null!;
+    public Event<StockReservationCommittedEvent> StockReservationCommitted { get; private set; } = null!;
+    public Event<StockReservationCommitFailedEvent> StockReservationCommitFailed { get; private set; } = null!;
 
     public OrderStateMachine()
     {
@@ -29,6 +36,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         Event(() => OrderCompleted, x => x.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => PaymentCompleted, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => PaymentFailed, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
+        Event(() => StockReservationCommitted, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
+        Event(() => StockReservationCommitFailed, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
 
         // === INITIAL ===
         Initially(
@@ -52,6 +61,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(PaymentCompleted)
                 .Then(ctx =>
                 {
+                    ctx.Saga.ProviderTransactionId = ctx.Message.ProviderTransactionId;
+                    ctx.Saga.PaymentId = ctx.Message.PaymentId;
                     Console.WriteLine($"[Saga] Payment completed for order {ctx.Saga.CorrelationId}");
                 })
                 .Publish(ctx => new CommitStockReservationCommand
@@ -59,19 +70,61 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId
                 })
-                .Publish(ctx => new OrderCompletedEvent
+                .Publish(ctx => new EmptyBasketCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    CustomerName = ctx.Saga.CustomerName,
-                    CustomerEmail = ctx.Saga.CustomerEmail
+                    ClientId = ctx.Saga.CustomerId
                 })
-                .TransitionTo(Completed)
-                .Finalize(),
+                .Publish(ctx => new ScheduleShippingCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    DestinationAddress = string.Empty
+                }),
+
+            When(StockReservationCommitted)
+                .Then(ctx =>
+                {
+                    Console.WriteLine($"[Saga] Stock committed for order {ctx.Saga.CorrelationId}");
+                })
+                .Publish(ctx => new PreparePackageCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    ReservationId = ctx.Message.ReservationId
+                }),
 
             When(PaymentFailed)
                 .Then(ctx =>
                 {
                     Console.WriteLine($"[Saga] Payment failed for order {ctx.Saga.CorrelationId}");
+                })
+                .Publish(ctx => new CancelOrderCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Reason = ctx.Message.Reason
+                })
+                .TransitionTo(Failed)
+                .Finalize(),
+
+            When(StockReservationCommitFailed)
+                .Then(ctx =>
+                {
+                    Console.WriteLine($"[Saga] Stock commit failed for order {ctx.Saga.CorrelationId}");
+                })
+                .Publish(ctx => new RefundPaymentCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    PaymentId = ctx.Saga.PaymentId,
+                    ProviderTransactionId = ctx.Saga.ProviderTransactionId,
+                    Amount = ctx.Saga.TotalAmount,
+                    Reason = ctx.Message.Reason
+                })
+                .Publish(ctx => new CancelShippingCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    ShippingId = ctx.Saga.CorrelationId
                 })
                 .Publish(ctx => new CancelOrderCommand
                 {

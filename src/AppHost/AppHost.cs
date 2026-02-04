@@ -50,4 +50,8 @@ builder.AddProject<Projects.Stock_Messaging_Processor>("stock-messaging-processo
 
 
 // Build and run the distributed application
+builder.AddProject<Projects.Payments_Messaging>("payments-messaging");
+
+
+// Build and run the distributed application
 builder.Build().Run();

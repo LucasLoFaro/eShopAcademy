@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" />
     <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.1" />
   </ItemGroup>
 

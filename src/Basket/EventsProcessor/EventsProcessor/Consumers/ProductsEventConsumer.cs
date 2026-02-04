@@ -5,7 +5,7 @@ using Domain.Basket.Contracts;
 using MassTransit;
 
 
-namespace Consumers;
+namespace Basket.EventsProcessor.Consumers;
 
 public class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
 {

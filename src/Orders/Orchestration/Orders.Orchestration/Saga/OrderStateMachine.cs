@@ -79,7 +79,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerEmail = ctx.Saga.CustomerEmail,
-                    DestinationAddress = string.Empty
+                    DestinationAddress = ctx.Saga.DestinationAddress
                 }),
 
             When(StockReservationCommitted)

@@ -36,6 +36,7 @@ var customersApi = builder.AddProject<Projects.Customers_Api>("eshopacademy-cust
 var ordersOrchestration = builder.AddProject<Projects.Orders_Orchestration>("eshopacademy-orders-orchestration");
 var ordersApi = builder.AddProject<Projects.Orders_API>("eshopacademy-orders-api")
                         .WithReference(customersApi)
+                        .WithReference(productsApi)
                         .WithReference(productsGrpc)
                         .WithReference(stockGrpc)
                         .WithReference(paymentsGrpc);

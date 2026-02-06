@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ServiceDiscovery;
@@ -12,9 +13,14 @@ public static partial class Extensions
 {
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
+        var enableMonitoring = builder.Configuration.GetValue("Aspire:Monitoring:Enabled", true);
+
         builder.AddDefaultConfiguration();
-        builder.ConfigureOpenTelemetry();
-        builder.AddDefaultHealthChecks();
+        if (enableMonitoring)
+        {
+            builder.ConfigureOpenTelemetry();
+            builder.AddDefaultHealthChecks();
+        }
         builder.Services.AddServiceDiscovery();
         builder.Services.Configure<ServiceDiscoveryOptions>(options =>
         {

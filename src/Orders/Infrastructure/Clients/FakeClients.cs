@@ -1,6 +1,5 @@
 ﻿using Core.Application.Interfaces;
 using Domain.Orders.Entities;
-using System.Net.Http.Json;
 
 
 namespace Infrastructure.Clients;
@@ -37,27 +36,6 @@ public class FakeCustomerServiceClient : ICustomerServiceClient
                 AdditionalInformation = "Piso 32 Departamento A"
             }
         };
-}
-
-public class CustomerServiceClient : ICustomerServiceClient
-{
-    private readonly HttpClient _httpClient;
-
-    public CustomerServiceClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
-    public async Task<Customer> GetCustomerByIdAsync(Guid customerId)
-    {
-        // Calls Customers.Api minimal endpoint which currently returns a hardcoded customer
-        var response = await _httpClient.GetFromJsonAsync<Customer>($"/customers/{customerId}");
-
-        if (response == null)
-            throw new InvalidOperationException("Customer service returned no data.");
-
-        return response;
-    }
 }
 
 public class FakePaymentGrpcClient : IPaymentServiceClient

@@ -15,6 +15,7 @@ public class OrderState : SagaStateMachineInstance
     public string ProviderTransactionId { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
+    public string DestinationAddress { get; set; } = string.Empty;
 
     // Needed for EF optimistic concurrency in Postgres
     public byte[]? RowVersion { get; set; }

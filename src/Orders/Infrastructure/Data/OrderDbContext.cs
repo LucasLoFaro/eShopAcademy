@@ -69,7 +69,7 @@ public class OrderDbContext : DbContext
                 p.Property(x => x.Stock).HasColumnName("product_stock");
                 p.Property(x => x.Description).HasColumnName("product_description");
                 p.Property(x => x.Image).HasColumnName("product_image");
-                p.Property(x => x.CategoryName).HasColumnName("product_category");
+                p.Property(x => x.CategoryName).HasColumnName("product_category").IsRequired(false);
             });
 
             oi.Ignore(x => x.Price);

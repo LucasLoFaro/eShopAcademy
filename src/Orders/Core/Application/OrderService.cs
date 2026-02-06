@@ -57,6 +57,7 @@ public class OrderService : IOrderService
         foreach (var item in request.Items)
         {
             var updatedProduct = await _productClient.GetProductByIdAsync(item.ProductID);
+            updatedProduct.Image ??= string.Empty;
             if (updatedProduct.Price != item.Price)
                 throw new InvalidOperationException($"Price changed for product {updatedProduct.Name}");
 

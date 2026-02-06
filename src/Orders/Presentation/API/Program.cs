@@ -32,6 +32,19 @@ builder.Services.AddHttpClient<ICustomerServiceClient, CustomerServiceClient>(cl
     client.BaseAddress = new Uri(baseAddress);
 });
 
+builder.Services.AddHttpClient<IProductServiceClient, ProductServiceClient>(client =>
+{
+    var baseAddress = builder.Configuration["services:eshopacademy-products-api:products-api:0"];
+
+    if (string.IsNullOrWhiteSpace(baseAddress))
+    {
+        throw new InvalidOperationException(
+            "Products API base address configuration 'services:eshopacademy-products-api:products-api:0' is missing.");
+    }
+
+    client.BaseAddress = new Uri(baseAddress);
+});
+
 builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(options =>
 {
     options.Address = new Uri(builder.Configuration["services:eshopacademy-payments-grpc:payments-grpc:0"]!);
@@ -52,7 +65,6 @@ else
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStockServiceClient, StockServiceClient>();
 builder.Services.AddScoped<IPaymentServiceClient, PaymentServiceClient>(); 
-builder.Services.AddScoped<IProductServiceClient, FakeProductServiceClient>();
 builder.Services.AddScoped<IOrderMessagingClient, OrderMessagingClient>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 

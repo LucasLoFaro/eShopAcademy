@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/shipping/schedule"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "ShipmentId": "{{randomValue type='UUID'}}",
+      "OrderId": "{{jsonPath request.body '$.OrderId'}}",
+      "Carrier": "DHL",
+      "TrackingNumber": "{{randomValue type='UUID'}}",
+      "Status": "accepted",
+      "NotificationUrl": "http://shipping-api:8007/api/shipping/webhook"
+    },
+    "transformers": [ "response-template" ]
+  },
+  "serveEventListeners": [
+    {
+      "name": "webhook",
+      "parameters": {
+        "method": "POST",
+        "url": "http://shipping-api:8007/api/shipping/webhook",
+        "delay": {
+          "type": "fixed",
+          "milliseconds": 1000
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Signature": "Signature"
+        },
+        "body": "{ \"ShipmentId\": \"{{jsonPath response.body '$.ShipmentId'}}\", \"OrderId\": \"{{jsonPath request.body '$.OrderId'}}\", \"Status\": \"shipped\", \"TrackingNumber\": \"{{jsonPath response.body '$.TrackingNumber'}}\", \"Carrier\": \"DHL\", \"OccurredAt\": \"{{now}}\" }"
+      }
+    }
+  ]
+}

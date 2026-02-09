@@ -37,6 +37,7 @@ public static class EnvironmentSetup
 
         var stockdb = mongo.AddDatabase("stock");
         var customersdb = mongo.AddDatabase("customers");
+        var shippingdb = mongo.AddDatabase("shipping");
 
         var postgres = builder.AddPostgres("postgres")
             .WithDataVolume("postgres-data")
@@ -67,7 +68,7 @@ public static class EnvironmentSetup
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
-        ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit);
+        ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
         NotificationExtensions.Configure(notificationService, rabbit);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);

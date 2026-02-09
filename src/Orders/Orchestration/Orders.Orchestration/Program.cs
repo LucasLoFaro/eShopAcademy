@@ -64,10 +64,11 @@ builder.Services.AddMassTransit(cfg =>
 
 var host = builder.Build();
 
+
 using (var scope = host.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OrderSagaDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
 
 host.Run();

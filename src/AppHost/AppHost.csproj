@@ -46,6 +46,9 @@
     <None Update="Mocks\psp-make-payment.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Mocks\dhl-schedule-shipping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

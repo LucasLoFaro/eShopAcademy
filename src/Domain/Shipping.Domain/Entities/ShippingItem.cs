@@ -1,6 +1,6 @@
 namespace Domain.Shipping.Entities;
 
-public class ShipmentItem
+public class ShippingItem
 {
     public Guid ProductId { get; set; }
     public int Quantity { get; set; }

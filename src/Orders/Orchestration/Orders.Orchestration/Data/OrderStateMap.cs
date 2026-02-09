@@ -19,7 +19,22 @@ public class OrderStateMap : SagaClassMap<OrderState>
               .IsRequired();
 
         entity.Property(x => x.OrderId);
-        entity.Property(x => x.CustomerEmail).HasMaxLength(256);
+        entity.Property(x => x.CustomerEmail)
+              .HasMaxLength(256)
+              .IsRequired();
+        entity.Property(x => x.CustomerId);
+        entity.Property(x => x.PaymentId);
+        entity.Property(x => x.ReservationId);
+        entity.Property(x => x.TotalAmount);
+        entity.Property(x => x.ProviderTransactionId)
+              .HasMaxLength(256)
+              .IsRequired();
+        entity.Property(x => x.CustomerName)
+              .HasMaxLength(256)
+              .IsRequired();
+        entity.Property(x => x.DestinationAddress)
+              .HasMaxLength(512)
+              .IsRequired();
 
         // Concurrency token in Postgres
         entity.Property(x => x.RowVersion)

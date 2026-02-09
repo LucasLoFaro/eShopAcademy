@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src\**" />
+    <Content Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.0" />
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
@@ -22,5 +29,9 @@
     <ProjectReference Include="..\..\Core\Application\Orders.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Orders.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Messaging\Orders.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 </Project>

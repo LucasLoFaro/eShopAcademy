@@ -8,12 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.2" />
-    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.0" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.5" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Operations.Application\Operations.Application.csproj" />
   </ItemGroup>
 </Project>

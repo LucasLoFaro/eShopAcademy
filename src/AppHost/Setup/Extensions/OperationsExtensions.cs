@@ -5,7 +5,7 @@ public static class OperationsExtensions
     public static void Configure(
         IResourceBuilder<ProjectResource> operationApi, 
         IResourceBuilder<ProjectResource> operationService,
-        IResourceBuilder<PostgresDatabaseResource> operationsdb,
+        IResourceBuilder<MongoDBDatabaseResource> operationsdb,
         IResourceBuilder<RabbitMQServerResource> rabbit)
     {
         operationApi

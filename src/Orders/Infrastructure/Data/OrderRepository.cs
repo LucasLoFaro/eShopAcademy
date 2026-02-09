@@ -2,7 +2,7 @@
 using Domain.Orders.Entities;
 
 
-namespace Data;
+namespace Infrastructure.Data;
 
 public class OrderRepository : IOrderRepository
 {

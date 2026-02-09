@@ -2,11 +2,11 @@
 using Domain.Common.Commands.Payments;
 using Domain.Common.Commands.Stock;
 using Domain.Common.Events.Orders;
-using Data;
+using Infrastructure.Data;
 using Domain.Orders.Enums;
 using MassTransit;
 
-namespace Orders.Orchestration.Consumers;
+namespace Orders.Messaging.Consumers;
 
 public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
 {

@@ -4,7 +4,7 @@ using Domain.Orders.Entities;
 using Domain.Orders.Enums;
 
 
-namespace Data;
+namespace Infrastructure.Data;
 
 public class OrderDbContext : DbContext
 {

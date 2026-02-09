@@ -32,21 +32,24 @@ var shippingService = builder.AddProject<Projects.Shipping_Service>("eshopacadem
 // Customer
 var customersApi = builder.AddProject<Projects.Customers_Api>("eshopacademy-customers-api");
 
+// SAGA Orchestration
+var ordersOrchestration = builder.AddProject<Projects.Orchestration>("eshopacademy-orchestration");
+
 // Order
-var ordersOrchestration = builder.AddProject<Projects.Orders_Orchestration>("eshopacademy-orders-orchestration");
 var ordersApi = builder.AddProject<Projects.Orders_API>("eshopacademy-orders-api")
                         .WithReference(customersApi)
                         .WithReference(productsApi)
                         .WithReference(productsGrpc)
                         .WithReference(stockGrpc)
                         .WithReference(paymentsGrpc);
+var ordersMessaging = builder.AddProject<Projects.Orders_Messaging>("eshopacademy-orders-messaging");
 
 // Notification
 var notificationService = builder.AddProject<Projects.Notification_Service>("eshopacademy-notification-service");
 
 
 if (builder.Environment.IsDevelopment())
-    EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, operationsApi, operationsService);
+    EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, operationsApi, operationsService);
 
 
 // Build and run the distributed application

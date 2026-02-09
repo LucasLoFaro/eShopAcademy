@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.2" />
-    <PackageReference Include="MassTransit" Version="9.0.0" />
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="MassTransit" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>

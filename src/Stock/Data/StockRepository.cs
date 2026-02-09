@@ -40,6 +40,21 @@ public class StockRepository : IStockRepository
     public async Task<Stock> AddOrUpdateAsync(Stock stock, CancellationToken ct = default)
     {
         var filter = Builders<Stock>.Filter.Eq(s => s.ProductID, stock.ProductID);
+        var existing = await _stocks.Find(filter).FirstOrDefaultAsync(ct);
+
+        var now = DateTime.UtcNow;
+
+        if (existing is not null)
+        {
+            stock.Id = existing.Id;
+            stock.CreatedAt = existing.CreatedAt;
+        }
+        else
+        {
+            stock.CreatedAt = now;
+        }
+
+        stock.ModifiedAt = now;
 
         var options = new ReplaceOptions { IsUpsert = true };
 

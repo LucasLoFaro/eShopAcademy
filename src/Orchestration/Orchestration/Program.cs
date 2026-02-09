@@ -1,11 +1,8 @@
 using Application.Saga;
-using Data;
 using Domain.Common.States;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orchestration.Data;
-using Orders.Orchestration.Consumers;
-
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -13,18 +10,15 @@ builder.AddServiceDefaults();
 builder.Logging.AddConsole();
 LogContext.ConfigureCurrentLogContext();
 
+var orchestrationConnectionString = builder.Configuration.GetConnectionString("orchestration");
+var rabbitConnectionString = builder.Configuration.GetConnectionString("rabbit");
+var serviceBusConnectionString = builder.Configuration.GetConnectionString("servicebus");
+
 builder.Services.AddDbContext<OrderSagaDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("orchestration"));
+    options.UseNpgsql(orchestrationConnectionString);
     options.EnableSensitiveDataLogging();
 });
-
-builder.Services.AddDbContext<OrderDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("orders"));
-});
-
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddMassTransit(cfg =>
 {
@@ -36,17 +30,15 @@ builder.Services.AddMassTransit(cfg =>
             r.ConcurrencyMode = ConcurrencyMode.Optimistic;
             r.AddDbContext<DbContext, OrderSagaDbContext>((provider, options) =>
             {
-                options.UseNpgsql(builder.Configuration.GetConnectionString("orchestration"));
+                options.UseNpgsql(orchestrationConnectionString);
             });
         });
-
-    cfg.AddConsumer<CancelOrderCommandConsumer>();
 
     if (builder.Environment.IsDevelopment())
     {
         cfg.UsingRabbitMq((context, bus) =>
         {
-            bus.Host(new Uri(builder.Configuration.GetConnectionString("rabbit")!));
+            bus.Host(new Uri(rabbitConnectionString));
             bus.UseDelayedMessageScheduler();
             bus.ConfigureEndpoints(context);
         });
@@ -55,7 +47,7 @@ builder.Services.AddMassTransit(cfg =>
     {
         cfg.UsingAzureServiceBus((context, bus) =>
         {
-            bus.Host(builder.Configuration.GetConnectionString("servicebus"));
+            bus.Host(serviceBusConnectionString);
             bus.UseServiceBusMessageScheduler();
             bus.ConfigureEndpoints(context);
         });
@@ -72,3 +64,4 @@ using (var scope = host.Services.CreateScope())
 }
 
 host.Run();
+

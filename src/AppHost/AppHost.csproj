@@ -28,7 +28,8 @@
     <ProjectReference Include="..\Notification\Notification.Service\Notification.Service.csproj" />
     <ProjectReference Include="..\Operations\Operations.Api\Operations.Api.csproj" />
     <ProjectReference Include="..\Operations\Operations.Service\Operations.Service.csproj" />
-    <ProjectReference Include="..\Orders\Orchestration\Orders.Orchestration\Orders.Orchestration.csproj" />
+    <ProjectReference Include="..\Orchestration\Orchestration\Orchestration.csproj" />
+    <ProjectReference Include="..\Orders\Orders.Messaging\Orders.Messaging.csproj" />
     <ProjectReference Include="..\Orders\Presentation\API\Orders.API.csproj" />
     <ProjectReference Include="..\Payments\Payments.API\Payments.API.csproj" />
     <ProjectReference Include="..\Payments\Payments.gRPC\Payments.gRPC.csproj" />

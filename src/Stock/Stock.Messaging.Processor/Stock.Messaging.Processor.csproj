@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" />
-    <PackageReference Include="MassTransit" Version="9.0.0" />
+    <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
   </ItemGroup>
 

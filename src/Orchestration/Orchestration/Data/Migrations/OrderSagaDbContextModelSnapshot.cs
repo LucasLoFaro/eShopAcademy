@@ -50,6 +50,17 @@ namespace Orders.Orchestration.Data.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
 
+                    b.Property<string>("IssueDetails")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("IssueReportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IssueType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 

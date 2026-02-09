@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Orders.Messaging-707da73b-b68c-4b99-b656-f864cdb4a0bb</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Core\Application\Orders.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Clients\Orders.Clients.csproj" />
+    <ProjectReference Include="..\Infrastructure\Data\Orders.Data.csproj" />
+  </ItemGroup>
+</Project>

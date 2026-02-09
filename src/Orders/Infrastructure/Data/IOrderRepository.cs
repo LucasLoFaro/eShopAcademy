@@ -1,6 +1,6 @@
 ﻿using Domain.Orders.Entities;
 
-namespace Data;
+namespace Infrastructure.Data;
 
 public interface IOrderRepository
 {

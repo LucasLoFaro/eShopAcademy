@@ -12,11 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.76.0">
+    <PackageReference Include="Grpc.Tools" Version="2.78.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MassTransit" Version="9.0.0" />
+    <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="NUnit" Version="4.4.0" />

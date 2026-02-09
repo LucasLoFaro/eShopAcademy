@@ -14,6 +14,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> productsGrpc,
         IResourceBuilder<ProjectResource> ordersApi,
         IResourceBuilder<ProjectResource> ordersOrchestration,
+        IResourceBuilder<ProjectResource> ordersMessaging,
         IResourceBuilder<ProjectResource> stockApi,
         IResourceBuilder<ProjectResource> stockGrpc,
         IResourceBuilder<ProjectResource> stockMessaging,
@@ -38,14 +39,14 @@ public static class EnvironmentSetup
         var stockdb = mongo.AddDatabase("stock");
         var customersdb = mongo.AddDatabase("customers");
         var shippingdb = mongo.AddDatabase("shipping");
+        var operationsdb = mongo.AddDatabase("operations");
 
         var postgres = builder.AddPostgres("postgres")
             .WithDataVolume("postgres-data")
             .WithLifetime(ContainerLifetime.Persistent);
 
         var ordersdb = postgres.AddDatabase("orders");
-        var orchestrationdb = postgres.AddDatabase("orchestration");
-        var operationsdb = postgres.AddDatabase("operations");
+        var orchestrationdb = postgres.AddDatabase("orchestration");        
 
         postgres.WithPgAdmin()
             .WithLifetime(ContainerLifetime.Persistent);
@@ -65,7 +66,7 @@ public static class EnvironmentSetup
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
-        OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersdb, orchestrationdb, rabbit);
+        OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);

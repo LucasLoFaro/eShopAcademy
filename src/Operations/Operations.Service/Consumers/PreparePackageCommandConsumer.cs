@@ -1,28 +1,42 @@
-﻿using Domain.Common.Commands.Operations;
+﻿using Operations.Application.Repositories;
+using Domain.Common.Commands.Operations;
+using Domain.Operations.Entities;
+using Domain.Operations.Enums;
 using MassTransit;
+
 
 namespace Operations.Service.Consumers;
 
 public class PreparePackageCommandConsumer : IConsumer<PreparePackageCommand>
 {
     private readonly ILogger<PreparePackageCommandConsumer> _logger;
+    private readonly IPackageRepository _repository;
 
-    public PreparePackageCommandConsumer(ILogger<PreparePackageCommandConsumer> logger)
+    public PreparePackageCommandConsumer(
+        ILogger<PreparePackageCommandConsumer> logger,
+        IPackageRepository repository)
     {
         _logger = logger;
+        _repository = repository;
     }
 
-    public Task Consume(ConsumeContext<PreparePackageCommand> context)
+    public async Task Consume(ConsumeContext<PreparePackageCommand> context)
     {
         var message = context.Message;
 
-        // TODO: Save to DB and publish a notification to the admin frontend.
+        var package = new Package
+        {
+            OrderId = message.OrderId,
+            ReservationId = message.ReservationId,
+            Status = PackageStatus.Pending,
+            PreparedAt = DateTime.UtcNow
+        };
+
+        await _repository.CreateOrUpdateAsync(package, context.CancellationToken);
 
         _logger.LogInformation(
             "[Operations] Prepare package requested for Order {OrderId}, Reservation {ReservationId}",
             message.OrderId,
             message.ReservationId);
-
-        return Task.CompletedTask;
     }
 }

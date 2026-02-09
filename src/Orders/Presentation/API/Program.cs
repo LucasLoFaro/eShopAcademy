@@ -1,11 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using Core.Application.Interfaces;
-using Infrastructure.Services;
-using Infrastructure.Clients;
-using ServiceDefaults;
 using Application;
+using Core.Application.Interfaces;
+using Infrastructure.Data;
+using Infrastructure.Clients;
+using Microsoft.EntityFrameworkCore;
 using Protos;
-using Data;
+using ServiceDefaults;
 
 
 var builder = WebApplication.CreateBuilder(args);

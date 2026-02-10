@@ -104,6 +104,16 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     ReadyAt = ctx.Message.ReadyAt
                 }),
 
+
+
+
+
+
+
+
+
+
+            // === FAILURE HANDLING ===
             When(PaymentFailed)
                 .Then(ctx =>
                 {

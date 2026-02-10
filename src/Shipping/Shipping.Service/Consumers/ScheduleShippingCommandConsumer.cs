@@ -24,11 +24,6 @@ public class ScheduleShippingCommandConsumer : IConsumer<ScheduleShippingCommand
     {
         var message = context.Message;
 
-        _logger.LogInformation(
-            "[Shipping] Schedule requested for Order {OrderId}, Destination {Destination}",
-            message.OrderId,
-            message.DestinationAddress);
-
         if (!string.IsNullOrWhiteSpace(message.CustomerEmail))
         {
             await _shippingInfoRepository.UpsertAsync(new ShippingInfo
@@ -37,6 +32,12 @@ public class ScheduleShippingCommandConsumer : IConsumer<ScheduleShippingCommand
                 CustomerEmail = message.CustomerEmail
             }, context.CancellationToken);
         }
+
+        _logger.LogInformation(
+            "[Shipping] Schedule requested for Order {OrderId}, Destination {Destination}",
+            message.OrderId,
+            message.DestinationAddress);
+
     }
 }
 

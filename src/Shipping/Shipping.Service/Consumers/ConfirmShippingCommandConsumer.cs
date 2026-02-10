@@ -21,11 +21,11 @@ public sealed class ConfirmShippingCommandConsumer : IConsumer<ConfirmShippingCo
     {
         var message = context.Message;
 
+        await _providerClient.ConfirmPickupAsync(message.ShippingId, message.OrderId, message.ReadyAt, context.CancellationToken);
+
         _logger.LogInformation(
             "[Shipping] Confirm requested for Order {OrderId}, Shipping {ShippingId}",
             message.OrderId,
             message.ShippingId);
-
-        await _providerClient.ConfirmPickupAsync(message.ShippingId, message.OrderId, message.ReadyAt, context.CancellationToken);
     }
 }

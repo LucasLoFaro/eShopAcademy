@@ -16,18 +16,15 @@ public class OrderDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         var toStringOrder = new EnumToStringConverter<OrderStatus>();
-        var toStringBilling = new EnumToStringConverter<BillingStatus>();
         var toStringShip = new EnumToStringConverter<ShippingStatus>();
         var toStringPay = new EnumToStringConverter<PaymentStatus>();
+        var toStringBilling = new EnumToStringConverter<BillingStatus>();
 
         builder.Entity<Order>(o =>
         {
             o.HasKey(x => x.Id);
 
             o.Property(x => x.Status).HasConversion(toStringOrder);
-            o.Property(x => x.BillingStatus).HasConversion(toStringBilling);
-            o.Property(x => x.ShippingStatus).HasConversion(toStringShip);
-            o.Property(x => x.PaymentStatus).HasConversion(toStringPay);
 
             o.HasMany(x => x.Items)
              .WithOne()
@@ -37,7 +34,7 @@ public class OrderDbContext : DbContext
             o.OwnsOne(o => o.Customer, c =>
             {
                 c.Property(x => x.Name).HasColumnName("customer_name");
-                c.Property(x => x.Mail).HasColumnName("customer_email");
+                c.Property(x => x.Email).HasColumnName("customer_email");
                 c.Property(x => x.Phone).HasColumnName("customer_phone");
                 c.OwnsOne(c => c.Address, a =>
                 {
@@ -46,16 +43,46 @@ public class OrderDbContext : DbContext
                     a.Property(x => x.City).HasColumnName("customer_address_city");
                     a.Property(x => x.ZipCode).HasColumnName("customer_address_zipcode");
                     a.Property(x => x.AdditionalInformation).HasColumnName("customer_address_additionalinformation");
-                    
                 });
             });
 
             o.OwnsOne(o => o.Payment, p =>
             {
                 p.Property(x => x.Id).HasColumnName("payment_id");
-                p.Property(x => x.Status).HasColumnName("payment_status");
+                p.Property(x => x.Status).HasColumnName("payment_status").HasConversion(toStringPay);
                 p.Property(x => x.ProviderTransactionId).HasColumnName("payment_provider_id");
                 p.Property(x => x.Amount).HasColumnName("payment_amount");
+                p.Property(x => x.PaidAt).HasColumnName("payment_paid_at");
+            });
+
+            o.OwnsOne(o => o.Shipping, s =>
+            {
+                s.Property(x => x.Status).HasColumnName("shipping_status").HasConversion(toStringShip);
+                s.Property(x => x.DestinationAddress).HasColumnName("shipping_destination_address");
+                s.Property(x => x.TrackingNumber).HasColumnName("shipping_tracking_number");
+                s.Property(x => x.Carrier).HasColumnName("shipping_carrier");
+                s.Property(x => x.ReadyForPickupAt).HasColumnName("shipping_ready_for_pickup_at");
+                s.Property(x => x.ShippedAt).HasColumnName("shipping_shipped_at");
+                s.Property(x => x.DeliveredAt).HasColumnName("shipping_delivered_at");
+            });
+
+            o.OwnsOne(o => o.Stock, st =>
+            {
+                st.Property(x => x.ReservationId).HasColumnName("stock_reservation_id");
+                st.Property(x => x.CommittedAt).HasColumnName("stock_committed_at");
+            });
+
+            o.OwnsOne(o => o.Operations, op =>
+            {
+                op.Property(x => x.OperatorName).HasColumnName("operations_operator_name");
+                op.Property(x => x.PackedAt).HasColumnName("operations_packed_at");
+            });
+
+            o.OwnsOne(o => o.Billing, b =>
+            {
+                b.Property(x => x.Status).HasColumnName("billing_status").HasConversion(toStringBilling);
+                b.Property(x => x.InvoiceId).HasColumnName("billing_invoice_id");
+                b.Property(x => x.BilledAt).HasColumnName("billing_billed_at");
             });
         });
 

@@ -14,10 +14,10 @@ public class CustomerServiceClient : ICustomerServiceClient
         _httpClient = httpClient;
     }
 
-    public async Task<Customer> GetCustomerByIdAsync(Guid customerId)
+    public async Task<OrderCustomerInfo> GetCustomerByIdAsync(Guid customerId)
     {
         // Calls Customers.Api minimal endpoint which currently returns a hardcoded customer
-        var response = await _httpClient.GetFromJsonAsync<Customer>($"/customers/{customerId}");
+        var response = await _httpClient.GetFromJsonAsync<OrderCustomerInfo>($"/customers/{customerId}");
 
         if (response == null)
             throw new InvalidOperationException("Customer service returned no data.");

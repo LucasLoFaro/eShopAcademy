@@ -41,8 +41,8 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
         await _orders.UpdateAsync(order, context.CancellationToken);
 
         var reason = string.IsNullOrWhiteSpace(command.Reason) ? "Payment failure" : command.Reason;
-        var customerEmail = !string.IsNullOrWhiteSpace(order.Customer?.Mail)
-            ? order.Customer.Mail
+        var customerEmail = !string.IsNullOrWhiteSpace(order.Customer?.Email)
+            ? order.Customer.Email
             : command.CustomerEmail;
         var customerName = !string.IsNullOrWhiteSpace(order.Customer?.Name)
             ? order.Customer.Name
@@ -56,22 +56,22 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
             Reason = reason
         }, context.CancellationToken);
 
-        if (order.ReservationId != Guid.Empty)
+        if (order.Stock?.ReservationId is { } reservationId && reservationId != Guid.Empty)
         {
             await context.Publish(new ReleaseStockReservationCommand
             {
                 OrderId = order.Id,
-                ReservationId = order.ReservationId,
+                ReservationId = reservationId,
                 Reason = reason
             }, context.CancellationToken);
         }
 
-        if (order.PaymentId != Guid.Empty)
+        if (order.Payment?.Id is { } paymentId && paymentId != Guid.Empty)
         {
             await context.Publish(new RefundPaymentCommand
             {
                 OrderId = order.Id,
-                PaymentId = order.PaymentId,
+                PaymentId = paymentId,
                 Reason = reason
             }, context.CancellationToken);
         }

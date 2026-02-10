@@ -1,4 +1,5 @@
 ﻿using Core.Application.Interfaces;
+using Domain.Orders.Contracts;
 using Domain.Orders.Entities;
 
 
@@ -21,11 +22,11 @@ public class FakeProductServiceClient : IProductServiceClient
 
 public class FakeCustomerServiceClient : ICustomerServiceClient
 {
-    public async Task<Customer> GetCustomerByIdAsync(Guid customerId)
-        => new Customer()
+    public async Task<OrderCustomerInfo> GetCustomerByIdAsync(Guid customerId)
+        => new OrderCustomerInfo()
         {
             Name = "Lucas Lo Faro",
-            Mail = "lucaslofaro@gmail.com",
+            Email = "lucaslofaro@gmail.com",
             Phone = "1160456045",
             Address = new()
             {
@@ -40,14 +41,12 @@ public class FakeCustomerServiceClient : ICustomerServiceClient
 
 public class FakePaymentGrpcClient : IPaymentServiceClient
 {
-    public Task<Payment> InitPaymentAsync(double amount, string currency, string notificationUrl, Guid orderId, CancellationToken ct = default)
-        => Task.FromResult(new Payment()
+    public Task<InitPaymentResponse> InitPaymentAsync(double amount, string currency, string notificationUrl, Guid orderId, CancellationToken ct = default)
+        => Task.FromResult(new InitPaymentResponse()
         {
             Id = Guid.NewGuid(),
             Amount = amount,
-            OrderId = orderId,
-            Status = Domain.Orders.Enums.PaymentStatus.Pending,
-            PaymentURL = $"https://psp.com/payment/{Guid.NewGuid().ToString()}",
+            PaymentUrl = $"https://psp.com/payment/{Guid.NewGuid()}",
             ProviderTransactionId = Guid.NewGuid().ToString()
         });
 }

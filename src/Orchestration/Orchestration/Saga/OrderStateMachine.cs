@@ -17,6 +17,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
     // Saga States
     public State Submitted { get; private set; } = null!;
+    public State Shipped { get; private set; } = null!;
     public State Completed { get; private set; } = null!;
     public State Failed { get; private set; } = null!;
 
@@ -28,6 +29,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<StockReservationCommittedEvent> StockReservationCommitted { get; private set; } = null!;
     public Event<StockReservationCommitFailedEvent> StockReservationCommitFailed { get; private set; } = null!;
     public Event<OrderReadyForPickupEvent> OrderReadyForPickup { get; private set; } = null!;
+    public Event<OrderShippedEvent> OrderShipped { get; private set; } = null!;
+    public Event<OrderDeliveredEvent> OrderDelivered { get; private set; } = null!;
 
     public OrderStateMachine()
     {
@@ -40,6 +43,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         Event(() => StockReservationCommitted, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => StockReservationCommitFailed, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => OrderReadyForPickup, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
+        Event(() => OrderShipped, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
+        Event(() => OrderDelivered, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
 
         // === INITIAL ===
         Initially(
@@ -82,6 +87,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     DestinationAddress = ctx.Saga.DestinationAddress
+                })
+                .Publish(ctx => new UpdateOrderStatusCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Status = "Paid",
+                    PaymentId = ctx.Message.PaymentId,
+                    ProviderTransactionId = ctx.Message.ProviderTransactionId,
+                    Amount = ctx.Message.Amount,
+                    PaymentStatus = "Captured",
+                    DestinationAddress = ctx.Saga.DestinationAddress,
+                    PaidAt = DateTime.UtcNow
                 }),
 
             When(StockReservationCommitted)
@@ -93,6 +111,16 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Message.ReservationId
+                })
+                .Publish(ctx => new UpdateOrderStatusCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Status = "Processing",
+                    ShippingStatus = "Confirmed",
+                    ReservationId = ctx.Message.ReservationId,
+                    StockCommittedAt = ctx.Message.CommittedAt
                 }),
 
             When(OrderReadyForPickup)
@@ -102,6 +130,17 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     OrderId = ctx.Saga.CorrelationId,
                     ShippingId = ctx.Saga.CorrelationId,
                     ReadyAt = ctx.Message.ReadyAt
+                })
+                .Publish(ctx => new UpdateOrderStatusCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Status = "ReadyForPickup",
+                    ShippingStatus = "ReadyForPickup",
+                    ReadyForPickupAt = ctx.Message.ReadyAt,
+                    OperatorName = ctx.Message.OperatorName,
+                    PackedAt = ctx.Message.ReadyAt
                 }),
 
 
@@ -112,6 +151,21 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
 
 
+
+            When(OrderShipped)
+                .Then(ctx => Console.WriteLine($"[Saga] Order shipped: {ctx.Saga.CorrelationId}"))
+                .Publish(ctx => new UpdateOrderStatusCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Status = "Shipped",
+                    ShippingStatus = "Shipped",
+                    TrackingNumber = ctx.Message.TrackingNumber,
+                    Carrier = ctx.Message.Carrier,
+                    ShippedAt = ctx.Message.ShippedAt
+                })
+                .TransitionTo(Shipped),
 
             // === FAILURE HANDLING ===
             When(PaymentFailed)
@@ -155,6 +209,29 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     Reason = ctx.Message.Reason
                 })
                 .TransitionTo(Failed)
+                .Finalize()
+        );
+
+        During(Shipped,
+            When(OrderDelivered)
+                .Then(ctx => Console.WriteLine($"[Saga] Order delivered for order {ctx.Saga.CorrelationId}"))
+                .Publish(ctx => new CompleteOrderCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail
+                })
+                .Publish(ctx => new UpdateOrderStatusCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail,
+                    Status = "Delivered",
+                    ShippingStatus = "Delivered",
+                    TrackingNumber = ctx.Message.TrackingNumber,
+                    DeliveredAt = ctx.Message.DeliveredAt
+                })
+                .TransitionTo(Completed)
                 .Finalize()
         );
 

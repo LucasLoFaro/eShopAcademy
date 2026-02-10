@@ -19,11 +19,11 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
         {
             OrderId = order.Id,
             CustomerName = order.Customer?.Name ?? string.Empty,
-            CustomerEmail = order.Customer?.Mail ?? string.Empty,
+            CustomerEmail = order.Customer?.Email ?? string.Empty,
             CustomerId = order.CustomerId,
             TotalAmount = Convert.ToDecimal(order.TotalPrice),
-            PaymentId = order.PaymentId,
-            ReservationId = order.ReservationId
+            PaymentId = order.Payment?.Id ?? Guid.Empty,
+            ReservationId = order.Stock?.ReservationId ?? Guid.Empty
         }, ct);
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken ct = default)

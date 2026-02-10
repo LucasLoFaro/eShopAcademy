@@ -76,14 +76,22 @@ public class OrderService : IOrderService
         if (payment == null)
             throw new InvalidOperationException("There was an error creating the payment");
 
-        order.PaymentId = payment.Id;
-        order.Payment = payment;
+        order.Payment = new OrderPaymentInfo
+        {
+            Id = payment.Id,
+            Status = PaymentStatus.Pending,
+            ProviderTransactionId = payment.ProviderTransactionId,
+            Amount = (decimal)payment.Amount
+        };
 
         var reserve = await _stockClient.ReserveStockAsync(order.Id, request.Items, ct);
         if (!reserve.Success)
             throw new InvalidOperationException($"The following products have run out of stock: {string.Join(", ", reserve.OutOfStockProducts)}");
 
-        order.ReservationId = (Guid) reserve.ReservationId!;
+        order.Stock = new OrderStockReservationInfo
+        {
+            ReservationId = (Guid) reserve.ReservationId!
+        };
         
         await _db.AddAsync(order);
 
@@ -93,7 +101,7 @@ public class OrderService : IOrderService
         return new()
         {
             OrderId = order.Id,
-            PaymentUrl = new Uri(order.Payment.PaymentURL),
+            PaymentUrl = new Uri(payment.PaymentUrl),
             Status = order.Status
         };
     }

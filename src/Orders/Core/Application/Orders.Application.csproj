@@ -7,10 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to the Orders.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove once Orders.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\..\Domain\Orders.Domain\Orders.Domain.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Orders.Data.csproj" />
   </ItemGroup>
 

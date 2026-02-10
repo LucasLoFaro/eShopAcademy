@@ -5,15 +5,21 @@ namespace Domain.Orders.Entities;
 
 public class Order : BaseEntity
 {
-    public Customer Customer { get; set; }
-    public Guid CustomerId { get; set; }
-    public Payment Payment { get; set; }
-    public Guid PaymentId { get; set; }
-    public Guid ReservationId { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
-    public double TotalPrice { get; set; }
+    // Order lifecycle
     public OrderStatus Status { get; set; }
-    public BillingStatus BillingStatus { get; set; }
-    public ShippingStatus ShippingStatus { get; set; }
-    public PaymentStatus PaymentStatus { get; set; }
+    public double TotalPrice { get; set; }
+
+    // Customer
+    public Guid CustomerId { get; set; }
+    public OrderCustomerInfo Customer { get; set; }
+
+    // Items
+    public List<OrderItem> Items { get; set; } = new();
+
+    // Domain sub-objects
+    public OrderPaymentInfo Payment { get; set; }
+    public OrderShippingInfo Shipping { get; set; }
+    public OrderStockReservationInfo Stock { get; set; }
+    public OrderOperationsInfo Operations { get; set; }
+    public OrderBillingInfo Billing { get; set; }
 }

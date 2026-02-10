@@ -15,8 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to the Common.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" /> -->
+    <!-- TODO: switch back to the Orders.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -28,5 +30,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <!-- TODO: remove once Common.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <!-- TODO: remove once Orders.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\Domain\Orders.Domain\Orders.Domain.csproj" />
   </ItemGroup>
 </Project>

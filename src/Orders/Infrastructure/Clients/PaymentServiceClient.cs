@@ -1,5 +1,5 @@
 ﻿using Core.Application.Interfaces;
-using Domain.Orders.Entities;
+using Domain.Orders.Contracts;
 using Protos;
 
 
@@ -14,7 +14,7 @@ public class PaymentServiceClient : IPaymentServiceClient
         _paymentGrpcClient = client;
     }
 
-    public async Task<Payment> InitPaymentAsync(double amount, string currency, string notificationUrl, Guid orderId, CancellationToken ct = default)
+    public async Task<InitPaymentResponse> InitPaymentAsync(double amount, string currency, string notificationUrl, Guid orderId, CancellationToken ct = default)
     {
         var request = new InitiatePaymentRequest
         {
@@ -29,10 +29,8 @@ public class PaymentServiceClient : IPaymentServiceClient
             {
                 Id = new Guid(response.Id),
                 Amount = response.Amount,
-                OrderId = new Guid(response.ExternalId),
-                Status = Domain.Orders.Enums.PaymentStatus.Pending,
-                PaymentURL = response.Url,
-                ProviderTransactionId = response.Id
+                ProviderTransactionId = response.Id,
+                PaymentUrl = response.Url
             };
         }
         else

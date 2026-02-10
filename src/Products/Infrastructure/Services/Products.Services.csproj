@@ -7,10 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
-    <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
+    <!-- TODO: switch back to the packaged Common.Domain once the build process is stable -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
+    <!-- TODO: switch back to the packaged Products.Domain once the build process is stable -->
+    <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove temporary project references once the domain nugets return -->
+    <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Domain\Products.Domain\Products.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

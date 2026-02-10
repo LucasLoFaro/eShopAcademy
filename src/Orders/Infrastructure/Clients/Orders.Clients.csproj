@@ -7,14 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to the packaged Common.Domain once the updated nuget is available -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
+    <!-- TODO: switch back to the packaged Orders.Domain once the updated nuget is available -->
+    <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
     <PackageReference Include="Google.Protobuf" Version="3.33.5" />
     <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
     <PackageReference Include="Grpc.Tools" Version="2.78.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove when this change is propagated back to the packaged Common.Domain -->
+    <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <!-- TODO: remove when this change is propagated back to the packaged Orders.Domain -->
+    <ProjectReference Include="..\..\..\Domain\Orders.Domain\Orders.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

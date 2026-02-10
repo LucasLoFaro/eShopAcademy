@@ -8,8 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" />
+    <!-- TODO: use local Payments.Domain project until nuget updates are published -->
+    <!-- <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" /> -->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove once Payments.Domain package is used again -->
+    <ProjectReference Include="..\..\Domain\Payments.Domain\Payments.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

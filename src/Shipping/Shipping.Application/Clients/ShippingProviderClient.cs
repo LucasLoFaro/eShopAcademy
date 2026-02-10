@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Domain.Shipping.Contracts.Requests;
 using Domain.Shipping.Contracts.Responses;
 using Microsoft.Extensions.Options;
 using Shipping.Application.Options;
@@ -24,6 +25,21 @@ public sealed class ShippingProviderClient : IShippingProviderClient
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task ConfirmPickupAsync(Guid shippingId, Guid orderId, DateTime readyAt, CancellationToken cancellationToken = default)
+    {
+        EnsureBasePathConfigured();
+
+        var request = new ShippingPickupConfirmationRequest
+        {
+            ShippingId = shippingId,
+            OrderId = orderId,
+            ReadyAt = readyAt
+        };
+
+        var response = await _client.PostAsJsonAsync(GetConfirmPath(), request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task<IReadOnlyList<ShippingStatusResponse>> GetStatusHistoryAsync(Guid orderId, CancellationToken cancellationToken = default)
     {
         EnsureBasePathConfigured();
@@ -46,5 +62,12 @@ public sealed class ShippingProviderClient : IShippingProviderClient
         {
             throw new InvalidOperationException("Shipping provider base address is not configured.");
         }
+    }
+
+    private string GetConfirmPath()
+    {
+        return string.IsNullOrWhiteSpace(_options.ConfirmPickupPath)
+            ? _options.SchedulePath
+            : _options.ConfirmPickupPath;
     }
 }

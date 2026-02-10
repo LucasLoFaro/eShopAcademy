@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
+    <!-- TODO: switch back to the Products.Domain nuget once the temporary project reference is no longer required -->
+    <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove when the Products.Domain package is restored -->
+    <ProjectReference Include="..\..\..\Domain\Products.Domain\Products.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

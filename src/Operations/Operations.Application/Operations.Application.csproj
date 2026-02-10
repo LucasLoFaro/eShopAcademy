@@ -7,7 +7,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+		<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
 		<PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.5" />
 		<PackageReference Include="MongoDB.Driver" Version="3.6.0" />
 		<PackageReference Include="MassTransit" Version="9.0.1" />

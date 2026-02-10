@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
+    <!-- TODO: restore this nuget reference when the Products.Domain package is refreshed -->
+    <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove this temporary project reference once the nuget is back in use -->
+    <ProjectReference Include="..\..\..\Domain\Products.Domain\Products.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

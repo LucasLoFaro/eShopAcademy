@@ -14,7 +14,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Azure.Identity" Version="1.17.1" />
-		<PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" />
+		<!-- TODO: revert to Stock.Domain package once temporary project references are removed -->
+		<!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
 		<PackageReference Include="Google.Protobuf" Version="3.33.5" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.78.0">
@@ -25,6 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- TODO: remove once Stock.Domain nuget is reinstated -->
+		<ProjectReference Include="..\..\Domain\Stock.Domain\Stock.Domain.csproj" />
 		<ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
 		<ProjectReference Include="..\Data\Stock.Data.csproj" />
 	</ItemGroup>

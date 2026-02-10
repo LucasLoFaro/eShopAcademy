@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to Stock.Domain package once domain release is ready -->
+    <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
     <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Temporary local reference for Stock domain -->
+    <ProjectReference Include="..\..\Domain\Stock.Domain\Stock.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

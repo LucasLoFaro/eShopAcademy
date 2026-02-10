@@ -11,7 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
+    <!-- TODO: revert to the Products.Domain nuget once the temporary project reference is no longer required -->
+    <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="Grpc.Tools" Version="2.78.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,6 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove once Products.Domain nuget is back in use -->
+    <ProjectReference Include="..\..\..\Domain\Products.Domain\Products.Domain.csproj" />
     <ProjectReference Include="..\..\Core\Application\Products.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Products.Data.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Services\Products.Services.csproj" />

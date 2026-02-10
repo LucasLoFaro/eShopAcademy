@@ -8,11 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
+    <!-- TODO: temporarily use the local Common.Domain until the new nuget is published -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" /> -->
     <PackageReference Include="MassTransit" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove this project reference once Common.Domain nuget is restored -->
+    <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
     <ProjectReference Include="..\..\Core\Application\Orders.Application.csproj" />
   </ItemGroup>
 

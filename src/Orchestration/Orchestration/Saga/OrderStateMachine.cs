@@ -27,6 +27,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<PaymentFailedEvent> PaymentFailed { get; private set; } = null!;
     public Event<StockReservationCommittedEvent> StockReservationCommitted { get; private set; } = null!;
     public Event<StockReservationCommitFailedEvent> StockReservationCommitFailed { get; private set; } = null!;
+    public Event<OrderReadyForPickupEvent> OrderReadyForPickup { get; private set; } = null!;
 
     public OrderStateMachine()
     {
@@ -38,6 +39,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         Event(() => PaymentFailed, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => StockReservationCommitted, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
         Event(() => StockReservationCommitFailed, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
+        Event(() => OrderReadyForPickup, cfg => cfg.CorrelateById(ctx => ctx.Message.OrderId));
 
         // === INITIAL ===
         Initially(
@@ -91,6 +93,15 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Message.ReservationId
+                }),
+
+            When(OrderReadyForPickup)
+                .Then(ctx => Console.WriteLine("[Saga] Order {0} ready for pickup.", ctx.Saga.CorrelationId))
+                .Publish(ctx => new ConfirmShippingCommand
+                {
+                    OrderId = ctx.Saga.CorrelationId,
+                    ShippingId = ctx.Saga.CorrelationId,
+                    ReadyAt = ctx.Message.ReadyAt
                 }),
 
             When(PaymentFailed)

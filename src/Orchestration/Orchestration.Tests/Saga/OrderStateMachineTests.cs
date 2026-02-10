@@ -215,4 +215,37 @@ public class OrderStateMachineTests : IAsyncLifetime
         Assert.Equal(submittedEvent.CustomerEmail, cancelOrderConsume.Context.Message.CustomerEmail);
         Assert.Equal(commitFailedEvent.Reason, cancelOrderConsume.Context.Message.Reason);
     }
+
+    [Theory]
+    [AutoData]
+    public async Task OnOrderReadyForPickupEvent_ShouldPublishConfirmShippingCommand(
+        OrderSubmittedEvent submittedEvent,
+        OrderReadyForPickupEvent readyEvent)
+    {
+        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+
+        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
+
+        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
+        Assert.NotNull(submittedId);
+
+        readyEvent = readyEvent with
+        {
+            OrderId = submittedEvent.OrderId
+        };
+
+        await _harness.InputQueueSendEndpoint.Send(readyEvent);
+
+        Assert.True(await _harness.Consumed.Any<OrderReadyForPickupEvent>());
+        Assert.True(await _harness.Published.Any<ConfirmShippingCommand>());
+
+        var confirmConsume = await _harness.Published
+            .SelectAsync<ConfirmShippingCommand>()
+            .FirstOrDefault();
+
+        Assert.NotNull(confirmConsume);
+        Assert.Equal(submittedEvent.OrderId, confirmConsume.Context.Message.OrderId);
+        Assert.Equal(submittedEvent.OrderId, confirmConsume.Context.Message.ShippingId);
+        Assert.Equal(readyEvent.ReadyAt, confirmConsume.Context.Message.ReadyAt);
+    }
 }

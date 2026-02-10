@@ -13,11 +13,14 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" />
+    <!-- TODO: revert to the Stock.Domain package once this temporary approach is no longer necessary -->
+    <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove once Stock.Domain nuget is used again -->
+    <ProjectReference Include="..\..\Domain\Stock.Domain\Stock.Domain.csproj" />
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Data\Stock.Data.csproj" />
     <ProjectReference Include="..\Infrastructure\Services\Stock.Services.csproj" />

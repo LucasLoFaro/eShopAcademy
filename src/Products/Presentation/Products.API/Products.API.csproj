@@ -13,7 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" />
+    <!-- TODO: remove once the Products.Domain package workflow is restored -->
+    <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
@@ -21,6 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove once Products.Domain nuget is used again -->
+    <ProjectReference Include="..\..\..\Domain\Products.Domain\Products.Domain.csproj" />
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Core\Application\Products.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Data\Products.Data.csproj" />

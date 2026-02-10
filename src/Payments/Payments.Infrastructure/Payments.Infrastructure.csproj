@@ -7,8 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
-    <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" />
+    <!-- TODO: revert to the packaged Common.Domain once the domain nugets are ready -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
+    <!-- TODO: revert to the packaged Payments.Domain once the domain nugets are ready -->
+    <!-- <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove once domain nugets are reinstated -->
+    <ProjectReference Include="..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <!-- TODO: remove once domain nugets are reinstated -->
+    <ProjectReference Include="..\..\Domain\Payments.Domain\Payments.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

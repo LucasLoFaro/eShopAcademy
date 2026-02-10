@@ -8,9 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" />
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to the Common.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
+    <!-- TODO: switch back to the Orders.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove once Common.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <!-- TODO: remove once Orders.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\Domain\Orders.Domain\Orders.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

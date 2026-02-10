@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" />
+    <!-- TODO: revert to the packaged Shipping.Domain when the domain release is stable -->
+    <!-- <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" /> -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: remove once Shipping.Domain nuget is restored -->
+    <ProjectReference Include="..\..\Domain\Shipping.Domain\Shipping.Domain.csproj" />
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Shipping.Application\Shipping.Application.csproj" />
   </ItemGroup>

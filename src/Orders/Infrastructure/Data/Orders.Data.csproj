@@ -7,11 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" />
+    <!-- TODO: switch back to the packaged Orders.Domain after the domain release is ready -->
+    <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- TODO: remove when this change is no longer needed -->
+    <ProjectReference Include="..\..\..\Domain\Orders.Domain\Orders.Domain.csproj" />
   </ItemGroup>
 
 </Project>

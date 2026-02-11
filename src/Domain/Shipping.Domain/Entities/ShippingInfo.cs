@@ -15,4 +15,6 @@ public sealed class ShippingInfo
     public string CustomerEmail { get; set; } = string.Empty;
 
     public string? CustomerName { get; set; }
+    
+    public string TrackingUrl { get; set; } = string.Empty;
 }

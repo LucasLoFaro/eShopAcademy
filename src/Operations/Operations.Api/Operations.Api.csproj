@@ -7,15 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
-    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.5" />
+    <!--<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
+    <PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.5" />-->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
     <PackageReference Include="MassTransit" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <ProjectReference Include="..\..\Domain\Operations.Domain\Operations.Domain.csproj" />
+	  <!--Remove and switch back to nugets once this hits prod-->
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Operations.Application\Operations.Application.csproj" />
+	  
+	  
   </ItemGroup>
 
 </Project>

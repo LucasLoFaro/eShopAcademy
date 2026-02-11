@@ -1,6 +1,6 @@
 ﻿namespace Domain.Common.Events.Shipping;
 
-public record ShippingConfirmedEvent : ShippingEvent
+public record ShippingPickupConfirmedEvent : ShippingEvent
 {
     public DateTime EstimatedDelivery { get; init; }
 }

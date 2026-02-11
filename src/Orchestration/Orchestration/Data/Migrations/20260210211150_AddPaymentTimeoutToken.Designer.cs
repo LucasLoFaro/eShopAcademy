@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Orchestration.Data;
 
 #nullable disable
 
-namespace Orders.Orchestration.Data.Migrations
+namespace Orchestration.Data.Migrations
 {
     [DbContext(typeof(OrderSagaDbContext))]
-    partial class OrderSagaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210211150_AddPaymentTimeoutToken")]
+    partial class AddPaymentTimeoutToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

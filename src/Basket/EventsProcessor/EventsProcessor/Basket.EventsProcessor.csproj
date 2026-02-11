@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,13 +11,15 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
+    <!--<PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />-->
+    <!--<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />-->
     <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+	  <ProjectReference Include="..\..\..\Domain\Basket.Domain\Basket.Domain.csproj" />
+	  <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Data\Basket.Data.csproj" />
   </ItemGroup>

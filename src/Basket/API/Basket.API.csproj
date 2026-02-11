@@ -13,11 +13,12 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />
+    <!--<PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />-->
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\Basket.Domain\Basket.Domain.csproj" />
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Data\Basket.Data.csproj" />
   </ItemGroup>

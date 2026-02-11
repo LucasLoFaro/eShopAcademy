@@ -3,7 +3,7 @@
 public enum ShippingStatus
 {
     AwaitingConfirmation,
-    Confirmed,
+    Scheduled,
     ReadyForPickup,
     Shipped,
     Delivered,

@@ -3,6 +3,7 @@ using Domain.Common.States;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orchestration.Data;
+using Quartz;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -36,15 +37,18 @@ builder.Services.AddMassTransit(cfg =>
 
     if (builder.Environment.IsDevelopment())
     {
+        // RabbitMQ with Quartz scheduler
+        cfg.AddQuartzConsumers();
         cfg.UsingRabbitMq((context, bus) =>
         {
             bus.Host(new Uri(rabbitConnectionString));
-            bus.UseDelayedMessageScheduler();
+            bus.UseMessageScheduler(new Uri("queue:quartz"));
             bus.ConfigureEndpoints(context);
         });
     }
     else
     {
+        // Azure Service Bus with built-in scheduler
         cfg.UsingAzureServiceBus((context, bus) =>
         {
             bus.Host(serviceBusConnectionString);
@@ -53,6 +57,13 @@ builder.Services.AddMassTransit(cfg =>
         });
     }
 });
+
+// Quartz scheduler for RabbitMQ (dev environment)
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddQuartz();
+    builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+}
 
 var host = builder.Build();
 

@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using Domain.Shipping.Contracts.Requests;
 using Domain.Shipping.Contracts.Responses;
 using Microsoft.Extensions.Options;
+using Shipping.Application.Constants;
 using Shipping.Application.Options;
 
 namespace Shipping.Application.Clients;
@@ -17,12 +18,15 @@ public sealed class ShippingProviderClient : IShippingProviderClient
         _options = options.Value;
     }
 
-    public async Task ScheduleShippingAsync(Domain.Shipping.Entities.Shipping shipping, CancellationToken cancellationToken = default)
+    public async Task<ScheduleShippingResponse> ScheduleShippingAsync(Domain.Shipping.Entities.Shipping shipping, CancellationToken cancellationToken = default)
     {
         EnsureBasePathConfigured();
 
-        var response = await _client.PostAsJsonAsync(_options.SchedulePath, shipping, cancellationToken);
+        var response = await _client.PostAsJsonAsync(ShippingProviderConstants.SchedulePath, shipping, cancellationToken);
         response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<ScheduleShippingResponse>(cancellationToken: cancellationToken);
+        return result ?? throw new InvalidOperationException("Shipping provider returned an empty schedule response.");
     }
 
     public async Task ConfirmPickupAsync(Guid shippingId, Guid orderId, DateTime readyAt, CancellationToken cancellationToken = default)
@@ -36,7 +40,7 @@ public sealed class ShippingProviderClient : IShippingProviderClient
             ReadyAt = readyAt
         };
 
-        var response = await _client.PostAsJsonAsync(GetConfirmPath(), request, cancellationToken);
+        var response = await _client.PostAsJsonAsync(ShippingProviderConstants.ConfirmPickupPath, request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
@@ -44,7 +48,7 @@ public sealed class ShippingProviderClient : IShippingProviderClient
     {
         EnsureBasePathConfigured();
 
-        var path = string.Format(_options.HistoryPathFormat, orderId);
+        var path = string.Format(ShippingProviderConstants.HistoryPathFormat, orderId);
         var response = await _client.GetAsync(path, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -63,11 +67,5 @@ public sealed class ShippingProviderClient : IShippingProviderClient
             throw new InvalidOperationException("Shipping provider base address is not configured.");
         }
     }
-
-    private string GetConfirmPath()
-    {
-        return string.IsNullOrWhiteSpace(_options.ConfirmPickupPath)
-            ? _options.SchedulePath
-            : _options.ConfirmPickupPath;
-    }
 }
+

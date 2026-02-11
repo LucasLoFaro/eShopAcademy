@@ -11,15 +11,15 @@ public class Order : BaseEntity
 
     // Customer
     public Guid CustomerId { get; set; }
-    public OrderCustomerInfo Customer { get; set; }
+    public OrderCustomerInfo Customer { get; set; } = new();
 
     // Items
     public List<OrderItem> Items { get; set; } = new();
 
     // Domain sub-objects
-    public OrderPaymentInfo Payment { get; set; }
-    public OrderShippingInfo Shipping { get; set; }
-    public OrderStockReservationInfo Stock { get; set; }
-    public OrderOperationsInfo Operations { get; set; }
-    public OrderBillingInfo Billing { get; set; }
+    public OrderPaymentInfo Payment { get; set; } = new();
+    public OrderShippingInfo Shipping { get; set; } = new();
+    public OrderStockReservationInfo Stock { get; set; } = new();
+    public OrderOperationsInfo Operations { get; set; } = new();
+    public OrderBillingInfo Billing { get; set; } = new();
 }

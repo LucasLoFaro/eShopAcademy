@@ -56,6 +56,15 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
             Reason = reason
         }, context.CancellationToken);
 
+        await context.Publish(new OrderStatusUpdatedEvent
+        {
+            OrderId = order.Id,
+            CustomerName = customerName,
+            CustomerEmail = customerEmail,
+            Status = "Cancelled",
+            Reason = reason
+        }, context.CancellationToken);
+
         if (order.Stock?.ReservationId is { } reservationId && reservationId != Guid.Empty)
         {
             await context.Publish(new ReleaseStockReservationCommand

@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/shipping/confirm-pickup"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "ShippingId": "{{jsonPath request.body '$.ShippingId'}}",
+      "OrderId": "{{jsonPath request.body '$.OrderId'}}",
+      "Status": "pickup_confirmed",
+      "ConfirmedAt": "{{now}}",
+      "Message": "Pickup confirmed successfully"
+    },
+    "transformers": [ "response-template" ]
+  },
+  "serveEventListeners": [
+    {
+      "name": "webhook",
+      "parameters": {
+        "method": "POST",
+        "url": "http://shipping-api:8007/api/shipping/webhook",
+        "delay": {
+          "type": "fixed",
+          "milliseconds": 500
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Signature": "Signature"
+        },
+        "body": "{ \"ShipmentId\": \"{{jsonPath request.body '$.ShippingId'}}\", \"OrderId\": \"{{jsonPath request.body '$.OrderId'}}\", \"Status\": \"picked_up\", \"TrackingNumber\": \"{{randomValue type='UUID'}}\", \"Carrier\": \"DHL\", \"OccurredAt\": \"{{now}}\" }"
+      }
+    }
+  ]
+}

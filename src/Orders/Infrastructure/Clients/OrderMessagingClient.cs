@@ -23,8 +23,25 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             CustomerId = order.CustomerId,
             TotalAmount = Convert.ToDecimal(order.TotalPrice),
             PaymentId = order.Payment?.Id ?? Guid.Empty,
-            ReservationId = order.Stock?.ReservationId ?? Guid.Empty
+            ReservationId = order.Stock?.ReservationId ?? Guid.Empty,
+            DestinationAddress = FormatAddress(order.Customer?.Address)
         }, ct);
+
+    private static string FormatAddress(OrderAddressInfo? address)
+    {
+        if (address is null) return string.Empty;
+        
+        var parts = new[]
+        {
+            address.Street,
+            address.Number,
+            address.AdditionalInformation,
+            address.ZipCode,
+            address.City
+        }.Where(s => !string.IsNullOrWhiteSpace(s));
+        
+        return string.Join(", ", parts);
+    }
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken ct = default)
         => _publishEndpoint.Publish(new OrderCancelledEvent

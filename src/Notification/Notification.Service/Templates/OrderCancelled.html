@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+  <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; overflow: hidden;">
+    <div style="background-color: #F44336; color: #fff; padding: 20px; text-align: center;">
+      <h1 style="margin: 0;">Order Cancelled</h1>
+    </div>
+    <div style="padding: 30px;">
+      <p>Hi <strong>{{CustomerName}}</strong>,</p>
+      <p>Unfortunately, your order <strong>#{{OrderNumber}}</strong> has been cancelled.</p>
+      <p><strong>Reason:</strong> {{Reason}}</p>
+      <p>If a payment was made, a refund will be processed automatically. Please contact our support team if you have any questions.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+      <p style="color: #888; font-size: 12px;">eShopAcademy &mdash; {{Date}}</p>
+    </div>
+  </div>
+</body>
+</html>

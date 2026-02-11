@@ -36,6 +36,8 @@ public class OrderStateMap : SagaClassMap<OrderState>
               .HasMaxLength(512)
               .IsRequired();
 
+        entity.Property(x => x.PaymentTimeoutTokenId);
+
         // Concurrency token in Postgres
         entity.Property(x => x.RowVersion)
               .IsRowVersion()

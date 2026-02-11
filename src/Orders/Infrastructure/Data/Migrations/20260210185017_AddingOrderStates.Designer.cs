@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Orders.Data.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    partial class OrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210185017_AddingOrderStates")]
+    partial class AddingOrderStates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -205,9 +208,6 @@ namespace Orders.Data.Migrations
                                 .HasColumnType("numeric")
                                 .HasColumnName("payment_amount");
 
-                            b1.Property<DateTime?>("ExpiredAt")
-                                .HasColumnType("timestamp with time zone");
-
                             b1.Property<Guid>("Id")
                                 .HasColumnType("uuid")
                                 .HasColumnName("payment_id");
@@ -220,9 +220,6 @@ namespace Orders.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("payment_provider_id");
-
-                            b1.Property<DateTime?>("RefundedAt")
-                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<string>("Status")
                                 .IsRequired()
@@ -260,9 +257,6 @@ namespace Orders.Data.Migrations
                                 .HasColumnType("timestamp with time zone")
                                 .HasColumnName("shipping_ready_for_pickup_at");
 
-                            b1.Property<DateTime?>("ReturnedAt")
-                                .HasColumnType("timestamp with time zone");
-
                             b1.Property<DateTime?>("ShippedAt")
                                 .HasColumnType("timestamp with time zone")
                                 .HasColumnName("shipping_shipped_at");
@@ -276,10 +270,6 @@ namespace Orders.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("shipping_tracking_number");
-
-                            b1.Property<string>("TrackingUrl")
-                                .IsRequired()
-                                .HasColumnType("text");
 
                             b1.HasKey("OrderId");
 
@@ -297,9 +287,6 @@ namespace Orders.Data.Migrations
                             b1.Property<DateTime?>("CommittedAt")
                                 .HasColumnType("timestamp with time zone")
                                 .HasColumnName("stock_committed_at");
-
-                            b1.Property<DateTime?>("ReleasedAt")
-                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<Guid>("ReservationId")
                                 .HasColumnType("uuid")

@@ -20,6 +20,9 @@ public class OrderState : SagaStateMachineInstance
     public string IssueDetails { get; set; } = string.Empty;
     public DateTime? IssueReportedAt { get; set; }
 
+    // Token for MassTransit scheduled payment timeout
+    public Guid? PaymentTimeoutTokenId { get; set; }
+
     // Needed for EF optimistic concurrency in Postgres
     public byte[]? RowVersion { get; set; }
 }

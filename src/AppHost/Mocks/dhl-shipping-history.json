@@ -1,0 +1,44 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/shipping/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/history"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": [
+      {
+        "ShipmentId": "{{randomValue type='UUID'}}",
+        "OrderId": "{{request.pathSegments.[1]}}",
+        "Status": "accepted",
+        "OccurredAt": "{{now offset='-3 days'}}",
+        "Carrier": "DHL",
+        "TrackingNumber": "{{randomValue type='UUID'}}"
+      },
+      {
+        "ShipmentId": "{{randomValue type='UUID'}}",
+        "OrderId": "{{request.pathSegments.[1]}}",
+        "Status": "shipped",
+        "OccurredAt": "{{now offset='-2 days'}}",
+        "Carrier": "DHL",
+        "TrackingNumber": "{{randomValue type='UUID'}}"
+      },
+      {
+        "ShipmentId": "{{randomValue type='UUID'}}",
+        "OrderId": "{{request.pathSegments.[1]}}",
+        "Status": "in_transit",
+        "OccurredAt": "{{now offset='-1 days'}}",
+        "Carrier": "DHL",
+        "TrackingNumber": "{{randomValue type='UUID'}}"
+      },
+      {
+        "ShipmentId": "{{randomValue type='UUID'}}",
+        "OrderId": "{{request.pathSegments.[1]}}",
+        "Status": "delivered",
+        "OccurredAt": "{{now}}",
+        "Carrier": "DHL",
+        "TrackingNumber": "{{randomValue type='UUID'}}"
+      }
+    ],
+    "transformers": [ "response-template" ]
+  }
+}

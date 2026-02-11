@@ -1,4 +1,5 @@
 using Domain.Common.Commands.Orders;
+using Domain.Common.Events.Orders;
 using Domain.Orders.Entities;
 using Domain.Orders.Enums;
 using Infrastructure.Data;
@@ -111,6 +112,17 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
         }
 
         await _orders.UpdateAsync(order, context.CancellationToken);
+
+        await context.Publish(new OrderStatusUpdatedEvent
+        {
+            OrderId = order.Id,
+            CustomerName = command.CustomerName,
+            CustomerEmail = command.CustomerEmail,
+            Status = command.Status,
+            Amount = command.Amount,
+            TrackingNumber = command.TrackingNumber,
+            Carrier = command.Carrier
+        }, context.CancellationToken);
 
         _logger.LogInformation("[UpdateOrderStatus] Order {OrderId} updated to {Status}.", order.Id, newStatus);
     }

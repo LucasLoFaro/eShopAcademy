@@ -8,13 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
-    <PackageReference Include="eShopAcademy.Notification.Domain" Version="1.0.0" />
+    <!-- TODO: switch back to the Common.Domain nuget once this change has stabilized -->
+    <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
+    <!--<PackageReference Include="eShopAcademy.Notification.Domain" Version="1.0.0" />-->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <!-- TODO: remove once Common.Domain nuget has been restored -->
+    <ProjectReference Include="..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <ProjectReference Include="..\Notification.Domain\Notification.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\*.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

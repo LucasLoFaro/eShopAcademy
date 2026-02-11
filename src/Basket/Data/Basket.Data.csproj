@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />
+    <!--<PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />-->
     <PackageReference Include="NRedisStack" Version="1.2.0" />
+	  <ProjectReference Include="..\..\Domain\Basket.Domain\Basket.Domain.csproj" />
   </ItemGroup>
 
 </Project>

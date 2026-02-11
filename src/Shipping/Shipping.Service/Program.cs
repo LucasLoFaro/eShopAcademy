@@ -48,7 +48,7 @@ builder.AddServiceDefaults()
         cfg.ReceiveEndpoint("order-delivered", e =>
             e.ConfigureConsumer<OrderDeliveredEventConsumer>(context));
         cfg.ReceiveEndpoint("confirm-shipping", e =>
-            e.ConfigureConsumer<ConfirmShippingCommandConsumer>(context));
+            e.ConfigureConsumer<ConfirmPickupCommandConsumer>(context));
     }, typeof(ScheduleShippingCommandConsumer).Assembly);
 
 var host = builder.Build();

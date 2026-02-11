@@ -9,6 +9,7 @@ using Domain.Common.Commands.Shipping;
 using Domain.Common.Commands.Stock;
 using Domain.Common.Events.Orders;
 using Domain.Common.Events.Payments;
+using Domain.Common.Events.Shipping;
 using Domain.Common.Events.Stock;
 using Domain.Common.States;
 using MassTransit;
@@ -237,15 +238,56 @@ public class OrderStateMachineTests : IAsyncLifetime
         await _harness.InputQueueSendEndpoint.Send(readyEvent);
 
         Assert.True(await _harness.Consumed.Any<OrderReadyForPickupEvent>());
-        Assert.True(await _harness.Published.Any<ConfirmShippingCommand>());
+        Assert.True(await _harness.Published.Any<ConfirmPickupCommand>());
 
         var confirmConsume = await _harness.Published
-            .SelectAsync<ConfirmShippingCommand>()
+            .SelectAsync<ConfirmPickupCommand>()
             .FirstOrDefault();
 
         Assert.NotNull(confirmConsume);
         Assert.Equal(submittedEvent.OrderId, confirmConsume.Context.Message.OrderId);
         Assert.Equal(submittedEvent.OrderId, confirmConsume.Context.Message.ShippingId);
         Assert.Equal(readyEvent.ReadyAt, confirmConsume.Context.Message.ReadyAt);
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task OnShippingScheduledEvent_ShouldPublishUpdateOrderStatusCommandWithTrackingInfo(
+        OrderSubmittedEvent submittedEvent,
+        ShippingScheduledEvent scheduledEvent)
+    {
+        // Arrange
+        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+
+        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
+
+        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
+        Assert.NotNull(submittedId);
+
+        // Act
+        scheduledEvent = scheduledEvent with
+        {
+            OrderId = submittedEvent.OrderId
+        };
+
+        await _harness.InputQueueSendEndpoint.Send(scheduledEvent);
+
+        // Assert
+        Assert.True(await _harness.Consumed.Any<ShippingScheduledEvent>());
+        Assert.True(await _harness.Published.Any<UpdateOrderStatusCommand>());
+
+        // Find the UpdateOrderStatusCommand with ShippingStatus = "Scheduled"
+        var updateCommands = await _harness.Published
+            .SelectAsync<UpdateOrderStatusCommand>()
+            .ToListAsync();
+
+        var scheduledUpdate = updateCommands
+            .Select(x => x.Context.Message)
+            .FirstOrDefault(x => x.ShippingStatus == "Scheduled");
+
+        Assert.NotNull(scheduledUpdate);
+        Assert.Equal(submittedEvent.OrderId, scheduledUpdate.OrderId);
+        Assert.Equal(scheduledEvent.TrackingNumber, scheduledUpdate.TrackingNumber);
+        Assert.Equal(scheduledEvent.Carrier, scheduledUpdate.Carrier);
     }
 }

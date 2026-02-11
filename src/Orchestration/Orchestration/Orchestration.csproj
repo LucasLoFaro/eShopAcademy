@@ -20,6 +20,7 @@
     <!-- TODO: switch back to the Orders.Domain nuget once this change has stabilized -->
     <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.1" />
+    <PackageReference Include="MassTransit.Quartz" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

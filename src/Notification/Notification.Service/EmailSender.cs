@@ -13,16 +13,19 @@ public class SendGridEmailSender : IEmailSender
     public SendGridEmailSender(IConfiguration config)
     {
         _client = new SendGridClient(config["SendGrid:ApiKey"]);
-        _fromAddress = config["SendGrid:FromAddress"] ?? "lucaslofaro@hotmail.com"; //?? "no-reply@eshopacademy.com";
-        _fromName = config["SendGrid:FromName"] ?? "Lucas";//?? "eShopAcademy";
+        _fromAddress = config["SendGrid:FromAddress"] ?? "lucaslofaro@hotmail.com";
+        _fromName = config["SendGrid:FromName"] ?? "Lucas";
     }
 
-    public async Task SendStatusUpdateAsync(string to, string orderNumber, string status)
+    public async Task SendAsync(string to, string subject, string htmlBody)
     {
-        var subject = $"Order {orderNumber} - {status}";
-        var plainTextContent = $"Your order n° {orderNumber} is now: {status}";
-        var htmlContent = "<h2><strong>eShopAcademy</strong></h2>";
-        var msg = MailHelper.CreateSingleEmail(new EmailAddress(_fromAddress, _fromName), new EmailAddress(to), subject, plainTextContent, htmlContent);
+        var plainText = subject;
+        var msg = MailHelper.CreateSingleEmail(
+            new EmailAddress(_fromAddress, _fromName),
+            new EmailAddress(to),
+            subject,
+            plainText,
+            htmlBody);
 
         var response = await _client.SendEmailAsync(msg);
 
@@ -34,7 +37,8 @@ public class SendGridEmailSender : IEmailSender
         }
     }
 }
+
 public interface IEmailSender
 {
-    Task SendStatusUpdateAsync(string to, string orderNumber, string status);
+    Task SendAsync(string to, string subject, string htmlBody);
 }

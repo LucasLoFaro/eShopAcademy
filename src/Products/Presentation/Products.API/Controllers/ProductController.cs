@@ -16,8 +16,34 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        async public Task<IActionResult> Get()
-            => Ok(await _productService.GetAllAsync());
+        public async Task<IActionResult> Get(
+            [FromQuery] string? sort = null,
+            [FromQuery] string? cat = null,
+            [FromQuery] bool? deals = null)
+        {
+            var products = (await _productService.GetAllAsync()).ToList();
+
+            if (!string.IsNullOrEmpty(cat))
+                products = products.Where(p =>
+                    p.Category != null && p.Category.Name.Contains(cat, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (deals == true)
+                products = products.Where(p => p.IsDeal).ToList();
+
+            products = sort switch
+            {
+                "best-sellers" => products.Where(p => p.IsBestSeller || p.ReviewCount > 0)
+                    .OrderByDescending(p => p.ReviewCount).ToList(),
+                "new" => products.Where(p => p.IsNewRelease)
+                    .OrderByDescending(p => p.CreatedAt).ToList(),
+                "price-asc" => products.OrderBy(p => p.DealPrice ?? p.Price).ToList(),
+                "price-desc" => products.OrderByDescending(p => p.DealPrice ?? p.Price).ToList(),
+                "rating" => products.OrderByDescending(p => p.Rating).ToList(),
+                _ => products
+            };
+
+            return Ok(products);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)

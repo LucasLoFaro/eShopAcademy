@@ -20,6 +20,9 @@ public class ProductDbContext : DbContext
         modelBuilder.Entity<Product>().HasPartitionKey(p => p.CategoryId);
         modelBuilder.Entity<Category>().HasPartitionKey(c => c.Id);
 
+        modelBuilder.Entity<Product>().OwnsMany(p => p.Specs);
+        modelBuilder.Entity<Product>().OwnsMany(p => p.Faqs);
+
         // Relationships
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)

@@ -1,6 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+<Project Sdk="Aspire.AppHost.Sdk/13.1.1">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,13 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.1.0" />
-    <PackageReference Include="Aspire.Hosting.Redis" Version="13.1.0" />
+    <PackageReference Include="Aspire.Hosting" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.1.1" />
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
   </ItemGroup>
 
@@ -25,6 +23,7 @@
     <ProjectReference Include="..\Basket\API\Basket.API.csproj" />
     <ProjectReference Include="..\Basket\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj" />
     <ProjectReference Include="..\Customers\Customers.Api\Customers.Api.csproj" />
+    <ProjectReference Include="..\Gateway\Gateway.csproj" />
     <ProjectReference Include="..\Notification\Notification.Service\Notification.Service.csproj" />
     <ProjectReference Include="..\Operations\Operations.Api\Operations.Api.csproj" />
     <ProjectReference Include="..\Operations\Operations.Service\Operations.Service.csproj" />

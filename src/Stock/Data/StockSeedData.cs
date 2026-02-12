@@ -7,6 +7,53 @@ namespace Infrastructure.Data;
 
 public static class StockSeedData
 {
+    // Must match the fixed GUIDs from ProductSeedData
+    static readonly Guid[] ProductIds =
+    [
+        Guid.Parse("10000000-0001-0000-0000-000000000001"),
+        Guid.Parse("10000000-0001-0000-0000-000000000002"),
+        Guid.Parse("10000000-0001-0000-0000-000000000003"),
+        Guid.Parse("10000000-0001-0000-0000-000000000004"),
+        Guid.Parse("10000000-0001-0000-0000-000000000005"),
+        Guid.Parse("10000000-0001-0000-0000-000000000006"),
+        Guid.Parse("10000000-0002-0000-0000-000000000001"),
+        Guid.Parse("10000000-0002-0000-0000-000000000002"),
+        Guid.Parse("10000000-0002-0000-0000-000000000003"),
+        Guid.Parse("10000000-0002-0000-0000-000000000004"),
+        Guid.Parse("10000000-0002-0000-0000-000000000005"),
+        Guid.Parse("10000000-0003-0000-0000-000000000001"),
+        Guid.Parse("10000000-0003-0000-0000-000000000002"),
+        Guid.Parse("10000000-0003-0000-0000-000000000003"),
+        Guid.Parse("10000000-0003-0000-0000-000000000004"),
+        Guid.Parse("10000000-0003-0000-0000-000000000005"),
+        Guid.Parse("10000000-0004-0000-0000-000000000001"),
+        Guid.Parse("10000000-0004-0000-0000-000000000002"),
+        Guid.Parse("10000000-0004-0000-0000-000000000003"),
+        Guid.Parse("10000000-0004-0000-0000-000000000004"),
+        Guid.Parse("10000000-0004-0000-0000-000000000005"),
+        Guid.Parse("10000000-0005-0000-0000-000000000001"),
+        Guid.Parse("10000000-0005-0000-0000-000000000002"),
+        Guid.Parse("10000000-0005-0000-0000-000000000003"),
+        Guid.Parse("10000000-0005-0000-0000-000000000004"),
+        Guid.Parse("10000000-0005-0000-0000-000000000005"),
+        Guid.Parse("10000000-0006-0000-0000-000000000001"),
+        Guid.Parse("10000000-0006-0000-0000-000000000002"),
+        Guid.Parse("10000000-0006-0000-0000-000000000003"),
+        Guid.Parse("10000000-0007-0000-0000-000000000001"),
+        Guid.Parse("10000000-0007-0000-0000-000000000002"),
+        Guid.Parse("10000000-0007-0000-0000-000000000003"),
+        Guid.Parse("10000000-0007-0000-0000-000000000004"),
+        Guid.Parse("10000000-0007-0000-0000-000000000005"),
+        Guid.Parse("10000000-0008-0000-0000-000000000001"),
+        Guid.Parse("10000000-0008-0000-0000-000000000002"),
+        Guid.Parse("10000000-0008-0000-0000-000000000003"),
+        Guid.Parse("10000000-0008-0000-0000-000000000004"),
+        Guid.Parse("10000000-0008-0000-0000-000000000005"),
+        Guid.Parse("10000000-0008-0000-0000-000000000006"),
+        Guid.Parse("10000000-0007-0000-0000-000000000006"),
+        Guid.Parse("10000000-0006-0000-0000-000000000004"),
+    ];
+
     public static async Task InitializeAsync(
         StockDbContext context,
         StockMessagingClient messaging,
@@ -15,27 +62,13 @@ public static class StockSeedData
         var stockExists = await context.Stocks.EstimatedDocumentCountAsync() > 0;
         if (!stockExists)
         {
-            var stocks = new List<Stock>
+            var rng = new Random(42);
+            var stocks = ProductIds.Select(id => new Stock
             {
-                new()
-                {
-                    ProductID = Guid.Parse("8b6e2e1d-6f1d-4b0d-9f6c-1a4c7b9d2e8f"),
-                    Quantity = 4,
-                    Warehouse = "WH-01"
-                },
-                new()
-                {
-                    ProductID = Guid.Parse("c2d3f8a1-9b4d-41ea-b77f-5e20b39a48a6"),
-                    Quantity = 7,
-                    Warehouse = "WH-01"
-                },
-                new()
-                {
-                    ProductID = Guid.Parse("4f2a0b63-8e3d-4f7d-9b5c-1e19f9c3d21b"),
-                    Quantity = 2,
-                    Warehouse = "WH-02"
-                }
-            };
+                ProductID = id,
+                Quantity = rng.Next(3, 25),
+                Warehouse = rng.Next(2) == 0 ? "WH-01" : "WH-02"
+            }).ToList();
 
             await context.Stocks.InsertManyAsync(stocks, cancellationToken: ct);
 
@@ -57,16 +90,8 @@ public static class StockSeedData
                         Warehouse = "WH-01",
                         Items =
                         [
-                            new StockItem
-                            {
-                                ProductID = Guid.Parse("8b6e2e1d-6f1d-4b0d-9f6c-1a4c7b9d2e8f"),
-                                Quantity = 1
-                            },
-                            new StockItem
-                            {
-                                ProductID = Guid.Parse("c2d3f8a1-9b4d-41ea-b77f-5e20b39a48a6"),
-                                Quantity = 2
-                            }
+                            new StockItem { ProductID = ProductIds[0], Quantity = 1 },
+                            new StockItem { ProductID = ProductIds[1], Quantity = 2 }
                         ]
                     }
                 ],

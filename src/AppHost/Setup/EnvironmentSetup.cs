@@ -26,7 +26,8 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> notificationService,
         IResourceBuilder<ProjectResource> customersApi,
         IResourceBuilder<ProjectResource> operationsApi,
-        IResourceBuilder<ProjectResource> operationsService)
+        IResourceBuilder<ProjectResource> operationsService,
+        IResourceBuilder<ProjectResource> gateway)
     {
         var redis = builder.AddRedis("redis")
             .WithDataVolume()
@@ -73,6 +74,7 @@ public static class EnvironmentSetup
         NotificationExtensions.Configure(notificationService, rabbit);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
+        GatewayExtensions.Configure(gateway);
     }
 }
 

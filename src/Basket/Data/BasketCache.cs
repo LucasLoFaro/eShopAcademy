@@ -66,9 +66,11 @@ public class BasketCache : IBasketCache
             if(productHash != null && productHash.Length > 0)
             {
                 // TODO: Add validation and encapsulate in automapper
-                item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").ToString() ?? "";
-                item.Product.Price = Convert.ToDouble(productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString() ?? "0");
-                item.Product.Stock = Convert.ToInt32(productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString() ?? "0");
+                item.Product.Name = productHash.FirstOrDefault(h => h.Name == "Name").Value.ToString();
+                var priceStr = productHash.FirstOrDefault(h => h.Name == "Price").Value.ToString();
+                item.Product.Price = double.TryParse(priceStr, out var price) ? price : 0;
+                var stockStr = productHash.FirstOrDefault(h => h.Name == "Stock").Value.ToString();
+                item.Product.Stock = int.TryParse(stockStr, out var stock) ? stock : 0;
             }                
         }
 
@@ -124,11 +126,11 @@ public class BasketCache : IBasketCache
     }
     public async Task<bool> RemoveProductFromBasket(Guid clientId, Item item)
     {
-        var basket = await GetBasketLoadedByClientId(clientId);
+        var basket = await GetBasketByClientId(clientId);
         if (basket == null)
             return false;
 
-        var existingItem = basket.Items.FirstOrDefault(i => i.Product.ID == item.ProductID);
+        var existingItem = basket.Items.FirstOrDefault(i => i.ProductID == item.ProductID);
         if (existingItem == null)
             return false;
         

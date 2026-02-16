@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Basket\API\Basket.API.csproj" />
     <ProjectReference Include="..\Basket\EventsProcessor\EventsProcessor\Basket.EventsProcessor.csproj" />
     <ProjectReference Include="..\Customers\Customers.Api\Customers.Api.csproj" />
+    <ProjectReference Include="..\Customers\Customers.Messaging\Customers.Messaging.csproj" />
     <ProjectReference Include="..\Gateway\Gateway.csproj" />
     <ProjectReference Include="..\Notification\Notification.Service\Notification.Service.csproj" />
     <ProjectReference Include="..\Operations\Operations.Api\Operations.Api.csproj" />

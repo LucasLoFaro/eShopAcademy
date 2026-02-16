@@ -25,6 +25,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> shippingService,
         IResourceBuilder<ProjectResource> notificationService,
         IResourceBuilder<ProjectResource> customersApi,
+        IResourceBuilder<ProjectResource> customersMessaging,
         IResourceBuilder<ProjectResource> operationsApi,
         IResourceBuilder<ProjectResource> operationsService,
         IResourceBuilder<ProjectResource> gateway)
@@ -73,6 +74,7 @@ public static class EnvironmentSetup
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
         NotificationExtensions.Configure(notificationService, rabbit);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
+        CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
         GatewayExtensions.Configure(gateway);
     }

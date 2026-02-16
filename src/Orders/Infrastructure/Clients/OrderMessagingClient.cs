@@ -1,4 +1,5 @@
 ﻿using Core.Application.Interfaces;
+using Domain.Common.Events.Customers;
 using Domain.Common.Events.Orders;
 using Domain.Orders.Entities;
 using MassTransit;
@@ -49,5 +50,17 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             OrderId = orderId,
             CustomerEmail = customerEmail,
             Reason = reason
+        }, ct);
+
+    public Task PublishCustomerAddressUpdated(Guid customerId, OrderAddressInfo address, Guid orderId, CancellationToken ct = default)
+        => _publishEndpoint.Publish(new CustomerAddressUpdatedEvent
+        {
+            CustomerId = customerId,
+            OrderId = orderId,
+            Street = address.Street,
+            Number = address.Number,
+            AdditionalInformation = address.AdditionalInformation,
+            ZipCode = address.ZipCode,
+            City = address.City
         }, ct);
 }

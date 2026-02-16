@@ -60,6 +60,13 @@ export interface BasketWithDetails {
 export interface OrderRequest {
   customerId: string;
   items: { productID: string; quantity: number; price: number }[];
+  shippingAddress: {
+    street: string;
+    number: string;
+    additionalInformation: string;
+    zipCode: string;
+    city: string;
+  };
 }
 
 export interface PlaceOrderResponse {
@@ -126,8 +133,17 @@ export interface Customer {
   name: string;
   mail: string;
   phone: string;
-  address: Address;
+  address: Address; // Legacy - for backward compatibility
+  savedAddresses: SavedAddress[];
   status: string;
+}
+
+export interface SavedAddress {
+  id: string;
+  customerId: string;
+  description: string; // e.g., "Home", "Work", "Office"
+  address: Address;
+  isDefault: boolean;
 }
 
 export interface Address {
@@ -136,4 +152,20 @@ export interface Address {
   additionalInformation: string;
   zipCode: string;
   city: string;
+  state?: string;
+  country: string;
+}
+
+// Payment Methods
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  icon: string;
+  enabled: boolean;
+}
+
+// Checkout State
+export interface CheckoutData {
+  address?: Address;
+  paymentMethod?: string;
 }

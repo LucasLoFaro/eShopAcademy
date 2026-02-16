@@ -15,3 +15,4 @@ public class CustomerDbContext
 
     public IMongoCollection<Customer> Customers => _database.GetCollection<Customer>("Customers");
 }
+

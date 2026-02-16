@@ -49,6 +49,44 @@ app.MapDelete("/customers/{id}", async (Guid id, ICustomerRepository repo, Cance
     return deleted ? Results.NoContent() : Results.NotFound();
 });
 
+// Address management endpoints
+app.MapGet("/customers/{customerId}/addresses", async (Guid customerId, ICustomerRepository repo, CancellationToken ct) =>
+{
+    var customer = await repo.GetByIdAsync(customerId, ct);
+    return customer is not null ? Results.Ok(customer.SavedAddresses) : Results.NotFound();
+});
+
+app.MapPost("/customers/{customerId}/addresses", async (Guid customerId, SavedAddress address, ICustomerRepository repo, CancellationToken ct) =>
+{
+    try
+    {
+        var created = await repo.AddAddressAsync(customerId, address, ct);
+        return Results.Created($"/customers/{customerId}/addresses/{created.Id}", created);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(new { error = ex.Message });
+    }
+});
+
+app.MapPut("/customers/{customerId}/addresses/{addressId}", async (Guid customerId, Guid addressId, SavedAddress address, ICustomerRepository repo, CancellationToken ct) =>
+{
+    var updated = await repo.UpdateAddressAsync(customerId, addressId, address, ct);
+    return updated is not null ? Results.Ok(updated) : Results.NotFound();
+});
+
+app.MapDelete("/customers/{customerId}/addresses/{addressId}", async (Guid customerId, Guid addressId, ICustomerRepository repo, CancellationToken ct) =>
+{
+    var deleted = await repo.DeleteAddressAsync(customerId, addressId, ct);
+    return deleted ? Results.NoContent() : Results.NotFound();
+});
+
+app.MapPost("/customers/{customerId}/addresses/{addressId}/set-default", async (Guid customerId, Guid addressId, ICustomerRepository repo, CancellationToken ct) =>
+{
+    var success = await repo.SetDefaultAddressAsync(customerId, addressId, ct);
+    return success ? Results.NoContent() : Results.NotFound();
+});
+
 app.UseDefaultEndpoints();
 
 app.Run();

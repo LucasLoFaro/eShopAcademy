@@ -10,6 +10,27 @@ builder.AddServiceDefaults()
 // Authentication - Entra ID JWT Bearer
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "EntraId");
 
+// Allow token from query string for SSE (EventSource doesn't support custom headers)
+builder.Services.Configure<Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions>(
+    Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme,
+    options =>
+    {
+        var existingOnMessageReceived = options.Events?.OnMessageReceived;
+        options.Events ??= new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents();
+        options.Events.OnMessageReceived = async context =>
+        {
+            if (string.IsNullOrEmpty(context.Token)
+                && context.Request.Query.TryGetValue("access_token", out var token)
+                && !string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+
+            if (existingOnMessageReceived != null)
+                await existingOnMessageReceived(context);
+        };
+    });
+
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("consumer", policy => policy.RequireAuthenticatedUser())
     .AddPolicy("admin", policy => policy.RequireRole("admin"));

@@ -17,4 +17,17 @@ public static class CustomersExtensions
             .WithEnvironment("AZURE_CLIENT_ID", "f8414e0b-f3fc-417e-9579-dcf2522d012f")
             .WithEnvironment("AZURE_CLIENT_SECRET", "5ou8Q~aiomsSKzKOQo89Eg6O4uKInhC2rM3fncCW");
     }
+
+    public static void ConfigureMessaging(
+        IResourceBuilder<ProjectResource> customersMessaging,
+        IResourceBuilder<MongoDBDatabaseResource> customersdb,
+        IResourceBuilder<RabbitMQServerResource> rabbit)
+    {
+        customersMessaging
+            .WithReference(customersdb)
+            .WaitFor(customersdb)
+            .WithReference(rabbit)
+            .WaitFor(rabbit)
+            .WithCommonEnvironments();
+    }
 }

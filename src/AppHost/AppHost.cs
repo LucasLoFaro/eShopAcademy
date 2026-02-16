@@ -31,6 +31,7 @@ var shippingService = builder.AddProject<Projects.Shipping_Service>("eshopacadem
 
 // Customer
 var customersApi = builder.AddProject<Projects.Customers_Api>("eshopacademy-customers-api");
+var customersMessaging = builder.AddProject<Projects.Customers_Messaging>("eshopacademy-customers-messaging");
 
 // SAGA Orchestration
 var ordersOrchestration = builder.AddProject<Projects.Orchestration>("eshopacademy-orchestration");
@@ -64,7 +65,7 @@ var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-we
 
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, operationsApi, operationsService, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, gateway);
 
 
 // Build and run the distributed application

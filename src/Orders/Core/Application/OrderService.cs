@@ -52,6 +52,9 @@ public class OrderService : IOrderService
         var customer = await _customerClient.GetCustomerByIdAsync(request.CustomerId);
         if (customer == null)
             throw new InvalidOperationException($"Customer not found");
+        
+        // Override customer address with shipping address from checkout
+        customer.Address = request.ShippingAddress;
         order.Customer = customer;
 
         foreach (var item in request.Items)
@@ -96,6 +99,13 @@ public class OrderService : IOrderService
         await _db.AddAsync(order);
 
         await _orderMessagingClient.PublishOrderSubmitted(order);
+
+        // Notify customer service to persist the updated address
+        await _orderMessagingClient.PublishCustomerAddressUpdated(
+            order.CustomerId, 
+            request.ShippingAddress, 
+            order.Id, 
+            ct);
 
         // TODO: Add Automapper
         return new()

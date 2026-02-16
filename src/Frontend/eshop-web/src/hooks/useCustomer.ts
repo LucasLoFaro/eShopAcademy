@@ -1,21 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMsal, useIsAuthenticated } from "@azure/msal-react";
 import api from "../api/client";
-
-interface CustomerData {
-  id: string;
-  name: string;
-  mail: string;
-  phone: string;
-  status: string;
-}
+import type { Customer } from "../types";
 
 export function useCustomer() {
   const { instance } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const account = instance.getActiveAccount();
 
-  return useQuery<CustomerData | null>({
+  return useQuery<Customer | null>({
     queryKey: ["customer", account?.homeAccountId],
     queryFn: async () => {
       if (!account) return null;
@@ -43,7 +36,7 @@ export function useEnsureCustomer() {
       // Try to get existing customer
       try {
         const { data } = await api.get(`/api/me/customer/${account.localAccountId}`);
-        return data as CustomerData;
+        return data as Customer;
       } catch (e: any) {
         if (e?.response?.status !== 404) throw e;
       }
@@ -54,10 +47,11 @@ export function useEnsureCustomer() {
         name: account.name ?? account.username ?? "User",
         mail: account.username ?? "",
         phone: "",
-        address: { street: "", city: "", state: "", country: "", zipCode: "" },
+        address: { street: "", city: "", state: "", country: "", zipCode: "", number: "", additionalInformation: "" },
+        savedAddresses: [],
         status: 0,
       });
-      return data as CustomerData;
+      return data as Customer;
     },
     onSuccess: () => {
       const account = instance.getActiveAccount();

@@ -5,13 +5,17 @@ using Infrastructure.Clients;
 using Microsoft.EntityFrameworkCore;
 using Protos;
 using ServiceDefaults;
+using API.Sse;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults()
        .WithSwagger()
-       .WithMassTransit();
+       .WithMassTransit(assemblies: Assembly.GetExecutingAssembly());
+
+builder.Services.AddSingleton<OrderStatusStreamService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });

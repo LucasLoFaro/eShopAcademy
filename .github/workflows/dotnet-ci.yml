@@ -13,7 +13,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
+      - name: Authenticate to GitHub Packages
+        run: dotnet nuget update source github --username LucasLoFaro --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --configfile src/NuGet.config
       - name: Restore
         run: dotnet restore src/eShopAcademy.sln
       - name: Build

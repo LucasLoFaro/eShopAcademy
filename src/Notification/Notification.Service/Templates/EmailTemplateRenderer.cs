@@ -17,6 +17,12 @@ public class EmailTemplateRenderer : IEmailTemplateRenderer
         _templateDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Templates");
     }
 
+    // Constructor for testing — allows injecting a custom template directory
+    public EmailTemplateRenderer(string templateDir)
+    {
+        _templateDir = templateDir;
+    }
+
     public string Render(string templateName, Dictionary<string, string> placeholders)
     {
         var html = LoadTemplate(templateName);

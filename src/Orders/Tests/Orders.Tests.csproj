@@ -29,6 +29,7 @@
     <ProjectReference Include="..\Core\Application\Orders.Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Clients\Orders.Clients.csproj" />
     <ProjectReference Include="..\Infrastructure\Data\Orders.Data.csproj" />
+    <ProjectReference Include="..\Orders.Messaging\Orders.Messaging.csproj" />
     <ProjectReference Include="..\Presentation\API\Orders.API.csproj" Aliases="global,OrdersApi" />
   </ItemGroup>
 

@@ -14,23 +14,28 @@ using Domain.Common.Events.Stock;
 using Domain.Common.States;
 using MassTransit;
 using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Orders.Tests.Orchestration.Saga;
 
 public class OrderStateMachineTests : IAsyncLifetime
 {
-    private InMemoryTestHarness _harness = null!;
-    private ISagaStateMachineTestHarness<OrderStateMachine, OrderState> _sagaHarness = null!;
-    private OrderStateMachine _machine = null!;
+    private ITestHarness _harness = null!;
+    private ServiceProvider _provider = null!;
 
     public async Task InitializeAsync()
     {
-        _harness = new InMemoryTestHarness();
+        // Arrange: setup DI and test harness
+        _provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
+            {
+                cfg.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                    .InMemoryRepository();
+            })
+            .BuildServiceProvider(true);
 
-        _machine = new OrderStateMachine();
-
-        _sagaHarness = _harness.StateMachineSaga<OrderState, OrderStateMachine>(_machine);
+        _harness = _provider.GetRequiredService<ITestHarness>();
 
         await _harness.Start();
     }
@@ -41,6 +46,11 @@ public class OrderStateMachineTests : IAsyncLifetime
         {
             await _harness.Stop();
         }
+
+        if (_provider != null)
+        {
+            await _provider.DisposeAsync();
+        }
     }
 
     [Theory]
@@ -49,18 +59,26 @@ public class OrderStateMachineTests : IAsyncLifetime
         OrderSubmittedEvent submittedEvent,
         PaymentCompletedEvent paymentCompletedEvent)
     {
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        // Arrange
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
+        // Act: send PaymentCompletedEvent
         paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.InputQueueSendEndpoint.Send(paymentCompletedEvent);
+        await _harness.Bus.Publish(paymentCompletedEvent);
 
+        // Assert: PaymentCompletedEvent consumed
         Assert.True(await _harness.Consumed.Any<PaymentCompletedEvent>());
 
+        // Assert: commands published
         Assert.True(await _harness.Published.Any<CommitStockReservationCommand>());
         Assert.True(await _harness.Published.Any<EmptyBasketCommand>());
         Assert.True(await _harness.Published.Any<ScheduleShippingCommand>());
@@ -96,18 +114,23 @@ public class OrderStateMachineTests : IAsyncLifetime
         OrderSubmittedEvent submittedEvent,
         PaymentFailedEvent paymentFailedEvent)
     {
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        // Arrange
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        // Ensure saga created
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
         // Act: payment failed
         paymentFailedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.InputQueueSendEndpoint.Send(paymentFailedEvent);
+        await _harness.Bus.Publish(paymentFailedEvent);
 
+        // Assert
         Assert.True(await _harness.Consumed.Any<PaymentFailedEvent>());
 
         // Assert CancelOrderCommand was published with reason + customer data
@@ -122,7 +145,7 @@ public class OrderStateMachineTests : IAsyncLifetime
         var cancel = cancelConsume.Context.Message;
 
         Assert.Equal(submittedEvent.OrderId, cancel.OrderId);
-        Assert.Equal(paymentFailedEvent.Reason, cancel.Reason);
+        Assert.Equal($"Payment failed: {paymentFailedEvent.Reason}", cancel.Reason);
         Assert.False(string.IsNullOrWhiteSpace(cancel.CustomerEmail));
         Assert.False(string.IsNullOrWhiteSpace(cancel.CustomerName));
     }
@@ -134,20 +157,27 @@ public class OrderStateMachineTests : IAsyncLifetime
         OrderSubmittedEvent submittedEvent,
         StockReservationCommittedEvent committedEvent)
     {
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        // Arrange
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
+        // Act: StockReservationCommittedEvent
         committedEvent = committedEvent with
         {
             OrderId = submittedEvent.OrderId,
             ReservationId = submittedEvent.ReservationId
         };
-        await _harness.InputQueueSendEndpoint.Send(committedEvent);
+        await _harness.Bus.Publish(committedEvent);
 
+        // Assert
         Assert.True(await _harness.Consumed.Any<StockReservationCommittedEvent>());
         Assert.True(await _harness.Published.Any<PreparePackageCommand>());
 
@@ -167,21 +197,29 @@ public class OrderStateMachineTests : IAsyncLifetime
         PaymentCompletedEvent paymentCompletedEvent,
         StockReservationCommitFailedEvent commitFailedEvent)
     {
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        // Arrange
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
+        // Act: PaymentCompletedEvent
         paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.InputQueueSendEndpoint.Send(paymentCompletedEvent);
+        await _harness.Bus.Publish(paymentCompletedEvent);
 
         Assert.True(await _harness.Consumed.Any<PaymentCompletedEvent>());
 
+        // Act: StockReservationCommitFailedEvent
         commitFailedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.InputQueueSendEndpoint.Send(commitFailedEvent);
+        await _harness.Bus.Publish(commitFailedEvent);
 
+        // Assert
         Assert.True(await _harness.Consumed.Any<StockReservationCommitFailedEvent>());
         Assert.True(await _harness.Published.Any<RefundPaymentCommand>());
         Assert.True(await _harness.Published.Any<CancelShippingCommand>());
@@ -214,7 +252,7 @@ public class OrderStateMachineTests : IAsyncLifetime
         Assert.Equal(submittedEvent.OrderId, cancelOrderConsume.Context.Message.OrderId);
         Assert.Equal(submittedEvent.CustomerName, cancelOrderConsume.Context.Message.CustomerName);
         Assert.Equal(submittedEvent.CustomerEmail, cancelOrderConsume.Context.Message.CustomerEmail);
-        Assert.Equal(commitFailedEvent.Reason, cancelOrderConsume.Context.Message.Reason);
+        Assert.Equal($"Stock reservation failed: {commitFailedEvent.Reason}", cancelOrderConsume.Context.Message.Reason);
     }
 
     [Theory]
@@ -223,20 +261,27 @@ public class OrderStateMachineTests : IAsyncLifetime
         OrderSubmittedEvent submittedEvent,
         OrderReadyForPickupEvent readyEvent)
     {
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        // Arrange
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
+        // Act: OrderReadyForPickupEvent
         readyEvent = readyEvent with
         {
             OrderId = submittedEvent.OrderId
         };
 
-        await _harness.InputQueueSendEndpoint.Send(readyEvent);
+        await _harness.Bus.Publish(readyEvent);
 
+        // Assert
         Assert.True(await _harness.Consumed.Any<OrderReadyForPickupEvent>());
         Assert.True(await _harness.Published.Any<ConfirmPickupCommand>());
 
@@ -257,12 +302,16 @@ public class OrderStateMachineTests : IAsyncLifetime
         ShippingScheduledEvent scheduledEvent)
     {
         // Arrange
-        await _harness.InputQueueSendEndpoint.Send(submittedEvent);
+        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
 
+        // Act
+        await _harness.Bus.Publish(submittedEvent);
+
+        // Assert: OrderSubmittedEvent consumed and saga created
         Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
 
-        var submittedId = await _sagaHarness.Exists(submittedEvent.OrderId, _machine.Submitted);
-        Assert.NotNull(submittedId);
+        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
+        Assert.NotNull(saga);
 
         // Act
         scheduledEvent = scheduledEvent with
@@ -270,7 +319,7 @@ public class OrderStateMachineTests : IAsyncLifetime
             OrderId = submittedEvent.OrderId
         };
 
-        await _harness.InputQueueSendEndpoint.Send(scheduledEvent);
+        await _harness.Bus.Publish(scheduledEvent);
 
         // Assert
         Assert.True(await _harness.Consumed.Any<ShippingScheduledEvent>());

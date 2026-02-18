@@ -9,6 +9,7 @@ public class OrderState : SagaStateMachineInstance
     public string CurrentState { get; set; } = string.Empty;
     public Guid OrderId { get; set; }
     public Guid CustomerId { get; set; }
+    public Guid BasketClientId { get; set; }
     public Guid PaymentId { get; set; }
     public Guid ReservationId { get; set; }
     public decimal TotalAmount { get; set; }

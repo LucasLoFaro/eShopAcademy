@@ -177,7 +177,7 @@ public class BasketCache : IBasketCache
     {
         try
         {
-            return await _cache.KeyDeleteAsync(BASKET_PREFIX + clientId);
+            return await _cache.KeyDeleteAsync(BASKET_PREFIX + clientId.ToString());
         }
         catch (Exception)
         {

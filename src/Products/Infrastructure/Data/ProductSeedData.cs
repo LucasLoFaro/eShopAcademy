@@ -65,11 +65,27 @@ public static class ProductSeedData
     const string CatGaming      = "e6f4a5b6-c7d8-9e0f-1a2b-3c4d5e6f7081";
     const string CatLaptops     = "f7a5b6c7-d8e9-0f1a-2b3c-4d5e6f708192";
 
-    private static string Img(int seed) => $"https://picsum.photos/seed/eshop{seed}/400/400";
+    // Uses a specific Unsplash photo ID; crop param lets Enrich vary the composition for additional images
+    private static string Img(string unsplashId, string crop = "center") =>
+        $"https://images.unsplash.com/photo-{unsplashId}?w=400&h=400&fit=crop&crop={crop}&auto=format&q=80";
+
+    // Representative Unsplash photo IDs per category (used for additional images)
+    private static readonly Dictionary<string, string> CategoryImages = new()
+    {
+        [CatPeripherals] = "1587829741301-dc798b83add3",  // mechanical keyboard
+        [CatAudio]       = "1505740420928-5e560c06d30e",  // Sony-style headphones
+        [CatAccessories] = "1558171813-d13d0c5e7b49",    // USB accessories
+        [CatMonitors]    = "1527443224154-c4a3942d3acf",  // computer monitor
+        [CatStorage]     = "1597754742025-5bb5de4bfb6b",  // SSD drive
+        [CatNetworking]  = "1562408590-e32931084e23",     // router
+        [CatGaming]      = "1593640408182-31c70c8268f5",  // gaming setup
+        [CatLaptops]     = "1496181133206-80ce9b88a853",  // MacBook
+    };
 
     private static void Enrich(Product p, int idx)
     {
-        p.AdditionalImages = [Img(idx * 10 + 1), Img(idx * 10 + 2), Img(idx * 10 + 3)];
+        var catImg = CategoryImages.GetValueOrDefault(p.CategoryId, "1496181133206-80ce9b88a853");
+        p.AdditionalImages = [Img(catImg, "left"), Img(catImg, "right"), Img(catImg, "entropy")];
         p.Rating = 3.5 + (idx % 15) * 0.1;
         p.ReviewCount = 50 + idx * 37 % 500;
         p.IsBestSeller = idx % 4 == 0;
@@ -151,84 +167,84 @@ public static class ProductSeedData
 
     public static async Task InitializeAsync(ProductDbContext context, IProductMessagingService messaging)
     {
+        var categoryMap = new Dictionary<string, Category>
+        {
+            [CatPeripherals] = new() { Id = CatPeripherals, Name = "Peripherals" },
+            [CatAudio]       = new() { Id = CatAudio,       Name = "Audio" },
+            [CatAccessories] = new() { Id = CatAccessories, Name = "Accessories" },
+            [CatMonitors]    = new() { Id = CatMonitors,    Name = "Monitors" },
+            [CatStorage]     = new() { Id = CatStorage,     Name = "Storage" },
+            [CatNetworking]  = new() { Id = CatNetworking,  Name = "Networking" },
+            [CatGaming]      = new() { Id = CatGaming,      Name = "Gaming" },
+            [CatLaptops]     = new() { Id = CatLaptops,     Name = "Laptops" },
+        };
+
         var productsExist = await context.Products.AsNoTracking().FirstOrDefaultAsync() != null;
         if (!productsExist)
         {
-            var categories = new List<Category>
-            {
-                new() { Id = CatPeripherals, Name = "Peripherals" },
-                new() { Id = CatAudio,       Name = "Audio" },
-                new() { Id = CatAccessories, Name = "Accessories" },
-                new() { Id = CatMonitors,    Name = "Monitors" },
-                new() { Id = CatStorage,     Name = "Storage" },
-                new() { Id = CatNetworking,  Name = "Networking" },
-                new() { Id = CatGaming,      Name = "Gaming" },
-                new() { Id = CatLaptops,     Name = "Laptops" },
-            };
-            context.Categories.AddRange(categories);
 
             var i = 0;
             var products = new List<Product>
             {
                 // ── Peripherals ──
-                new() { Id = Ids[i++], Name = "Logitech MX Master 3S",          Price = 99.99,   Description = "Advanced wireless mouse with ultra-fast scrolling and 8K DPI sensor",              ImageUrl = Img(1),  CategoryId = CatPeripherals },
-                new() { Id = Ids[i++], Name = "Logitech MX Keys Mini",           Price = 79.99,   Description = "Minimalist wireless illuminated keyboard with smart backlighting",                 ImageUrl = Img(2),  CategoryId = CatPeripherals },
-                new() { Id = Ids[i++], Name = "Razer DeathAdder V3",             Price = 89.99,   Description = "Ultra-lightweight ergonomic esports mouse with 30K optical sensor",                ImageUrl = Img(3),  CategoryId = CatPeripherals },
-                new() { Id = Ids[i++], Name = "Corsair K70 RGB Pro",             Price = 159.99,  Description = "Mechanical gaming keyboard with Cherry MX switches and RGB",                       ImageUrl = Img(4),  CategoryId = CatPeripherals },
-                new() { Id = Ids[i++], Name = "SteelSeries Aerox 3 Wireless",   Price = 59.99,   Description = "Ultra-lightweight wireless gaming mouse at 68g",                                    ImageUrl = Img(5),  CategoryId = CatPeripherals },
-                new() { Id = Ids[i++], Name = "Keychron Q1 Pro",                 Price = 199.00,  Description = "QMK/VIA wireless custom mechanical keyboard with gasket mount",                    ImageUrl = Img(6),  CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "Logitech MX Master 3S",           Price = 99.99,   Description = "Advanced wireless mouse with ultra-fast scrolling and 8K DPI sensor",              ImageUrl = Img("1527864550417-7fd91fc51a46"), CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "Logitech MX Keys Mini",            Price = 79.99,   Description = "Minimalist wireless illuminated keyboard with smart backlighting",                 ImageUrl = Img("1587829741301-dc798b83add3"), CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "Razer DeathAdder V3",              Price = 89.99,   Description = "Ultra-lightweight ergonomic esports mouse with 30K optical sensor",                ImageUrl = Img("1527864550417-7fd91fc51a46", "entropy"), CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "Corsair K70 RGB Pro",              Price = 159.99,  Description = "Mechanical gaming keyboard with Cherry MX switches and RGB",                       ImageUrl = Img("1587829741301-dc798b83add3", "entropy"), CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "SteelSeries Aerox 3 Wireless",    Price = 59.99,   Description = "Ultra-lightweight wireless gaming mouse at 68g",                                    ImageUrl = Img("1527864550417-7fd91fc51a46", "left"),    CategoryId = CatPeripherals },
+                new() { Id = Ids[i++], Name = "Keychron Q1 Pro",                  Price = 199.00,  Description = "QMK/VIA wireless custom mechanical keyboard with gasket mount",                    ImageUrl = Img("1587829741301-dc798b83add3", "left"),    CategoryId = CatPeripherals },
 
                 // ── Audio ──
-                new() { Id = Ids[i++], Name = "SteelSeries Arctis Nova 7",      Price = 179.99,  Description = "Multi-platform wireless gaming headset with 38-hour battery",                      ImageUrl = Img(7),  CategoryId = CatAudio },
-                new() { Id = Ids[i++], Name = "Sony WH-1000XM5",                Price = 348.00,  Description = "Industry-leading noise cancelling wireless headphones",                             ImageUrl = Img(8),  CategoryId = CatAudio },
-                new() { Id = Ids[i++], Name = "Apple AirPods Pro 2",             Price = 249.00,  Description = "Active noise cancelling with adaptive audio and USB-C",                            ImageUrl = Img(9),  CategoryId = CatAudio },
-                new() { Id = Ids[i++], Name = "Bose QuietComfort Ultra",         Price = 429.00,  Description = "Immersive spatial audio with world-class noise cancellation",                      ImageUrl = Img(10), CategoryId = CatAudio },
-                new() { Id = Ids[i++], Name = "HyperX Cloud III",                Price = 99.99,   Description = "Gaming headset with angled 53mm drivers and DTS spatial audio",                    ImageUrl = Img(11), CategoryId = CatAudio },
+                new() { Id = Ids[i++], Name = "SteelSeries Arctis Nova 7",       Price = 179.99,  Description = "Multi-platform wireless gaming headset with 38-hour battery",                      ImageUrl = Img("1599669851046-5fce00fd3f3d"),             CategoryId = CatAudio },
+                new() { Id = Ids[i++], Name = "Sony WH-1000XM5",                 Price = 348.00,  Description = "Industry-leading noise cancelling wireless headphones",                             ImageUrl = Img("1505740420928-5e560c06d30e"),             CategoryId = CatAudio },
+                new() { Id = Ids[i++], Name = "Apple AirPods Pro 2",              Price = 249.00,  Description = "Active noise cancelling with adaptive audio and USB-C",                            ImageUrl = Img("1600585154526-990dced4db0d"),             CategoryId = CatAudio },
+                new() { Id = Ids[i++], Name = "Bose QuietComfort Ultra",          Price = 429.00,  Description = "Immersive spatial audio with world-class noise cancellation",                      ImageUrl = Img("1484704849700-f032a568e944"),             CategoryId = CatAudio },
+                new() { Id = Ids[i++], Name = "HyperX Cloud III",                 Price = 99.99,   Description = "Gaming headset with angled 53mm drivers and DTS spatial audio",                    ImageUrl = Img("1546435770-a3e426bf472b"),                CategoryId = CatAudio },
 
                 // ── Accessories ──
-                new() { Id = Ids[i++], Name = "Anker USB-C Hub 7-in-1",          Price = 35.99,   Description = "USB-C hub with 4K HDMI, USB 3.0 ports and SD card reader",                        ImageUrl = Img(12), CategoryId = CatAccessories },
-                new() { Id = Ids[i++], Name = "Apple Magic Trackpad",            Price = 129.00,  Description = "Wireless Multi-Touch trackpad with Force Touch technology",                        ImageUrl = Img(13), CategoryId = CatAccessories },
-                new() { Id = Ids[i++], Name = "Elgato Stream Deck MK.2",         Price = 149.99,  Description = "Studio controller with 15 customizable LCD keys",                                  ImageUrl = Img(14), CategoryId = CatAccessories },
-                new() { Id = Ids[i++], Name = "CalDigit TS4 Thunderbolt Dock",   Price = 399.99,  Description = "18-port Thunderbolt 4 docking station for pro workflows",                          ImageUrl = Img(15), CategoryId = CatAccessories },
-                new() { Id = Ids[i++], Name = "Logitech Spotlight Presenter",    Price = 129.99,  Description = "Advanced digital pointer with smart highlighting and timer",                       ImageUrl = Img(16), CategoryId = CatAccessories },
+                new() { Id = Ids[i++], Name = "Anker USB-C Hub 7-in-1",           Price = 35.99,   Description = "USB-C hub with 4K HDMI, USB 3.0 ports and SD card reader",                        ImageUrl = Img("1558171813-d13d0c5e7b49"),                CategoryId = CatAccessories },
+                new() { Id = Ids[i++], Name = "Apple Magic Trackpad",             Price = 129.00,  Description = "Wireless Multi-Touch trackpad with Force Touch technology",                        ImageUrl = Img("1611532736597-de2d4265fba3"),             CategoryId = CatAccessories },
+                new() { Id = Ids[i++], Name = "Elgato Stream Deck MK.2",          Price = 149.99,  Description = "Studio controller with 15 customizable LCD keys",                                  ImageUrl = Img("1593640408182-31c70c8268f5", "left"),    CategoryId = CatAccessories },
+                new() { Id = Ids[i++], Name = "CalDigit TS4 Thunderbolt Dock",    Price = 399.99,  Description = "18-port Thunderbolt 4 docking station for pro workflows",                          ImageUrl = Img("1558171813-d13d0c5e7b49", "entropy"),    CategoryId = CatAccessories },
+                new() { Id = Ids[i++], Name = "Logitech Spotlight Presenter",     Price = 129.99,  Description = "Advanced digital pointer with smart highlighting and timer",                       ImageUrl = Img("1558171813-d13d0c5e7b49", "right"),     CategoryId = CatAccessories },
 
                 // ── Monitors ──
-                new() { Id = Ids[i++], Name = "Dell UltraSharp U2723QE",         Price = 619.99,  Description = "27-inch 4K USB-C Hub Monitor with IPS Black technology",                           ImageUrl = Img(17), CategoryId = CatMonitors },
-                new() { Id = Ids[i++], Name = "LG 27GP850-B UltraGear",          Price = 449.99,  Description = "27-inch QHD Nano IPS 165Hz gaming monitor with G-Sync",                            ImageUrl = Img(18), CategoryId = CatMonitors },
-                new() { Id = Ids[i++], Name = "Samsung Odyssey G7 32\"",          Price = 699.99,  Description = "32-inch WQHD 240Hz curved gaming monitor with 1ms response",                      ImageUrl = Img(19), CategoryId = CatMonitors },
-                new() { Id = Ids[i++], Name = "ASUS ProArt PA278QV",             Price = 329.00,  Description = "27-inch WQHD professional monitor with 100% sRGB and Rec.709",                    ImageUrl = Img(20), CategoryId = CatMonitors },
-                new() { Id = Ids[i++], Name = "BenQ PD2725U DesignVue",          Price = 899.00,  Description = "27-inch 4K Thunderbolt 3 designer monitor with HDR10",                             ImageUrl = Img(21), CategoryId = CatMonitors },
+                new() { Id = Ids[i++], Name = "Dell UltraSharp U2723QE",          Price = 619.99,  Description = "27-inch 4K USB-C Hub Monitor with IPS Black technology",                           ImageUrl = Img("1527443224154-c4a3942d3acf"),             CategoryId = CatMonitors },
+                new() { Id = Ids[i++], Name = "LG 27GP850-B UltraGear",           Price = 449.99,  Description = "27-inch QHD Nano IPS 165Hz gaming monitor with G-Sync",                            ImageUrl = Img("1593640408182-31c70c8268f5"),             CategoryId = CatMonitors },
+                new() { Id = Ids[i++], Name = "Samsung Odyssey G7 32\"",           Price = 699.99,  Description = "32-inch WQHD 240Hz curved gaming monitor with 1ms response",                      ImageUrl = Img("1527443224154-c4a3942d3acf", "entropy"), CategoryId = CatMonitors },
+                new() { Id = Ids[i++], Name = "ASUS ProArt PA278QV",              Price = 329.00,  Description = "27-inch WQHD professional monitor with 100% sRGB and Rec.709",                    ImageUrl = Img("1527443224154-c4a3942d3acf", "left"),    CategoryId = CatMonitors },
+                new() { Id = Ids[i++], Name = "BenQ PD2725U DesignVue",           Price = 899.00,  Description = "27-inch 4K Thunderbolt 3 designer monitor with HDR10",                             ImageUrl = Img("1527443224154-c4a3942d3acf", "right"),   CategoryId = CatMonitors },
 
                 // ── Storage ──
-                new() { Id = Ids[i++], Name = "Samsung 990 Pro 2TB NVMe",        Price = 189.99,  Description = "PCIe 4.0 NVMe M.2 SSD with up to 7450 MB/s sequential read",                      ImageUrl = Img(22), CategoryId = CatStorage },
-                new() { Id = Ids[i++], Name = "WD Black SN850X 1TB",             Price = 89.99,   Description = "High-performance NVMe SSD designed for gaming with heatsink",                      ImageUrl = Img(23), CategoryId = CatStorage },
-                new() { Id = Ids[i++], Name = "Samsung T7 Shield 2TB",           Price = 159.99,  Description = "Portable SSD with IP65 water and dust resistance rating",                          ImageUrl = Img(24), CategoryId = CatStorage },
-                new() { Id = Ids[i++], Name = "Crucial MX500 1TB SATA",          Price = 69.99,   Description = "Reliable 2.5-inch SATA SSD with 560 MB/s sequential read",                        ImageUrl = Img(25), CategoryId = CatStorage },
-                new() { Id = Ids[i++], Name = "Seagate Expansion 4TB",           Price = 94.99,   Description = "Portable external hard drive compatible with PC and Mac",                          ImageUrl = Img(26), CategoryId = CatStorage },
+                new() { Id = Ids[i++], Name = "Samsung 990 Pro 2TB NVMe",         Price = 189.99,  Description = "PCIe 4.0 NVMe M.2 SSD with up to 7450 MB/s sequential read",                      ImageUrl = Img("1597754742025-5bb5de4bfb6b"),             CategoryId = CatStorage },
+                new() { Id = Ids[i++], Name = "WD Black SN850X 1TB",              Price = 89.99,   Description = "High-performance NVMe SSD designed for gaming with heatsink",                      ImageUrl = Img("1597754742025-5bb5de4bfb6b", "entropy"), CategoryId = CatStorage },
+                new() { Id = Ids[i++], Name = "Samsung T7 Shield 2TB",            Price = 159.99,  Description = "Portable SSD with IP65 water and dust resistance rating",                          ImageUrl = Img("1597754742025-5bb5de4bfb6b", "left"),    CategoryId = CatStorage },
+                new() { Id = Ids[i++], Name = "Crucial MX500 1TB SATA",           Price = 69.99,   Description = "Reliable 2.5-inch SATA SSD with 560 MB/s sequential read",                        ImageUrl = Img("1597754742025-5bb5de4bfb6b", "right"),   CategoryId = CatStorage },
+                new() { Id = Ids[i++], Name = "Seagate Expansion 4TB",            Price = 94.99,   Description = "Portable external hard drive compatible with PC and Mac",                          ImageUrl = Img("1597754742025-5bb5de4bfb6b", "top"),     CategoryId = CatStorage },
 
                 // ── Networking ──
-                new() { Id = Ids[i++], Name = "TP-Link Deco XE75 3-Pack",        Price = 299.99,  Description = "Wi-Fi 6E tri-band whole home mesh system up to 5500 sqft",                        ImageUrl = Img(27), CategoryId = CatNetworking },
-                new() { Id = Ids[i++], Name = "ASUS RT-AX86U Pro",               Price = 249.99,  Description = "Dual-band Wi-Fi 6 gaming router with AiMesh support",                              ImageUrl = Img(28), CategoryId = CatNetworking },
-                new() { Id = Ids[i++], Name = "Netgear Nighthawk AX12",          Price = 399.99,  Description = "12-stream Wi-Fi 6 router with up to 6 Gbps combined speed",                       ImageUrl = Img(29), CategoryId = CatNetworking },
+                new() { Id = Ids[i++], Name = "TP-Link Deco XE75 3-Pack",         Price = 299.99,  Description = "Wi-Fi 6E tri-band whole home mesh system up to 5500 sqft",                        ImageUrl = Img("1562408590-e32931084e23"),                CategoryId = CatNetworking },
+                new() { Id = Ids[i++], Name = "ASUS RT-AX86U Pro",                Price = 249.99,  Description = "Dual-band Wi-Fi 6 gaming router with AiMesh support",                              ImageUrl = Img("1562408590-e32931084e23", "entropy"),     CategoryId = CatNetworking },
+                new() { Id = Ids[i++], Name = "Netgear Nighthawk AX12",           Price = 399.99,  Description = "12-stream Wi-Fi 6 router with up to 6 Gbps combined speed",                       ImageUrl = Img("1562408590-e32931084e23", "left"),       CategoryId = CatNetworking },
 
                 // ── Gaming ──
-                new() { Id = Ids[i++], Name = "Xbox Wireless Controller",        Price = 59.99,   Description = "Wireless controller with textured grip for Xbox and PC",                           ImageUrl = Img(30), CategoryId = CatGaming },
-                new() { Id = Ids[i++], Name = "PS5 DualSense Controller",        Price = 69.99,   Description = "Wireless controller with haptic feedback and adaptive triggers",                    ImageUrl = Img(31), CategoryId = CatGaming },
-                new() { Id = Ids[i++], Name = "Razer Wolverine V2 Chroma",       Price = 149.99,  Description = "Wired gaming controller with Razer Mecha-Tactile buttons",                        ImageUrl = Img(32), CategoryId = CatGaming },
-                new() { Id = Ids[i++], Name = "SteelSeries QcK Heavy XXL",       Price = 34.99,   Description = "Extra-thick gaming mouse pad 900x400mm non-slip rubber base",                     ImageUrl = Img(33), CategoryId = CatGaming },
-                new() { Id = Ids[i++], Name = "Elgato HD60 X Capture Card",      Price = 199.99,  Description = "External capture card with 4K60 HDR10 passthrough",                                ImageUrl = Img(34), CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "Xbox Wireless Controller",         Price = 59.99,   Description = "Wireless controller with textured grip for Xbox and PC",                           ImageUrl = Img("1605899435591-d1c3e2f78db3"),             CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "PS5 DualSense Controller",         Price = 69.99,   Description = "Wireless controller with haptic feedback and adaptive triggers",                    ImageUrl = Img("1606144042614-1b29b50dd2ee"),             CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "Razer Wolverine V2 Chroma",        Price = 149.99,  Description = "Wired gaming controller with Razer Mecha-Tactile buttons",                        ImageUrl = Img("1605899435591-d1c3e2f78db3", "entropy"), CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "SteelSeries QcK Heavy XXL",        Price = 34.99,   Description = "Extra-thick gaming mouse pad 900x400mm non-slip rubber base",                     ImageUrl = Img("1626958097536-e3c98ce5c4c0"),             CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "Elgato HD60 X Capture Card",       Price = 199.99,  Description = "External capture card with 4K60 HDR10 passthrough",                                ImageUrl = Img("1593640408182-31c70c8268f5", "right"),   CategoryId = CatGaming },
 
                 // ── Laptops ──
-                new() { Id = Ids[i++], Name = "Apple MacBook Air M3 15\"",        Price = 1299.00, Description = "15-inch Liquid Retina display with M3 chip and 18h battery",                       ImageUrl = Img(35), CategoryId = CatLaptops },
-                new() { Id = Ids[i++], Name = "Dell XPS 15",                      Price = 1499.99, Description = "15.6-inch FHD+ InfinityEdge display with Intel Core i7-13700H",                   ImageUrl = Img(36), CategoryId = CatLaptops },
-                new() { Id = Ids[i++], Name = "Lenovo ThinkPad X1 Carbon Gen 11", Price = 1649.00, Description = "14-inch ultralight business laptop with 13th Gen Intel vPro",                     ImageUrl = Img(37), CategoryId = CatLaptops },
-                new() { Id = Ids[i++], Name = "ASUS ROG Zephyrus G14",           Price = 1599.99, Description = "14-inch QHD 165Hz gaming laptop with RTX 4060 and Ryzen 9",                       ImageUrl = Img(38), CategoryId = CatLaptops },
-                new() { Id = Ids[i++], Name = "HP Spectre x360 16",              Price = 1799.99, Description = "16-inch 2-in-1 OLED touch laptop with Intel Core i7",                              ImageUrl = Img(39), CategoryId = CatLaptops },
-                new() { Id = Ids[i++], Name = "Acer Swift Go 14",                Price = 849.99,  Description = "14-inch OLED display with Intel Core Ultra and 16GB RAM",                          ImageUrl = Img(40), CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "Apple MacBook Air M3 15\"",         Price = 1299.00, Description = "15-inch Liquid Retina display with M3 chip and 18h battery",                       ImageUrl = Img("1496181133206-80ce9b88a853"),             CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "Dell XPS 15",                       Price = 1499.99, Description = "15.6-inch FHD+ InfinityEdge display with Intel Core i7-13700H",                   ImageUrl = Img("1593642632559-0c6d3fc62b89"),             CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "Lenovo ThinkPad X1 Carbon Gen 11",  Price = 1649.00, Description = "14-inch ultralight business laptop with 13th Gen Intel vPro",                     ImageUrl = Img("1484788984921-03950022c9ef"),             CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "ASUS ROG Zephyrus G14",            Price = 1599.99, Description = "14-inch QHD 165Hz gaming laptop with RTX 4060 and Ryzen 9",                       ImageUrl = Img("1593642702749-b7d2a804fbf7"),             CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "HP Spectre x360 16",               Price = 1799.99, Description = "16-inch 2-in-1 OLED touch laptop with Intel Core i7",                              ImageUrl = Img("1593642632559-0c6d3fc62b89", "entropy"), CategoryId = CatLaptops },
+                new() { Id = Ids[i++], Name = "Acer Swift Go 14",                 Price = 849.99,  Description = "14-inch OLED display with Intel Core Ultra and 16GB RAM",                          ImageUrl = Img("1593642632559-0c6d3fc62b89", "left"),    CategoryId = CatLaptops },
 
                 // Extra to round out
-                new() { Id = Ids[i++], Name = "Elgato Key Light Air",             Price = 129.99,  Description = "Professional LED panel for streaming and video calls",                             ImageUrl = Img(41), CategoryId = CatGaming },
-                new() { Id = Ids[i++], Name = "TP-Link Archer AX55",              Price = 129.99,  Description = "AX3000 dual-band Wi-Fi 6 router with HomeCare security",                          ImageUrl = Img(42), CategoryId = CatNetworking },
+                new() { Id = Ids[i++], Name = "Elgato Key Light Air",              Price = 129.99,  Description = "Professional LED panel for streaming and video calls",                             ImageUrl = Img("1567879021502-1ffe5b4e2fba"),             CategoryId = CatGaming },
+                new() { Id = Ids[i++], Name = "TP-Link Archer AX55",               Price = 129.99,  Description = "AX3000 dual-band Wi-Fi 6 router with HomeCare security",                          ImageUrl = Img("1562408590-e32931084e23", "right"),     CategoryId = CatNetworking },
             };
 
             // Enrich all products with specs, FAQs, ratings, and flags
@@ -236,6 +252,7 @@ public static class ProductSeedData
             {
                 var p = products[idx];
                 Enrich(p, idx);
+                p.Category = categoryMap[p.CategoryId];
                 p.Specs = SpecsForCategory(p.CategoryId);
                 p.Faqs = DefaultFaqs(p.Name);
             }
@@ -246,6 +263,35 @@ public static class ProductSeedData
 
             foreach (var product in products)
                 await messaging.SendProductUpdate(product);
+        }
+        else
+        {
+            // Backfill: patch any existing products that are missing the embedded Category or have old image URLs
+            var allProducts = await context.Products.ToListAsync();
+            var toUpdate = allProducts
+                .Where(p => p.Category == null && categoryMap.ContainsKey(p.CategoryId))
+                .ToList();
+
+            if (toUpdate.Count > 0)
+            {
+                foreach (var p in toUpdate)
+                    p.Category = categoryMap[p.CategoryId];
+
+                // Fix image URLs that still point at picsum or loremflickr
+                foreach (var p in toUpdate.Where(p => p.ImageUrl.Contains("picsum.photos") || p.ImageUrl.Contains("loremflickr")))
+                {
+                    var catImg = CategoryImages.GetValueOrDefault(p.CategoryId, "1496181133206-80ce9b88a853");
+                    p.ImageUrl = Img(catImg);
+                    p.AdditionalImages = [Img(catImg, "left"), Img(catImg, "right"), Img(catImg, "entropy")];
+                }
+
+                await context.SaveChangesAsync();
+            }
+
+            // Always republish all products so the basket Redis product cache is restored
+            // after a volume wipe or fresh container start.
+            foreach (var p in allProducts)
+                await messaging.SendProductUpdate(p);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace Infrastructure.Data;
 public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products => base.Set<Product>();
-    public DbSet<Category> Categories => Set<Category>();
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
@@ -15,18 +14,10 @@ public class ProductDbContext : DbContext
         modelBuilder.HasDefaultContainer("eShopAcademy");
 
         modelBuilder.Entity<Product>().ToContainer("Products");
-        modelBuilder.Entity<Category>().ToContainer("Categories");
-
         modelBuilder.Entity<Product>().HasPartitionKey(p => p.CategoryId);
-        modelBuilder.Entity<Category>().HasPartitionKey(c => c.Id);
 
+        modelBuilder.Entity<Product>().OwnsOne(p => p.Category);
         modelBuilder.Entity<Product>().OwnsMany(p => p.Specs);
         modelBuilder.Entity<Product>().OwnsMany(p => p.Faqs);
-
-        // Relationships
-        modelBuilder.Entity<Product>()
-            .HasOne(p => p.Category)
-            .WithMany(c => c.Products)
-            .HasForeignKey(p => p.CategoryId);
     }
 }

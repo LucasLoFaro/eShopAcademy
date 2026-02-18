@@ -119,7 +119,7 @@ public class OrderServiceTests
         _stockClient.Setup(s => s.ReserveStockAsync(It.IsAny<Guid>(), It.IsAny<List<Item>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(stockResponse);
         _repository.Setup(r => r.AddAsync(It.IsAny<Order>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        _messagingClient.Setup(m => m.PublishOrderSubmitted(It.IsAny<Order>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _messagingClient.Setup(m => m.PublishOrderSubmitted(It.IsAny<Order>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _messagingClient.Setup(m => m.PublishCustomerAddressUpdated(It.IsAny<Guid>(), It.IsAny<OrderAddressInfo>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act
@@ -131,7 +131,7 @@ public class OrderServiceTests
         result.PaymentUrl.Should().Be(new Uri(paymentResponse.PaymentUrl));
 
         _repository.Verify(r => r.AddAsync(It.Is<Order>(o => o.CustomerId == customerId), It.IsAny<CancellationToken>()), Times.Once);
-        _messagingClient.Verify(m => m.PublishOrderSubmitted(It.IsAny<Order>(), It.IsAny<CancellationToken>()), Times.Once);
+        _messagingClient.Verify(m => m.PublishOrderSubmitted(It.IsAny<Order>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
         _messagingClient.Verify(m => m.PublishCustomerAddressUpdated(customerId, It.IsAny<OrderAddressInfo>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 

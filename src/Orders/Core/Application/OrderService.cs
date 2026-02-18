@@ -38,9 +38,7 @@ public class OrderService : IOrderService
     public Task<Order?> GetOrderById(Guid id, CancellationToken ct = default)
         => _db.GetByIdAsync(id, ct);
 
-    // TODO: When success, empty basket
-    //       Return a custom response with the result and possible errors
-    //       Replace mocks for real services
+    // TODO: Return a custom response with the result and possible errors
     public async Task<PlaceOrderResponse> PlaceOrderAsync(OrderRequest request, CancellationToken ct = default)
     {
         var order = new Order
@@ -98,7 +96,7 @@ public class OrderService : IOrderService
         
         await _db.AddAsync(order);
 
-        await _orderMessagingClient.PublishOrderSubmitted(order);
+        await _orderMessagingClient.PublishOrderSubmitted(order, request.BasketClientId);
 
         // Notify customer service to persist the updated address
         await _orderMessagingClient.PublishCustomerAddressUpdated(

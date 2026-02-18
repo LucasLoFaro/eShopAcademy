@@ -66,13 +66,15 @@ public static class EnvironmentSetup
             .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
             .WithLifetime(ContainerLifetime.Persistent);
 
+        var sendGridApiKey = builder.AddParameter("sendgrid-apikey", secret: true);
+
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
-        NotificationExtensions.Configure(notificationService, rabbit);
+        NotificationExtensions.Configure(notificationService, rabbit, sendGridApiKey);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);

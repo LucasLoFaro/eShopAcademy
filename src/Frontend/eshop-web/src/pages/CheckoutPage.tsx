@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useBasket } from "../hooks/useBasket";
 import { usePlaceOrder } from "../hooks/useOrders";
 import { useCustomer, useEnsureCustomer } from "../hooks/useCustomer";
 import { useAddCustomerAddress, useDeleteCustomerAddress } from "../hooks/useCustomerAddresses";
+import { useClientId } from "../hooks/useClientId";
 import type { Address } from "../types";
 import type { CheckoutData } from "../types";
 import AddressStep from "../components/checkout/AddressStep";
@@ -13,13 +15,15 @@ import ConfirmationStep from "../components/checkout/ConfirmationStep";
 type CheckoutStep = "address" | "payment" | "confirmation";
 
 export default function CheckoutPage() {
-  const { data: basket, isLoading } = useBasket();
-  const { data: customer, isLoading: customerLoading } = useCustomer();
-  const ensureCustomer = useEnsureCustomer();
-  const placeOrder = usePlaceOrder();
-  const addAddress = useAddCustomerAddress();
-  const deleteAddress = useDeleteCustomerAddress();
-  const navigate = useNavigate();
+const { data: basket, isLoading } = useBasket();
+const { data: customer, isLoading: customerLoading } = useCustomer();
+const ensureCustomer = useEnsureCustomer();
+const placeOrder = usePlaceOrder();
+const addAddress = useAddCustomerAddress();
+const deleteAddress = useDeleteCustomerAddress();
+const navigate = useNavigate();
+const queryClient = useQueryClient();
+const clientId = useClientId();
 
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [checkoutData, setCheckoutData] = useState<CheckoutData>({});
@@ -69,6 +73,7 @@ export default function CheckoutPage() {
 
     const result = await placeOrder.mutateAsync({
       customerId: cust.id,
+      basketClientId: clientId,
       items: items.map((i) => ({
         productID: i.product.id,
         quantity: i.quantity,
@@ -83,6 +88,7 @@ export default function CheckoutPage() {
       },
     });
     navigate(`/orders/${result.orderId}`, { state: { paymentUrl: result.paymentUrl } });
+    queryClient.invalidateQueries({ queryKey: ["basket", clientId] });
   };
 
   if (isLoading || customerLoading) {

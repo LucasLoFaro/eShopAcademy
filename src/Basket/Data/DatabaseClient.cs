@@ -10,7 +10,9 @@ namespace Data
 
         public DatabaseClient(string connectionString)
         {
-            redis = ConnectionMultiplexer.Connect(connectionString);
+            var options = ConfigurationOptions.Parse(connectionString);
+            options.AbortOnConnectFail = false;
+            redis = ConnectionMultiplexer.Connect(options);
             db = redis.GetDatabase();
         }
 

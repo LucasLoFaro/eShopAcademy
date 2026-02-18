@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useProducts } from "../hooks/useProducts";
 import { useAddToBasket } from "../hooks/useBasket";
@@ -26,6 +26,10 @@ export default function ProductListPage() {
   const { toggle, isFavorite } = useWishlist();
   const isAuthenticated = useIsAuthenticated();
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [sort, cat, deals]);
 
   if (isLoading) return <div className="flex justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-amber-500" /></div>;
   if (error) return <p className="text-center py-12 text-red-600">Failed to load products.</p>;

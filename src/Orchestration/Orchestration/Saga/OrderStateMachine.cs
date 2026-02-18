@@ -72,6 +72,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     ctx.Saga.CustomerName  = ctx.Message.CustomerName;
                     ctx.Saga.CustomerEmail = ctx.Message.CustomerEmail;
                     ctx.Saga.CustomerId    = ctx.Message.CustomerId;
+                    ctx.Saga.BasketClientId = ctx.Message.BasketClientId;
                     ctx.Saga.TotalAmount   = ctx.Message.TotalAmount;
                     ctx.Saga.PaymentId     = ctx.Message.PaymentId;
                     ctx.Saga.ReservationId = ctx.Message.ReservationId;
@@ -105,7 +106,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Publish(ctx => new EmptyBasketCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    ClientId = ctx.Saga.CustomerId
+                    ClientId = ctx.Saga.BasketClientId
                 })
                 .Publish(ctx => new ScheduleShippingCommand
                 {

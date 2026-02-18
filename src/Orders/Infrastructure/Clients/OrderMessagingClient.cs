@@ -15,13 +15,14 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
         _publishEndpoint = publishEndpoint;
     }
 
-    public Task PublishOrderSubmitted(Order order, CancellationToken ct = default)
+    public Task PublishOrderSubmitted(Order order, Guid basketClientId, CancellationToken ct = default)
         => _publishEndpoint.Publish(new OrderSubmittedEvent
         {
             OrderId = order.Id,
             CustomerName = order.Customer?.Name ?? string.Empty,
             CustomerEmail = order.Customer?.Email ?? string.Empty,
             CustomerId = order.CustomerId,
+            BasketClientId = basketClientId,
             TotalAmount = Convert.ToDecimal(order.TotalPrice),
             PaymentId = order.Payment?.Id ?? Guid.Empty,
             ReservationId = order.Stock?.ReservationId ?? Guid.Empty,

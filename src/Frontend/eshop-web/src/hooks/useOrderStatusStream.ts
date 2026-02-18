@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { msalInstance, loginRequest } from "../auth/msalConfig";
+import { useClientId } from "./useClientId";
 
 interface OrderStatusEvent {
   orderId: string;
@@ -11,7 +12,8 @@ interface OrderStatusEvent {
 }
 
 export function useOrderStatusStream(orderId: string | undefined) {
-  const queryClient = useQueryClient();
+const queryClient = useQueryClient();
+const clientId = useClientId();
 
   const invalidateOrder = useCallback(
     () => {
@@ -62,8 +64,11 @@ export function useOrderStatusStream(orderId: string | undefined) {
           const data: OrderStatusEvent = JSON.parse(event.data);
           console.log("[SSE] Order status update:", data.status);
 
-          // Refetch order data to get the full updated object
           invalidateOrder();
+
+          if (data.status === "Paid") {
+            queryClient.invalidateQueries({ queryKey: ["basket", clientId] });
+          }
         } catch (err) {
           console.error("[SSE] Failed to parse event:", err);
         }
@@ -82,5 +87,5 @@ export function useOrderStatusStream(orderId: string | undefined) {
       eventSource?.close();
       clearTimeout(retryTimeout);
     };
-  }, [orderId, invalidateOrder]);
+  }, [orderId, invalidateOrder, clientId, queryClient]);
 }

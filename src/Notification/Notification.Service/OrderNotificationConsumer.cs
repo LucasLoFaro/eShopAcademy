@@ -80,7 +80,14 @@ IConsumer<OrderStatusUpdatedEvent>
 
     private async Task SendAsync(string email, string subject, string html, string template, Guid orderId)
     {
-        await _emailSender.SendAsync(email, subject, html);
-        _logger.LogInformation("[Notification] Sent '{Template}' email to {Email} for order {OrderId}.", template, email, orderId);
+        try
+        {
+            await _emailSender.SendAsync(email, subject, html);
+            _logger.LogInformation("[Notification] Sent '{Template}' email to {Email} for order {OrderId}.", template, email, orderId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[Notification] Failed to send '{Template}' email to {Email} for order {OrderId}.", template, email, orderId);
+        }
     }
 }

@@ -4,7 +4,6 @@ using Payments.Messaging.Consumers;
 using ServiceDefaults;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
 
 builder.AddServiceDefaults()
        .WithMassTransit((context, cfg) =>

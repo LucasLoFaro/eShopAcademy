@@ -58,8 +58,9 @@ export interface BasketWithDetails {
 
 // Orders
 export interface OrderRequest {
-  customerId: string;
-  items: { productID: string; quantity: number; price: number }[];
+customerId: string;
+basketClientId: string;
+items: { productID: string; quantity: number; price: number }[];
   shippingAddress: {
     street: string;
     number: string;

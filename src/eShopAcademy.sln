@@ -183,25 +183,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customers.Tests", "Customer
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Customers.Infrastructure", "Customers.Infrastructure", "{EB50222C-4930-64E5-097D-C88244D2CC98}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "eshop-web(1)", "Frontend\eshop-web\", "{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_53399"
-		Debug.AspNetCompiler.PhysicalPath = "Frontend\eshop-web\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53399\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_53399"
-		Release.AspNetCompiler.PhysicalPath = "Frontend\eshop-web\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_53399\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "53399"
-		SlnRelativePath = "Frontend\eshop-web\"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C875804F-784F-4AB6-8AC9-BB26B2D83992}"
+	ProjectSection(SolutionItems) = preProject
+		Frontend\eshop-web\.env = Frontend\eshop-web\.env
+		Frontend\eshop-web\.gitignore = Frontend\eshop-web\.gitignore
+		Frontend\eshop-web\CHECKOUT_FLOW.md = Frontend\eshop-web\CHECKOUT_FLOW.md
+		Frontend\eshop-web\eshop-web.esproj = Frontend\eshop-web\eshop-web.esproj
+		Frontend\eshop-web\eslint.config.js = Frontend\eshop-web\eslint.config.js
+		Frontend\eshop-web\index.html = Frontend\eshop-web\index.html
+		Frontend\eshop-web\package-lock.json = Frontend\eshop-web\package-lock.json
+		Frontend\eshop-web\package.json = Frontend\eshop-web\package.json
+		Frontend\eshop-web\README.md = Frontend\eshop-web\README.md
+		Frontend\eshop-web\tsconfig.app.json = Frontend\eshop-web\tsconfig.app.json
+		Frontend\eshop-web\tsconfig.json = Frontend\eshop-web\tsconfig.json
+		Frontend\eshop-web\tsconfig.node.json = Frontend\eshop-web\tsconfig.node.json
+		Frontend\eshop-web\vite.config.ts = Frontend\eshop-web\vite.config.ts
 	EndProjectSection
 EndProject
 Global
@@ -886,18 +882,6 @@ Global
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x64.Build.0 = Release|Any CPU
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x86.ActiveCfg = Release|Any CPU
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x86.Build.0 = Release|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|x64.Build.0 = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Debug|x86.Build.0 = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|x64.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|x64.Build.0 = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|x86.ActiveCfg = Debug|Any CPU
-		{6F0CDA29-6D43-F307-85BE-CC5B8E8002D0}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

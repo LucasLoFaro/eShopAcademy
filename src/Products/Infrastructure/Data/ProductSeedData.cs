@@ -252,14 +252,20 @@ public static class ProductSeedData
             {
                 var p = products[idx];
                 Enrich(p, idx);
-                p.Category = categoryMap[p.CategoryId];
+                var cat = categoryMap[p.CategoryId];
+                p.Category = new Category { Id = cat.Id, Name = cat.Name };
                 p.Specs = SpecsForCategory(p.CategoryId);
                 p.Faqs = DefaultFaqs(p.Name);
             }
 
-            context.Products.AddRange(products);
-
-            await context.SaveChangesAsync();
+            // Save each product individually to avoid EF Core owned-entity
+            // tracking conflicts (multiple Category instances share the same Id).
+            foreach (var product in products)
+            {
+                context.Products.Add(product);
+                await context.SaveChangesAsync();
+                context.ChangeTracker.Clear();
+            }
 
             foreach (var product in products)
                 await messaging.SendProductUpdate(product);
@@ -275,7 +281,10 @@ public static class ProductSeedData
             if (toUpdate.Count > 0)
             {
                 foreach (var p in toUpdate)
-                    p.Category = categoryMap[p.CategoryId];
+                {
+                    var cat = categoryMap[p.CategoryId];
+                    p.Category = new Category { Id = cat.Id, Name = cat.Name };
+                }
 
                 // Fix image URLs that still point at picsum or loremflickr
                 foreach (var p in toUpdate.Where(p => p.ImageUrl.Contains("picsum.photos") || p.ImageUrl.Contains("loremflickr")))

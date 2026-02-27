@@ -8,6 +8,7 @@ public class ProductSearchFilter
     public double? MaxPrice { get; set; }
     public bool? Deals { get; set; }
     public bool? InStock { get; set; }
+    public double? MinRating { get; set; }
     public string? Sort { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Layout from "./components/Layout";
 import RequireAuth from "./components/RequireAuth";
+import HomePage from "./pages/HomePage";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import BasketPage from "./pages/BasketPage";
@@ -22,7 +23,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route index element={<ProductListPage />} />
+            <Route index element={<HomePage />} />
+            <Route path="search" element={<ProductListPage />} />
             <Route path="products/:id" element={<ProductDetailPage />} />
             <Route path="basket" element={<RequireAuth><BasketPage /></RequireAuth>} />
             <Route path="wishlist" element={<RequireAuth><WishlistPage /></RequireAuth>} />

@@ -57,6 +57,9 @@ static async Task SeedTestData(WebApplication app)
         var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
         await db.Database.EnsureCreatedAsync();
 
+        if (await db.Products.AsNoTracking().FirstOrDefaultAsync() != null)
+            return;
+
         var messagingService = scope.ServiceProvider.GetRequiredService<IProductMessagingService>();
         await ProductSeedData.InitializeAsync(db, messagingService);
     }

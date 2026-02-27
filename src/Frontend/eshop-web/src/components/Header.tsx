@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useMsal, useIsAuthenticated } from "@azure/msal-react";
 import { handleLogin, handleLogout } from "../auth/authHelpers";
 import { useUser } from "../hooks/useUser";
@@ -19,20 +19,20 @@ const CartIcon = () => (
 );
 
 const categories = [
-  { name: "Peripherals", href: "/?cat=Peripherals" },
-  { name: "Audio", href: "/?cat=Audio" },
-  { name: "Accessories", href: "/?cat=Accessories" },
-  { name: "Monitors", href: "/?cat=Monitors" },
-  { name: "Storage", href: "/?cat=Storage" },
-  { name: "Networking", href: "/?cat=Networking" },
-  { name: "Gaming", href: "/?cat=Gaming" },
-  { name: "Laptops", href: "/?cat=Laptops" },
+  { name: "Peripherals", href: "/search?cat=Peripherals" },
+  { name: "Audio", href: "/search?cat=Audio" },
+  { name: "Accessories", href: "/search?cat=Accessories" },
+  { name: "Monitors", href: "/search?cat=Monitors" },
+  { name: "Storage", href: "/search?cat=Storage" },
+  { name: "Networking", href: "/search?cat=Networking" },
+  { name: "Gaming", href: "/search?cat=Gaming" },
+  { name: "Laptops", href: "/search?cat=Laptops" },
 ];
 const navLinks = [
-  { label: "Best Sellers", href: "/?sort=best-sellers" },
-  { label: "New Releases", href: "/?sort=new" },
-  { label: "Today's Deals", href: "/?deals=true" },
-  { label: "Top Rated", href: "/?sort=rating" },
+  { label: "Best Sellers", href: "/search?sort=best-sellers" },
+  { label: "New Releases", href: "/search?sort=new" },
+  { label: "Today's Deals", href: "/search?deals=true" },
+  { label: "Top Rated", href: "/search?sort=rating" },
 ];
 
 export default function Header() {
@@ -49,6 +49,8 @@ export default function Header() {
   const basketRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+  const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
   
   // Mock notifications data (will be replaced with real data later)
   const notifications = [
@@ -74,20 +76,20 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50">
       <div className="bg-gray-900 text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+        <div className="mx-auto flex items-center px-4 py-2 gap-4">
+          <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight shrink-0">
             <span className="text-2xl">&#128722;</span>
             <span>eShop <span className="font-light text-amber-400">Academy</span></span>
           </Link>
-          <div className="mx-8 hidden flex-1 md:block">
-            <div className="flex rounded-md overflow-hidden">
-              <input type="text" placeholder="Search products..." className="w-full bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none" />
-              <button className="bg-amber-400 px-4 text-gray-900 hover:bg-amber-500">
+          <div className="hidden flex-1 md:block">
+            <form className="flex rounded-md overflow-hidden" onSubmit={(e) => { e.preventDefault(); if (searchText.trim()) navigate(`/search?searchText=${encodeURIComponent(searchText.trim())}`); }}>
+              <input type="text" placeholder="Search eShop Academy" value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none" />
+              <button type="submit" className="bg-amber-400 px-5 text-gray-900 hover:bg-amber-500 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </button>
-            </div>
+            </form>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             {isAuthenticated && user ? (
               <div className="hidden sm:flex items-center gap-2">
                 {user.photoUrl ? (
@@ -251,20 +253,29 @@ export default function Header() {
         </div>
       </div>
       <div className="relative z-40 bg-gray-800 text-white text-sm">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-1.5">
+        <div className="mx-auto flex max-w-7xl items-center px-4 py-0">
           <div ref={catRef} className="relative flex-shrink-0">
-            <button onClick={() => setCatOpen(!catOpen)} className="flex items-center gap-1 font-bold hover:text-amber-400">
+            <button onClick={() => setCatOpen(!catOpen)} className="flex items-center gap-1.5 font-bold hover:bg-gray-700 px-3 py-2 rounded transition">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-              All Categories
+              All
             </button>
             {catOpen && (
-              <div className="absolute left-0 top-full mt-1 w-56 rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl z-50">
-                {categories.map((cat) => <Link key={cat.name} to={cat.href} onClick={() => setCatOpen(false)} className="block px-4 py-2 text-sm hover:bg-gray-100">{cat.name}</Link>)}
+              <div className="absolute left-0 top-full mt-0.5 w-64 rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl z-50 py-1">
+                <p className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Shop by Category</p>
+                {categories.map((cat) => (
+                  <Link key={cat.name} to={cat.href} onClick={() => setCatOpen(false)} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-gray-50 transition">
+                    {cat.name}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
-          {navLinks.map((link) => <Link key={link.label} to={link.href} className="whitespace-nowrap hover:text-amber-400">{link.label}</Link>)}
-          <span className="ml-auto whitespace-nowrap text-amber-400 font-semibold">Special Offers!</span>
+          <div className="h-5 w-px bg-gray-600 mx-1" />
+          {navLinks.map((link) => <Link key={link.label} to={link.href} className="whitespace-nowrap hover:bg-gray-700 px-3 py-2 rounded transition">{link.label}</Link>)}
+          <Link to="/search?deals=true" className="ml-auto flex items-center gap-1.5 whitespace-nowrap bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 font-bold px-3 py-1 rounded-full text-xs hover:from-amber-400 hover:to-orange-400 transition">
+            <span>🔥</span> Special Offers
+          </Link>
         </div>
       </div>
     </header>

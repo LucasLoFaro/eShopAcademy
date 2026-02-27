@@ -128,6 +128,28 @@ export type OrderStatus =
   | "Cancelled"
   | "Error";
 
+// Search
+export interface ProductSearchFilter {
+  searchText?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  deals?: boolean;
+  inStock?: boolean;
+  minRating?: number;
+  sort?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 // Customer
 export interface Customer {
   id: string;

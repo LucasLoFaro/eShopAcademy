@@ -50,49 +50,56 @@ public class ProductsRepository : IProductsRepository
 
     public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter)
     {
-        var query = _context.Products.AsQueryable();
+        // Cosmos DB emulator has limited query translation, so we filter in memory.
+        // This matches the pattern used by the existing GetAllAsync/Get endpoint.
+        var products = await _context.Products.ToListAsync();
+        var results = products.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(filter.SearchText))
         {
-            var searchText = filter.SearchText.ToLower();
-            query = query.Where(p =>
-                p.Name.ToLower().Contains(searchText) ||
-                p.Description.ToLower().Contains(searchText));
+            var searchText = filter.SearchText;
+            results = results.Where(p =>
+                p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                p.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Category))
-            query = query.Where(p => p.Category != null && p.Category.Name.ToLower().Contains(filter.Category.ToLower()));
+            results = results.Where(p => p.Category != null && p.Category.Name.Contains(filter.Category, StringComparison.OrdinalIgnoreCase));
 
         if (filter.MinPrice.HasValue)
-            query = query.Where(p => (p.DealPrice ?? p.Price) >= filter.MinPrice.Value);
+            results = results.Where(p => (p.DealPrice ?? p.Price) >= filter.MinPrice.Value);
 
         if (filter.MaxPrice.HasValue)
-            query = query.Where(p => (p.DealPrice ?? p.Price) <= filter.MaxPrice.Value);
+            results = results.Where(p => (p.DealPrice ?? p.Price) <= filter.MaxPrice.Value);
 
         if (filter.Deals == true)
-            query = query.Where(p => p.IsDeal);
+            results = results.Where(p => p.IsDeal);
 
-        var totalCount = await query.CountAsync();
+        if (filter.MinRating.HasValue)
+            results = results.Where(p => p.Rating >= filter.MinRating.Value);
 
-        query = filter.Sort switch
+        var filtered = results.ToList();
+        var totalCount = filtered.Count;
+
+        IEnumerable<Product> sorted = filter.Sort switch
         {
-            "price-asc" => query.OrderBy(p => p.DealPrice ?? p.Price),
-            "price-desc" => query.OrderByDescending(p => p.DealPrice ?? p.Price),
-            "rating" => query.OrderByDescending(p => p.Rating),
-            "new" => query.OrderByDescending(p => p.CreatedAt),
-            "best-sellers" => query.OrderByDescending(p => p.ReviewCount),
-            "name-asc" => query.OrderBy(p => p.Name),
-            "name-desc" => query.OrderByDescending(p => p.Name),
-            _ => query.OrderByDescending(p => p.CreatedAt)
+            "price-asc" => filtered.OrderBy(p => p.DealPrice ?? p.Price),
+            "price-desc" => filtered.OrderByDescending(p => p.DealPrice ?? p.Price),
+            "rating" => filtered.OrderByDescending(p => p.Rating),
+            "new" => filtered.OrderByDescending(p => p.CreatedAt),
+            "best-sellers" => filtered.OrderByDescending(p => p.ReviewCount),
+            "name-asc" => filtered.OrderBy(p => p.Name),
+            "name-desc" => filtered.OrderByDescending(p => p.Name),
+            _ => filtered.OrderByDescending(p => p.CreatedAt)
         };
 
         var page = Math.Max(1, filter.Page);
         var pageSize = Math.Clamp(filter.PageSize, 1, 100);
 
-        var items = await query
+        var items = sorted
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
+            .ToList();
 
         return new PagedResult<Product>
         {

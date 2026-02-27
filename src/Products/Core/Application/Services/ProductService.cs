@@ -1,4 +1,5 @@
 ﻿using Core.Application.Interfaces.Data;
+using Domain.Products.Contracts;
 using Domain.Products.Entities;
 using Core.Application.Interfaces.Services;
 
@@ -38,4 +39,7 @@ public class ProductService : IProductService
         await _productsRepository.DeleteAsync(product);
         await _messaging.SendProductDelete(product);
     }
+
+    public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter)
+        => await _productsRepository.SearchAsync(filter);
 }

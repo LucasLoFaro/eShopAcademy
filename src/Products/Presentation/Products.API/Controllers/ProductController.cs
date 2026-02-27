@@ -1,4 +1,5 @@
-﻿using Domain.Products.Entities;
+﻿using Domain.Products.Contracts;
+using Domain.Products.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Core.Application.Interfaces.Services;
 
@@ -43,6 +44,13 @@ namespace API.Controllers
             };
 
             return Ok(products);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] ProductSearchFilter filter)
+        {
+            var result = await _productService.SearchAsync(filter);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

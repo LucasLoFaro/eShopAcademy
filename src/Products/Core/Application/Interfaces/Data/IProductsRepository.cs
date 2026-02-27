@@ -1,4 +1,5 @@
-﻿using Domain.Products.Entities;
+﻿using Domain.Products.Contracts;
+using Domain.Products.Entities;
 
 namespace Core.Application.Interfaces.Data;
 
@@ -9,4 +10,5 @@ public interface IProductsRepository
     public Task<Product?> GetMostExpensive();
     public Task AddOrUpdateAsync(Product product);
     public Task DeleteAsync(Product product);
+    public Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter);
 }

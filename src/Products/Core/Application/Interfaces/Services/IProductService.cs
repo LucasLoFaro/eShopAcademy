@@ -1,4 +1,5 @@
-﻿using Domain.Products.Entities;
+﻿using Domain.Products.Contracts;
+using Domain.Products.Entities;
 
 namespace Core.Application.Interfaces.Services;
 
@@ -9,4 +10,5 @@ public interface IProductService
     Task<IEnumerable<Product>> GetAllAsync();
     Task<Product?> GetByIdAsync(Guid id);
     Task<Product?> GetMostExpensive();
+    Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter);
 }

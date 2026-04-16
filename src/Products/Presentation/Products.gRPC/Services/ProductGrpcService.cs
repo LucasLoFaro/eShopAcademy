@@ -32,7 +32,8 @@ public class ProductGrpcService : ProductService.ProductServiceBase
             Price = (double)product.Price,
             Description = product.Description ?? "",
             ImageUrl = product.ImageUrl ?? "",
-            CategoryId = product.CategoryId
+            CategoryId = product.CategoryId,
+            SellerId = product.SellerId.ToString()
         };
     }
 }

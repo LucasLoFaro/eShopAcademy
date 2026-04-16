@@ -28,6 +28,9 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> customersMessaging,
         IResourceBuilder<ProjectResource> operationsApi,
         IResourceBuilder<ProjectResource> operationsService,
+        IResourceBuilder<ProjectResource> sellersApi,
+        IResourceBuilder<ProjectResource> sellersService,
+        IResourceBuilder<ProjectResource> sellersEventsProcessor,
         IResourceBuilder<ProjectResource> gateway)
     {
         var redis = builder.AddRedis("redis")
@@ -42,6 +45,7 @@ public static class EnvironmentSetup
         var customersdb = mongo.AddDatabase("customers");
         var shippingdb = mongo.AddDatabase("shipping");
         var operationsdb = mongo.AddDatabase("operations");
+        var sellersdb = mongo.AddDatabase("sellers");
 
         var postgres = builder.AddPostgres("postgres")
             .WithDataVolume("postgres-data")
@@ -78,9 +82,9 @@ public static class EnvironmentSetup
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
+        SellersExtensions.Configure(sellersApi, sellersService, sellersEventsProcessor, sellersdb, rabbit);
         GatewayExtensions.Configure(gateway);
     }
 }
-
 
 

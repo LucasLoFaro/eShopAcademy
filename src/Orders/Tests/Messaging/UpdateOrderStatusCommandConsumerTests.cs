@@ -5,6 +5,7 @@ using Domain.Orders.Enums;
 using FluentAssertions;
 using Infrastructure.Data;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Orders.Messaging.Consumers;
@@ -17,7 +18,15 @@ public class UpdateOrderStatusCommandConsumerTests
     private readonly Mock<IOrderRepository> _orders = new();
 
     private UpdateOrderStatusCommandConsumer CreateSut() =>
-        new(_orders.Object, NullLogger<UpdateOrderStatusCommandConsumer>.Instance);
+        new(
+            _orders.Object,
+            new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Sellers:CommissionRate"] = "0.10"
+                })
+                .Build(),
+            NullLogger<UpdateOrderStatusCommandConsumer>.Instance);
 
     [Theory]
     [AutoData]
@@ -61,7 +70,7 @@ public class UpdateOrderStatusCommandConsumerTests
     [AutoData]
     public async Task Consume_WhenOrderAlreadyDelivered_DoesNotUpdate(UpdateOrderStatusCommand command)
     {
-        // Arrange: terminal state — should not be overwritten
+        // Arrange: terminal state should not be overwritten
         var cmd = command with { Status = "Processing" };
         var order = new Order { Status = OrderStatus.Delivered };
 

@@ -22,4 +22,5 @@ public class Order : BaseEntity
     public OrderStockReservationInfo Stock { get; set; } = new();
     public OrderOperationsInfo Operations { get; set; } = new();
     public OrderBillingInfo Billing { get; set; } = new();
+    public DateTime? SellerSalesRegisteredAt { get; set; }
 }

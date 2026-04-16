@@ -20,13 +20,17 @@ namespace API.Controllers
         public async Task<IActionResult> Get(
             [FromQuery] string? sort = null,
             [FromQuery] string? cat = null,
-            [FromQuery] bool? deals = null)
+            [FromQuery] bool? deals = null,
+            [FromQuery] Guid? sellerId = null)
         {
             var products = (await _productService.GetAllAsync()).ToList();
 
             if (!string.IsNullOrEmpty(cat))
                 products = products.Where(p =>
                     p.Category != null && p.Category.Name.Contains(cat, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (sellerId.HasValue)
+                products = products.Where(p => p.SellerId == sellerId.Value).ToList();
 
             if (deals == true)
                 products = products.Where(p => p.IsDeal).ToList();

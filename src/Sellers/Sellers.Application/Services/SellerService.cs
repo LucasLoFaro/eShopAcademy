@@ -1,6 +1,7 @@
 using Domain.Common.Events.Sellers;
 using Domain.Sellers.Contracts;
 using Domain.Sellers.Entities;
+using Domain.Sellers.Enums;
 using MassTransit;
 using Sellers.Application.Repositories;
 
@@ -36,6 +37,39 @@ public class SellerService : ISellerService
     public Task<Seller?> GetByIdAsync(Guid sellerId, CancellationToken cancellationToken)
         => _repository.GetByIdAsync(sellerId, cancellationToken);
 
+    public async Task<Seller?> UpdateStatusAsync(Guid sellerId, SellerStatus status, CancellationToken cancellationToken)
+    {
+        var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
+
+        if (seller is null)
+        {
+            return null;
+        }
+
+        seller.Status = status;
+        return await _repository.UpdateAsync(seller, cancellationToken);
+    }
+
+    public async Task<Seller?> AssignPublishedProductsAsync(
+        Guid sellerId,
+        IEnumerable<Guid> productIds,
+        CancellationToken cancellationToken)
+    {
+        var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
+
+        if (seller is null)
+        {
+            return null;
+        }
+
+        seller.PublishedProductIds = productIds
+            .Where(id => id != Guid.Empty)
+            .Distinct()
+            .ToList();
+
+        return await _repository.UpdateAsync(seller, cancellationToken);
+    }
+
     public async Task<Seller?> RegisterSaleAsync(
         Guid sellerId,
         Guid orderId,
@@ -50,6 +84,14 @@ public class SellerService : ISellerService
         if (seller is null)
         {
             return null;
+        }
+
+        if (seller.Ledger.Any(entry =>
+                entry.OrderId == orderId &&
+                entry.OrderItemId == orderItemId &&
+                entry.Type == SellerLedgerEntryType.Sale))
+        {
+            return seller;
         }
 
         seller.AccumulatedSalesAmount += grossAmount;

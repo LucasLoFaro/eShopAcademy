@@ -28,8 +28,57 @@ app.MapGet("/api/sellers/{sellerId:guid}", async (Guid sellerId, ISellerService 
 
 app.MapPost("/api/sellers", async (CreateSellerRequest request, ISellerService sellerService, CancellationToken cancellationToken) =>
 {
+    if (string.IsNullOrWhiteSpace(request.Name) ||
+        string.IsNullOrWhiteSpace(request.Email) ||
+        string.IsNullOrWhiteSpace(request.TaxId))
+    {
+        return Results.BadRequest("Name, Email and TaxId are required.");
+    }
+
     var seller = await sellerService.CreateAsync(request, cancellationToken);
     return Results.Created($"/api/sellers/{seller.Id}", SellerResponse.FromSeller(seller));
+});
+
+app.MapPut("/api/sellers/{sellerId:guid}/status", async (
+    Guid sellerId,
+    UpdateSellerStatusRequest request,
+    ISellerService sellerService,
+    CancellationToken cancellationToken) =>
+{
+    var seller = await sellerService.UpdateStatusAsync(sellerId, request.Status, cancellationToken);
+    return seller is null ? Results.NotFound() : Results.Ok(SellerResponse.FromSeller(seller));
+});
+
+app.MapPut("/api/sellers/{sellerId:guid}/products", async (
+    Guid sellerId,
+    AssignSellerProductsRequest request,
+    ISellerService sellerService,
+    CancellationToken cancellationToken) =>
+{
+    var seller = await sellerService.AssignPublishedProductsAsync(sellerId, request.ProductIds, cancellationToken);
+    return seller is null ? Results.NotFound() : Results.Ok(SellerResponse.FromSeller(seller));
+});
+
+app.MapGet("/api/sellers/{sellerId:guid}/ledger", async (
+    Guid sellerId,
+    int? skip,
+    int? take,
+    ISellerService sellerService,
+    CancellationToken cancellationToken) =>
+{
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null)
+    {
+        return Results.NotFound();
+    }
+
+    var entries = seller.Ledger
+        .OrderByDescending(entry => entry.CreatedAt)
+        .Skip(Math.Max(skip ?? 0, 0))
+        .Take(Math.Clamp(take ?? 50, 1, 500))
+        .Select(SellerLedgerEntryResponse.FromEntry);
+
+    return Results.Ok(entries);
 });
 
 app.UseDefaultEndpoints();

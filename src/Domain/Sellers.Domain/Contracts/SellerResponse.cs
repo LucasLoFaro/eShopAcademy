@@ -12,6 +12,7 @@ public record SellerResponse(
     SellerAddress Address,
     decimal AccumulatedSalesAmount,
     decimal AccumulatedCommissionsAmount,
+    int PublishedProducts,
     int LedgerEntries)
 {
     public static SellerResponse FromSeller(Seller seller) =>
@@ -24,5 +25,6 @@ public record SellerResponse(
             seller.Address,
             seller.AccumulatedSalesAmount,
             seller.AccumulatedCommissionsAmount,
+            seller.PublishedProductIds.Count,
             seller.Ledger.Count);
 }

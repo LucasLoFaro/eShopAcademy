@@ -17,6 +17,7 @@ public class Product : BaseEntity
 
     public string CategoryId { get; set; } = "";
     public Category? Category { get; set; }
+    public Guid SellerId { get; set; }
 
     // ── Enhanced fields ──
     public List<string> AdditionalImages { get; set; } = [];

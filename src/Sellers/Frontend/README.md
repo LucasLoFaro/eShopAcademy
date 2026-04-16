@@ -1,21 +1,27 @@
-# Sellers Frontend (Planned)
+# Sellers Frontend (Microfrontend Starter)
 
-This folder is reserved for the dedicated Sellers frontend application.
+This folder now contains the initial Sellers microfrontend shell built with React + Vite.
 
-## Architecture direction
-- It should be implemented as a **microfrontend**.
-- It will be exposed under the same platform surface using a dedicated host such as `sellers.eshopacademy.com`.
+## Run locally
+```bash
+cd src/Sellers/Frontend
+npm install
+npm run dev
+```
 
-## Planned initial capabilities
-- Seller registration flow.
-- Seller management dashboard for:
-  - published products;
-  - creating new products;
-  - managing stock levels.
-- Sales insights:
-  - current sales summary;
-  - transaction history based on seller ledger entries.
+The portal runs on `http://localhost:5174`.
 
-## Operations integration
-- Once a seller is registered, they will manage operational order actions in the Operations frontend (pack, ship, cancel, etc.).
-- Access control will require ABAC to limit scope to the seller's own products/orders.
+## Environment variables
+- `VITE_SELLERS_API_BASE_URL` (default: `http://localhost:8010`)
+- `VITE_DEFAULT_SELLER_ID` (default: empty GUID placeholder)
+
+## Current capabilities (Phase 5 bootstrap)
+- Seller dashboard shell.
+- Financial summary cards loaded from Sellers API.
+- Recent ledger transaction list loaded from Sellers API.
+
+## Planned next capabilities
+- Seller registration and onboarding UX.
+- Product catalog management for seller-owned products.
+- Stock updates for seller-owned SKUs.
+- Deep links and scoped workflow handoff to Operations frontend.

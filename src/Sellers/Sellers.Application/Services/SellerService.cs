@@ -40,7 +40,6 @@ public class SellerService : ISellerService
     public async Task<Seller?> UpdateStatusAsync(Guid sellerId, SellerStatus status, CancellationToken cancellationToken)
     {
         var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
-
         if (seller is null)
         {
             return null;
@@ -56,7 +55,6 @@ public class SellerService : ISellerService
         CancellationToken cancellationToken)
     {
         var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
-
         if (seller is null)
         {
             return null;

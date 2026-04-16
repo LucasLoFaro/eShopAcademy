@@ -69,6 +69,12 @@ var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-we
                       .WithEndpoint("http", e => e.Port = 5173)
                       .WithEnvironment("VITE_GATEWAY_URL", gateway.GetEndpoint("gateway"));
 
+// Sellers Frontend Microfrontend (React + Vite)
+var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Sellers/Frontend")
+                             .WithEndpoint("http", e => e.Port = 5174)
+                             .WithEnvironment("VITE_SELLERS_API_BASE_URL", sellersApi.GetEndpoint("sellers-api"))
+                             .WithEnvironment("VITE_DEFAULT_SELLER_ID", "00000000-0000-0000-0000-000000000000");
+
 
 if (builder.Environment.IsDevelopment())
 EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);

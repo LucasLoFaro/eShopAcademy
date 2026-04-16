@@ -97,7 +97,7 @@ public class OrderStateMachineTests : IAsyncLifetime
 
         Assert.NotNull(emptyBasketConsume);
         Assert.Equal(submittedEvent.OrderId, emptyBasketConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.CustomerId, emptyBasketConsume.Context.Message.ClientId);
+        Assert.Equal(submittedEvent.BasketClientId, emptyBasketConsume.Context.Message.ClientId);
 
         var scheduleConsume = await _harness.Published
             .SelectAsync<ScheduleShippingCommand>()

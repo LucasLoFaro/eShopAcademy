@@ -25,6 +25,11 @@ var paymentsMessaging = builder.AddProject<Projects.Payments_Messaging>("eshopac
 var operationsApi = builder.AddProject<Projects.Operations_Api>("eshopacademy-operations-api");
 var operationsService = builder.AddProject<Projects.Operations_Service>("eshopacademy-operations-service");
 
+// Sellers
+var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api");
+var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-sellers-service");
+var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
+
 // Shipping
 var shippingApi = builder.AddProject<Projects.Shipping_Api>("eshopacademy-shipping-api");
 var shippingService = builder.AddProject<Projects.Shipping_Service>("eshopacademy-shipping-service");
@@ -56,16 +61,23 @@ var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")
                      .WithReference(customersApi)
                      .WithReference(paymentsApi)
                      .WithReference(shippingApi)
-                     .WithReference(operationsApi);
+                     .WithReference(operationsApi)
+                     .WithReference(sellersApi);
 
 // Consumer Frontend (React + Vite)
 var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-web")
                       .WithEndpoint("http", e => e.Port = 5173)
                       .WithEnvironment("VITE_GATEWAY_URL", gateway.GetEndpoint("gateway"));
 
+// Sellers Frontend Microfrontend (React + Vite)
+var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Sellers/Frontend")
+                             .WithEndpoint("http", e => e.Port = 5174)
+                             .WithEnvironment("VITE_SELLERS_API_BASE_URL", sellersApi.GetEndpoint("sellers-api"))
+                             .WithEnvironment("VITE_DEFAULT_SELLER_ID", "00000000-0000-0000-0000-000000000000");
+
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
 
 
 // Build and run the distributed application

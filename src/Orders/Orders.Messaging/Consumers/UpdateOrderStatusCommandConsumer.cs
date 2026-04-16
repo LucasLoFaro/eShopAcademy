@@ -11,13 +11,16 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
 {
     private readonly IOrderRepository _orders;
     private readonly ILogger<UpdateOrderStatusCommandConsumer> _logger;
+    private readonly decimal _sellerCommissionRate;
 
     public UpdateOrderStatusCommandConsumer(
         IOrderRepository orders,
+        IConfiguration configuration,
         ILogger<UpdateOrderStatusCommandConsumer> logger)
     {
         _orders = orders;
         _logger = logger;
+        _sellerCommissionRate = configuration.GetValue<decimal?>("Sellers:CommissionRate") ?? 0.10m;
     }
 
     public async Task Consume(ConsumeContext<UpdateOrderStatusCommand> context)
@@ -123,6 +126,37 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
             TrackingNumber = command.TrackingNumber,
             Carrier = command.Carrier
         }, context.CancellationToken);
+
+        if (newStatus == OrderStatus.Paid && order.SellerSalesRegisteredAt is null)
+        {
+            foreach (var item in order.Items)
+            {
+                if (item.Product is null || item.Product.SellerId == Guid.Empty)
+                {
+                    _logger.LogWarning(
+                        "[UpdateOrderStatus] Product {ProductId} from order {OrderId} has no SellerId. Seller sale registration skipped.",
+                        item.ProductID,
+                        order.Id);
+                    continue;
+                }
+
+                var grossAmount = Convert.ToDecimal(item.Price);
+                var commissionAmount = decimal.Round(grossAmount * _sellerCommissionRate, 2, MidpointRounding.AwayFromZero);
+
+                await context.Publish(new OrderSellerSaleRegistrationRequestedEvent
+                {
+                    OrderId = order.Id,
+                    SellerId = item.Product.SellerId,
+                    OrderItemId = item.Id,
+                    GrossAmount = grossAmount,
+                    CommissionAmount = commissionAmount,
+                    Notes = $"Auto-generated from payment capture. CommissionRate={_sellerCommissionRate:P2}"
+                }, context.CancellationToken);
+            }
+
+            order.SellerSalesRegisteredAt = DateTime.UtcNow;
+            await _orders.UpdateAsync(order, context.CancellationToken);
+        }
 
         _logger.LogInformation("[UpdateOrderStatus] Order {OrderId} updated to {Status}.", order.Id, newStatus);
     }

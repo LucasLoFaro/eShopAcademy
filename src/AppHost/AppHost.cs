@@ -25,6 +25,11 @@ var paymentsMessaging = builder.AddProject<Projects.Payments_Messaging>("eshopac
 var operationsApi = builder.AddProject<Projects.Operations_Api>("eshopacademy-operations-api");
 var operationsService = builder.AddProject<Projects.Operations_Service>("eshopacademy-operations-service");
 
+// Sellers
+var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api");
+var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-sellers-service");
+var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
+
 // Shipping
 var shippingApi = builder.AddProject<Projects.Shipping_Api>("eshopacademy-shipping-api");
 var shippingService = builder.AddProject<Projects.Shipping_Service>("eshopacademy-shipping-service");
@@ -56,7 +61,8 @@ var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")
                      .WithReference(customersApi)
                      .WithReference(paymentsApi)
                      .WithReference(shippingApi)
-                     .WithReference(operationsApi);
+                     .WithReference(operationsApi)
+                     .WithReference(sellersApi);
 
 // Consumer Frontend (React + Vite)
 var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-web")
@@ -65,7 +71,7 @@ var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-we
 
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
 
 
 // Build and run the distributed application

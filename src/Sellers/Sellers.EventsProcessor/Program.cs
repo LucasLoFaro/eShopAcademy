@@ -1,3 +1,4 @@
+using MassTransit;
 using Sellers.Application.Repositories;
 using Sellers.Application.Services;
 using Sellers.EventsProcessor.Consumers;

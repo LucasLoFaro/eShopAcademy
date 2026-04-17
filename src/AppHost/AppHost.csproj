@@ -37,6 +37,9 @@
     <ProjectReference Include="..\Payments\Payments.Messaging\Payments.Messaging.csproj" />
     <ProjectReference Include="..\Products\Presentation\Products.API\Products.API.csproj" />
     <ProjectReference Include="..\Products\Presentation\Products.gRPC\Products.gRPC.csproj" />
+    <ProjectReference Include="..\Sellers\Sellers.Api\Sellers.Api.csproj" />
+    <ProjectReference Include="..\Sellers\Sellers.EventsProcessor\Sellers.EventsProcessor.csproj" />
+    <ProjectReference Include="..\Sellers\Sellers.Service\Sellers.Service.csproj" />
     <ProjectReference Include="..\Shipping\Shipping.Api\Shipping.Api.csproj" />
     <ProjectReference Include="..\Shipping\Shipping.Service\Shipping.Service.csproj" />
     <ProjectReference Include="..\Stock\Stock.API\Stock.API.csproj" />

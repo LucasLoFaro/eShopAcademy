@@ -17,4 +17,5 @@ message ProductResponse {
   string description = 4;
   string image_url = 5;
   string category_id = 6;
+  string seller_id = 7;
 }

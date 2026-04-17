@@ -5,6 +5,7 @@ import { handleLogin, handleLogout } from "../auth/authHelpers";
 import { useUser } from "../hooks/useUser";
 import { useBasket, useRemoveFromBasket, useAddToBasket } from "../hooks/useBasket";
 import { useWishlist } from "../hooks/useWishlist";
+import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from "../hooks/useNotifications";
 
 const BellIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -35,6 +36,19 @@ const navLinks = [
   { label: "Top Rated", href: "/search?sort=rating" },
 ];
 
+function formatRelativeTime(dateString: string): string {
+  const now = Date.now();
+  const then = new Date(dateString).getTime();
+  const seconds = Math.floor((now - then) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
 export default function Header() {
   const { instance } = useMsal();
   const isAuthenticated = useIsAuthenticated();
@@ -43,6 +57,9 @@ export default function Header() {
   const removeItem = useRemoveFromBasket();
   const addItem = useAddToBasket();
   const { count: wishlistCount } = useWishlist();
+  const { data: notifications = [] } = useNotifications();
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
   const [basketOpen, setBasketOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -51,14 +68,8 @@ export default function Header() {
   const notifRef = useRef<HTMLDivElement>(null);
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
-  
-  // Mock notifications data (will be replaced with real data later)
-  const notifications = [
-    { id: 1, title: "Order Shipped", message: "Your order #1234 has been shipped", time: "2h ago", unread: true },
-    { id: 2, title: "Payment Confirmed", message: "Payment for order #1233 confirmed", time: "5h ago", unread: true },
-    { id: 3, title: "Item Delivered", message: "Your order #1232 has been delivered", time: "1d ago", unread: false },
-  ];
-  const unreadCount = notifications.filter(n => n.unread).length;
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
   const items = basket?.items ?? [];
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
@@ -128,7 +139,7 @@ export default function Header() {
                     <div className="border-b p-3 flex items-center justify-between">
                       <h3 className="font-semibold text-sm">Notifications</h3>
                       {unreadCount > 0 && (
-                        <button className="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                        <button onClick={() => markAllRead.mutate()} className="text-xs text-amber-600 hover:text-amber-700 font-medium">
                           Mark all read
                         </button>
                       )}
@@ -140,22 +151,23 @@ export default function Header() {
                         {notifications.map((notif) => (
                           <div
                             key={notif.id}
+                            onClick={() => !notif.isRead && markRead.mutate(notif.id)}
                             className={`p-3 hover:bg-gray-50 cursor-pointer ${
-                              notif.unread ? "bg-blue-50" : ""
+                              !notif.isRead ? "bg-blue-50" : ""
                             }`}
                           >
                             <div className="flex items-start gap-2">
-                              {notif.unread && (
+                              {!notif.isRead && (
                                 <div className="mt-1.5 h-2 w-2 rounded-full bg-blue-600 flex-shrink-0" />
                               )}
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                  {notif.title}
+                                  {notif.subject}
                                 </p>
                                 <p className="text-xs text-gray-600 mt-0.5">
-                                  {notif.message}
+                                  {notif.body}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+                                <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(notif.createdAt)}</p>
                               </div>
                             </div>
                           </div>

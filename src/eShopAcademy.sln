@@ -200,6 +200,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C8
 		Frontend\eshop-web\vite.config.ts = Frontend\eshop-web\vite.config.ts
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification\Notification.Api\Notification.Api.csproj", "{05E39293-1D45-3F8B-E655-8F19718C89AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -882,6 +884,18 @@ Global
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x64.Build.0 = Release|Any CPU
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x86.ActiveCfg = Release|Any CPU
 		{38191DD5-B893-41FF-9717-35F97C988252}.Release|x86.Build.0 = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|x64.Build.0 = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|x64.Build.0 = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{05E39293-1D45-3F8B-E655-8F19718C89AD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -963,6 +977,7 @@ Global
 		{B140D5FC-2A53-044A-97BA-15C3D704E7A7} = {29B74B18-ED7A-4DA7-92D0-1DFED43959E1}
 		{38191DD5-B893-41FF-9717-35F97C988252} = {B140D5FC-2A53-044A-97BA-15C3D704E7A7}
 		{EB50222C-4930-64E5-097D-C88244D2CC98} = {29B74B18-ED7A-4DA7-92D0-1DFED43959E1}
+		{05E39293-1D45-3F8B-E655-8F19718C89AD} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4274B344-9898-451A-8F05-24BD02B0A9BA}

@@ -47,6 +47,7 @@ var ordersMessaging = builder.AddProject<Projects.Orders_Messaging>("eshopacadem
 
 // Notification
 var notificationService = builder.AddProject<Projects.Notification_Service>("eshopacademy-notification-service");
+var notificationApi = builder.AddProject<Projects.Notification_Api>("eshopacademy-notification-api");
 
 // API Gateway
 var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")
@@ -56,7 +57,8 @@ var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")
                      .WithReference(customersApi)
                      .WithReference(paymentsApi)
                      .WithReference(shippingApi)
-                     .WithReference(operationsApi);
+                     .WithReference(operationsApi)
+                     .WithReference(notificationApi);
 
 // Consumer Frontend (React + Vite)
 var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-web")
@@ -65,7 +67,7 @@ var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-we
 
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, customersApi, customersMessaging, operationsApi, operationsService, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, notificationApi, customersApi, customersMessaging, operationsApi, operationsService, gateway);
 
 
 // Build and run the distributed application

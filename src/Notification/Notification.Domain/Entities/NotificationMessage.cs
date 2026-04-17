@@ -1,3 +1,5 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Domain.Notification.Enums;
 
 namespace Domain.Notification.Entities;
@@ -12,4 +14,9 @@ public class NotificationMessage : BaseEntity
     public DateTime? SentAt { get; set; }
     public DateTime? FailedAt { get; set; }
     public string? Error { get; set; }
+
+    [BsonRepresentation(BsonType.String)]
+    public Guid OrderId { get; set; }
+    public string Type { get; set; } = string.Empty;
+    public bool IsRead { get; set; }
 }

@@ -18,4 +18,8 @@
 	  <PackageProjectUrl>https://github.com/LucasLoFaro/eShopAcademy</PackageProjectUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+	<PackageReference Include="MongoDB.Bson" Version="3.6.0" />
+  </ItemGroup>
+
 </Project>

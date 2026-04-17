@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NotificationService;
+using NotificationService.Data;
 using NotificationService.Templates;
 using Xunit;
 
@@ -15,8 +16,11 @@ public class OrderNotificationConsumerTests
     private readonly Mock<IEmailSender> _emailSender = new();
     private readonly Mock<IEmailTemplateRenderer> _renderer = new();
 
+    // Uses a dummy connection string — persistence is wrapped in try/catch so tests won't fail
+    private readonly NotificationDbContext _dbContext = new("mongodb://localhost:27017", "notifications-test");
+
     private OrderNotificationConsumer CreateSut() =>
-        new(_emailSender.Object, _renderer.Object, NullLogger<OrderNotificationConsumer>.Instance);
+        new(_emailSender.Object, _renderer.Object, _dbContext, NullLogger<OrderNotificationConsumer>.Instance);
 
     [Theory]
     [AutoData]

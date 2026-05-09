@@ -9,9 +9,9 @@
 	<ItemGroup>
         <!--<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />
 		<PackageReference Include="eShopAcademy.Operations.Domain" Version="1.0.5" />-->
-		<PackageReference Include="MongoDB.Driver" Version="3.6.0" />
-		<PackageReference Include="MassTransit" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+		<PackageReference Include="MongoDB.Driver" Version="3.8.0" />
+		<PackageReference Include="MassTransit" Version="9.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
 		
 		<!--Remove and switch back to nugets once this hits prod-->
 		<ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />

@@ -9,10 +9,10 @@
   <ItemGroup>
     <!-- TODO: switch back to the packaged Orders.Domain after the domain release is ready -->
     <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
-    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>

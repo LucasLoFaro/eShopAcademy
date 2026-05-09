@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Basket.API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/basket/clientId": {
+      "get": {
+        "tags": [
+          "Basket.API"
+        ],
+        "parameters": [
+          {
+            "name": "clientID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/basket/clientId/add": {
+      "post": {
+        "tags": [
+          "Basket.API"
+        ],
+        "parameters": [
+          {
+            "name": "clientID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Item"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/basket/clientId/remove": {
+      "post": {
+        "tags": [
+          "Basket.API"
+        ],
+        "parameters": [
+          {
+            "name": "clientID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Item"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "properties": {
+          "productID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Basket.API"
+    }
+  ]
+}

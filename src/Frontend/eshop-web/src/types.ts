@@ -128,6 +128,17 @@ export type OrderStatus =
   | "Cancelled"
   | "Error";
 
+// Notifications
+export interface NotificationMessage {
+  id: string;
+  subject: string;
+  body: string;
+  type: string;
+  orderId: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 // Search
 export interface ProductSearchFilter {
   searchText?: string;

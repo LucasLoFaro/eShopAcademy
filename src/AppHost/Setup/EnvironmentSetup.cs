@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using AppHost.Setup.Extensions;
 
 
@@ -24,6 +24,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> shippingApi,
         IResourceBuilder<ProjectResource> shippingService,
         IResourceBuilder<ProjectResource> notificationService,
+        IResourceBuilder<ProjectResource> notificationApi,
         IResourceBuilder<ProjectResource> customersApi,
         IResourceBuilder<ProjectResource> customersMessaging,
         IResourceBuilder<ProjectResource> operationsApi,
@@ -45,6 +46,7 @@ public static class EnvironmentSetup
         var customersdb = mongo.AddDatabase("customers");
         var shippingdb = mongo.AddDatabase("shipping");
         var operationsdb = mongo.AddDatabase("operations");
+        var notificationsdb = mongo.AddDatabase("notifications");
         var sellersdb = mongo.AddDatabase("sellers");
 
         var postgres = builder.AddPostgres("postgres")
@@ -78,7 +80,7 @@ public static class EnvironmentSetup
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
-        NotificationExtensions.Configure(notificationService, rabbit, sendGridApiKey);
+        NotificationExtensions.Configure(notificationService, notificationApi, notificationsdb, rabbit, sendGridApiKey);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);

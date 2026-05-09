@@ -10,8 +10,8 @@
   <ItemGroup>
     <!-- TODO: revert to the Stock.Domain package once the temporary project reference is no longer necessary -->
     <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

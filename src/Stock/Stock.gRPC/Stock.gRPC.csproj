@@ -13,16 +13,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Identity" Version="1.17.1" />
+		<PackageReference Include="Azure.Identity" Version="1.21.0" />
 		<!-- TODO: revert to Stock.Domain package once temporary project references are removed -->
 		<!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
-		<PackageReference Include="Google.Protobuf" Version="3.33.5" />
-		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-		<PackageReference Include="Grpc.Tools" Version="2.78.0">
+		<PackageReference Include="Google.Protobuf" Version="3.34.1" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.80.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.80.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>

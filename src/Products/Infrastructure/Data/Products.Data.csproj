@@ -9,9 +9,9 @@
   <ItemGroup>
     <!-- TODO: restore this nuget reference when the Products.Domain package is refreshed -->
     <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="10.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,3 +33,5 @@ app.MapPost("/notifications/read-all", async (string email, INotificationReposit
 app.UseDefaultEndpoints();
 
 app.Run();
+
+public partial class Program { }

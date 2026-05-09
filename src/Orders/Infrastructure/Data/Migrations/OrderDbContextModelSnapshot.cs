@@ -37,6 +37,9 @@ namespace Orders.Data.Migrations
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("SellerSalesRegisteredAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -113,7 +116,8 @@ namespace Orders.Data.Migrations
                             b1.Property<string>("Email")
                                 .IsRequired()
                                 .HasColumnType("text")
-                                .HasColumnName("customer_email");
+                                .HasColumnName("customer_email")
+                                .HasJsonPropertyName("mail");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
@@ -371,6 +375,9 @@ namespace Orders.Data.Migrations
                             b1.Property<float>("Price")
                                 .HasColumnType("real")
                                 .HasColumnName("product_price");
+
+                            b1.Property<Guid>("SellerId")
+                                .HasColumnType("uuid");
 
                             b1.Property<int>("Stock")
                                 .HasColumnType("integer")

@@ -9,9 +9,9 @@
   <ItemGroup>
     <!-- TODO: switch back to the packaged Shipping.Domain version once this change is merged -->
     <!-- <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" /> -->
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.8.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
     <!-- TODO: switch back to the packaged Common.Domain version once this change is merged -->
     <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
   </ItemGroup>

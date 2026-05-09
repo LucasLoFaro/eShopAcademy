@@ -24,7 +24,7 @@ public static partial class Extensions
         builder.Services.AddServiceDiscovery();
         builder.Services.Configure<ServiceDiscoveryOptions>(options =>
         {
-            options.AllowedSchemes = ["https"];
+            options.AllowedSchemes = ["http"];
         });
         builder.Services.ConfigureHttpClientDefaults(http =>
         {

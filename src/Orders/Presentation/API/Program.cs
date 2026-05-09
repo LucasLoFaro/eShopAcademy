@@ -20,8 +20,6 @@ builder.Services.AddSingleton<OrderStatusStreamService>();
 builder.Services.AddControllers()
     .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
 
-AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-
 builder.Services.AddHttpClient<ICustomerServiceClient, CustomerServiceClient>(client =>
 {
     var baseAddress = builder.Configuration["services:eshopacademy-customers-api:customers-api:0"];
@@ -47,6 +45,8 @@ builder.Services.AddHttpClient<IProductServiceClient, ProductServiceClient>(clie
 
     client.BaseAddress = new Uri(baseAddress);
 });
+
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 builder.Services.AddGrpcClient<PaymentGrpc.PaymentGrpcClient>(options =>
 {

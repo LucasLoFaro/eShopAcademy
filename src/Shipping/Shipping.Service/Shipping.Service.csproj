@@ -12,8 +12,8 @@
     <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
     <!-- TODO: revert to the Shipping.Domain package once the nuget workflow is restored -->
     <!-- <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" /> -->
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

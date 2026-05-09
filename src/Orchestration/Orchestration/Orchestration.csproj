@@ -19,14 +19,14 @@
     <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.5" /> -->
     <!-- TODO: switch back to the Orders.Domain nuget once this change has stabilized -->
     <!-- <PackageReference Include="eShopAcademy.Orders.Domain" Version="1.0.1" /> -->
-    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.1" />
-    <PackageReference Include="MassTransit.Quartz" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+    <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.1.0" />
+    <PackageReference Include="MassTransit.Quartz" Version="9.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>

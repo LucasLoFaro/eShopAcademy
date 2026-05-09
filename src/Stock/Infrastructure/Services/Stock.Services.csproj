@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
     <!-- TODO: revert to the Common.Domain package once the local project references are no longer necessary -->
     <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" /> -->
     <!-- TODO: revert to the Stock.Domain package once the local project references are no longer necessary -->
     <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

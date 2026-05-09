@@ -1,0 +1,770 @@
+{
+  "info": {
+    "name": "eShopAcademy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "products_api", "value": "http://localhost:8001" },
+    { "key": "stock_api", "value": "http://localhost:8002" },
+    { "key": "orders_api", "value": "http://localhost:8003" },
+    { "key": "basket_api", "value": "http://localhost:8004" },
+    { "key": "payments_api", "value": "http://localhost:8006" },
+    { "key": "shipping_api", "value": "http://localhost:8007" },
+    { "key": "customers_api", "value": "http://localhost:8008" },
+    { "key": "operations_api", "value": "http://localhost:8009" },
+    { "key": "notifications_api", "value": "http://localhost:8010" },
+    { "key": "gateway", "value": "http://localhost:5200" },
+    { "key": "customerId", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "orderId", "value": "" },
+    { "key": "addressId", "value": "" },
+    { "key": "basketClientId", "value": "{{$guid}}" },
+    { "key": "paymentProviderTxId", "value": "" },
+    { "key": "notificationId", "value": "" },
+    { "key": "sellerId", "value": "" },
+    { "key": "customerEmail", "value": "maria.garcia@eshop.com" }
+  ],
+  "item": [
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.length > 0) {",
+            "  pm.collectionVariables.set('customerId', json[0].id);",
+            "  if (json[0].mail) pm.collectionVariables.set('customerEmail', json[0].mail);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "url": "{{customers_api}}/customers"
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{customers_api}}/customers/{{customerId}}"
+          }
+        },
+        {
+          "name": "Create Customer",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "pm.collectionVariables.set('customerId', json.id);",
+            "if (json.mail) pm.collectionVariables.set('customerEmail', json.mail);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{customers_api}}/customers",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Garcia\",\n  \"mail\": \"maria.garcia@eshop.com\",\n  \"phone\": \"+34612345678\",\n  \"address\": {\n    \"street\": \"Calle Mayor\",\n    \"number\": \"42\",\n    \"additionalInformation\": \"Piso 3A\",\n    \"zipCode\": \"28013\",\n    \"city\": \"Madrid\"\n  },\n  \"savedAddresses\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "url": "{{customers_api}}/customers/{{customerId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Garcia-Lopez\",\n  \"mail\": \"maria.garcia@eshop.com\",\n  \"phone\": \"+34612345678\",\n  \"address\": {\n    \"street\": \"Calle Mayor\",\n    \"number\": \"42\",\n    \"additionalInformation\": \"Piso 3A\",\n    \"zipCode\": \"28013\",\n    \"city\": \"Madrid\"\n  },\n  \"savedAddresses\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "url": "{{customers_api}}/customers/{{customerId}}"
+          }
+        },
+        {
+          "name": "Get Customer Addresses",
+          "request": {
+            "method": "GET",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses"
+          }
+        },
+        {
+          "name": "Add Address - Home",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('addressId', json.id);",
+            "if (json.savedAddresses && json.savedAddresses.length > 0) {",
+            "  var last = json.savedAddresses[json.savedAddresses.length - 1];",
+            "  pm.collectionVariables.set('addressId', last.id);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Home\",\n  \"address\": {\n    \"street\": \"Calle Mayor\",\n    \"number\": \"42\",\n    \"additionalInformation\": \"Piso 3A\",\n    \"zipCode\": \"28013\",\n    \"city\": \"Madrid\"\n  },\n  \"isDefault\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Address - Work",
+          "request": {
+            "method": "POST",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Work\",\n  \"address\": {\n    \"street\": \"Paseo de la Castellana\",\n    \"number\": \"100\",\n    \"additionalInformation\": \"Oficina 512\",\n    \"zipCode\": \"28046\",\n    \"city\": \"Madrid\"\n  },\n  \"isDefault\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PUT",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses/{{addressId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Home (updated)\",\n  \"address\": {\n    \"street\": \"Gran Via\",\n    \"number\": \"1\",\n    \"additionalInformation\": \"Atico B\",\n    \"zipCode\": \"28013\",\n    \"city\": \"Madrid\"\n  },\n  \"isDefault\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses/{{addressId}}"
+          }
+        },
+        {
+          "name": "Set Default Address",
+          "request": {
+            "method": "POST",
+            "url": "{{customers_api}}/customers/{{customerId}}/addresses/{{addressId}}/set-default"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.length > 0) {",
+            "  pm.collectionVariables.set('productId', json[0].id);",
+            "  if (json[0].sellerId) pm.collectionVariables.set('sellerId', json[0].sellerId);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "url": "{{products_api}}/api/product"
+          }
+        },
+        {
+          "name": "Get Products (sorted by price asc)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product?sort=price-asc",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product"],
+              "query": [{ "key": "sort", "value": "price-asc" }]
+            }
+          }
+        },
+        {
+          "name": "Get Products (sorted by price desc)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product?sort=price-desc",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product"],
+              "query": [{ "key": "sort", "value": "price-desc" }]
+            }
+          }
+        },
+        {
+          "name": "Get Products (deals only)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product?deals=true",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product"],
+              "query": [{ "key": "deals", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "Get Products (by category)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product?cat=Electronics",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product"],
+              "query": [{ "key": "cat", "value": "Electronics" }]
+            }
+          }
+        },
+        {
+          "name": "Get Products (by seller)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product?sellerId={{sellerId}}",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product"],
+              "query": [{ "key": "sellerId", "value": "{{sellerId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{products_api}}/api/product/search?SearchText=laptop&Category=Electronics&MinPrice=100&MaxPrice=2000&Deals=false&InStock=true&MinRating=3.5&Sort=price-asc&Page=1&PageSize=10",
+              "host": ["{{products_api}}"],
+              "path": ["api", "product", "search"],
+              "query": [
+                { "key": "SearchText", "value": "laptop" },
+                { "key": "Category", "value": "Electronics" },
+                { "key": "MinPrice", "value": "100" },
+                { "key": "MaxPrice", "value": "2000" },
+                { "key": "Deals", "value": "false", "disabled": true },
+                { "key": "InStock", "value": "true", "disabled": true },
+                { "key": "MinRating", "value": "3.5", "disabled": true },
+                { "key": "Sort", "value": "price-asc", "disabled": true },
+                { "key": "Page", "value": "1" },
+                { "key": "PageSize", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{products_api}}/api/product/{{productId}}"
+          }
+        },
+        {
+          "name": "Get Most Expensive Product",
+          "request": {
+            "method": "GET",
+            "url": "{{products_api}}/api/product/MostExpensive"
+          }
+        },
+        {
+          "name": "Create Product - Laptop",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('productId', json.id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{products_api}}/api/product",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ProBook 450 G10 Laptop\",\n  \"description\": \"15.6-inch Full HD laptop with Intel Core i7, 16GB RAM, 512GB SSD. Ideal for business and productivity.\",\n  \"price\": 899.99,\n  \"imageUrl\": \"https://via.placeholder.com/600x400?text=ProBook+450\",\n  \"category\": {\n    \"name\": \"Electronics\"\n  },\n  \"sellerId\": \"00000000-0000-0000-0000-000000000000\",\n  \"additionalImages\": [\n    \"https://via.placeholder.com/600x400?text=Side+View\",\n    \"https://via.placeholder.com/600x400?text=Keyboard\",\n    \"https://via.placeholder.com/600x400?text=Ports\"\n  ],\n  \"aboutHtml\": \"<h2>ProBook 450 G10</h2><p>A powerful business laptop designed for professionals who demand reliability and performance.</p><ul><li>Intel Core i7-1355U</li><li>16GB DDR5 RAM</li><li>512GB PCIe NVMe SSD</li><li>15.6\\\" FHD IPS Display</li></ul>\",\n  \"isBestSeller\": false,\n  \"isNewRelease\": true,\n  \"isDeal\": false,\n  \"rating\": 0,\n  \"reviewCount\": 0,\n  \"specs\": [\n    { \"label\": \"Processor\", \"value\": \"Intel Core i7-1355U\" },\n    { \"label\": \"RAM\", \"value\": \"16GB DDR5\" },\n    { \"label\": \"Storage\", \"value\": \"512GB PCIe NVMe SSD\" },\n    { \"label\": \"Display\", \"value\": \"15.6\\\" FHD IPS (1920x1080)\" },\n    { \"label\": \"Battery\", \"value\": \"Up to 12 hours\" },\n    { \"label\": \"Weight\", \"value\": \"1.74 kg\" }\n  ],\n  \"faqs\": [\n    { \"question\": \"Does it come with Windows pre-installed?\", \"answer\": \"Yes, it ships with Windows 11 Pro.\" },\n    { \"question\": \"Is the RAM upgradeable?\", \"answer\": \"Yes, it supports up to 32GB DDR5.\" },\n    { \"question\": \"Does it have a backlit keyboard?\", \"answer\": \"Yes, it features a full-size backlit keyboard.\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Product - Headphones",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('productId', json.id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{products_api}}/api/product",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SoundMax Pro Wireless Headphones\",\n  \"description\": \"Premium noise-cancelling wireless headphones with 40-hour battery life, Hi-Res Audio, and multipoint connection.\",\n  \"price\": 249.99,\n  \"imageUrl\": \"https://via.placeholder.com/600x400?text=SoundMax+Pro\",\n  \"category\": {\n    \"name\": \"Electronics\"\n  },\n  \"sellerId\": \"00000000-0000-0000-0000-000000000000\",\n  \"additionalImages\": [\n    \"https://via.placeholder.com/600x400?text=Folded\",\n    \"https://via.placeholder.com/600x400?text=Case\"\n  ],\n  \"aboutHtml\": \"<p>Experience studio-quality sound with adaptive noise cancellation. Perfect for commuting, working, and relaxing.</p>\",\n  \"isBestSeller\": true,\n  \"isNewRelease\": false,\n  \"isDeal\": true,\n  \"dealPrice\": 189.99,\n  \"rating\": 4.7,\n  \"reviewCount\": 342,\n  \"specs\": [\n    { \"label\": \"Driver Size\", \"value\": \"40mm\" },\n    { \"label\": \"Frequency Response\", \"value\": \"4Hz - 40kHz\" },\n    { \"label\": \"Battery Life\", \"value\": \"40 hours (ANC on)\" },\n    { \"label\": \"Bluetooth\", \"value\": \"5.3 with multipoint\" },\n    { \"label\": \"Weight\", \"value\": \"254g\" }\n  ],\n  \"faqs\": [\n    { \"question\": \"Can I connect to two devices at once?\", \"answer\": \"Yes, multipoint Bluetooth allows simultaneous connection to two devices.\" },\n    { \"question\": \"Are replacement ear pads available?\", \"answer\": \"Yes, replacement pads are sold separately.\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Product - Book",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('productId', json.id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{products_api}}/api/product",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Clean Architecture: A Craftsman's Guide\",\n  \"description\": \"Robert C. Martin's guide to software architecture principles. A must-read for software engineers.\",\n  \"price\": 34.99,\n  \"imageUrl\": \"https://via.placeholder.com/600x400?text=Clean+Architecture\",\n  \"category\": {\n    \"name\": \"Books\"\n  },\n  \"sellerId\": \"00000000-0000-0000-0000-000000000000\",\n  \"isBestSeller\": true,\n  \"isNewRelease\": false,\n  \"isDeal\": false,\n  \"rating\": 4.6,\n  \"reviewCount\": 1287,\n  \"specs\": [\n    { \"label\": \"Author\", \"value\": \"Robert C. Martin\" },\n    { \"label\": \"Pages\", \"value\": \"432\" },\n    { \"label\": \"Publisher\", \"value\": \"Prentice Hall\" },\n    { \"label\": \"Language\", \"value\": \"English\" },\n    { \"label\": \"ISBN\", \"value\": \"978-0134494166\" }\n  ],\n  \"faqs\": [\n    { \"question\": \"Is this suitable for beginners?\", \"answer\": \"Some prior programming knowledge is recommended.\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "url": "{{products_api}}/api/product",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\",\n  \"name\": \"ProBook 450 G10 Laptop (Updated)\",\n  \"description\": \"15.6-inch Full HD laptop with Intel Core i7, 16GB RAM, 512GB SSD. Now with free carry case!\",\n  \"price\": 899.99,\n  \"imageUrl\": \"https://via.placeholder.com/600x400?text=ProBook+450\",\n  \"category\": {\n    \"name\": \"Electronics\"\n  },\n  \"sellerId\": \"00000000-0000-0000-0000-000000000000\",\n  \"isBestSeller\": true,\n  \"isNewRelease\": true,\n  \"isDeal\": true,\n  \"dealPrice\": 749.99,\n  \"rating\": 4.5,\n  \"reviewCount\": 28,\n  \"specs\": [\n    { \"label\": \"Processor\", \"value\": \"Intel Core i7-1355U\" },\n    { \"label\": \"RAM\", \"value\": \"16GB DDR5\" },\n    { \"label\": \"Storage\", \"value\": \"512GB PCIe NVMe SSD\" },\n    { \"label\": \"Display\", \"value\": \"15.6\\\" FHD IPS (1920x1080)\" }\n  ],\n  \"faqs\": [\n    { \"question\": \"Does it come with Windows pre-installed?\", \"answer\": \"Yes, it ships with Windows 11 Pro.\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{products_api}}/api/product/{{productId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock",
+      "item": [
+        {
+          "name": "Get All Stock",
+          "request": {
+            "method": "GET",
+            "url": "{{stock_api}}/api/stock"
+          }
+        },
+        {
+          "name": "Get Stock by Product",
+          "request": {
+            "method": "GET",
+            "url": "{{stock_api}}/api/stock/{{productId}}"
+          }
+        },
+        {
+          "name": "Get Stock by Product & Warehouse",
+          "request": {
+            "method": "GET",
+            "url": "{{stock_api}}/api/stock/{{productId}}/warehouse/warehouse-madrid"
+          }
+        },
+        {
+          "name": "Increase Stock (warehouse-madrid)",
+          "request": {
+            "method": "POST",
+            "url": "{{stock_api}}/api/stock/Increase",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "ProductGuid", "value": "{{productId}}", "type": "text" },
+                { "key": "Quantity", "value": "50", "type": "text" },
+                { "key": "Warehouse", "value": "warehouse-madrid", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Increase Stock (warehouse-barcelona)",
+          "request": {
+            "method": "POST",
+            "url": "{{stock_api}}/api/stock/Increase",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "ProductGuid", "value": "{{productId}}", "type": "text" },
+                { "key": "Quantity", "value": "30", "type": "text" },
+                { "key": "Warehouse", "value": "warehouse-barcelona", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Decrease Stock",
+          "request": {
+            "method": "POST",
+            "url": "{{stock_api}}/api/stock/Decrease",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "ProductGuid", "value": "{{productId}}", "type": "text" },
+                { "key": "Quantity", "value": "2", "type": "text" },
+                { "key": "Warehouse", "value": "warehouse-madrid", "type": "text" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Basket",
+      "item": [
+        {
+          "name": "Get Basket",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{basket_api}}/basket/clientId?clientID={{basketClientId}}",
+              "host": ["{{basket_api}}"],
+              "path": ["basket", "clientId"],
+              "query": [{ "key": "clientID", "value": "{{basketClientId}}" }]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Basket (qty 2)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{basket_api}}/basket/clientId/add?clientID={{basketClientId}}",
+              "host": ["{{basket_api}}"],
+              "path": ["basket", "clientId", "add"],
+              "query": [{ "key": "clientID", "value": "{{basketClientId}}" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productID\": \"{{productId}}\",\n  \"quantity\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Item to Basket (qty 1)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{basket_api}}/basket/clientId/add?clientID={{basketClientId}}",
+              "host": ["{{basket_api}}"],
+              "path": ["basket", "clientId", "add"],
+              "query": [{ "key": "clientID", "value": "{{basketClientId}}" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productID\": \"{{productId}}\",\n  \"quantity\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Basket",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{basket_api}}/basket/clientId/remove?clientID={{basketClientId}}",
+              "host": ["{{basket_api}}"],
+              "path": ["basket", "clientId", "remove"],
+              "query": [{ "key": "clientID", "value": "{{basketClientId}}" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productID\": \"{{productId}}\",\n  \"quantity\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.length > 0) {",
+            "  pm.collectionVariables.set('orderId', json[0].id);",
+            "  if (json[0].payment && json[0].payment.providerTransactionId) {",
+            "    pm.collectionVariables.set('paymentProviderTxId', json[0].payment.providerTransactionId);",
+            "  }",
+            "}"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "url": "{{orders_api}}/Orders"
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{orders_api}}/Orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Get Order Stream",
+          "request": {
+            "method": "GET",
+            "url": "{{orders_api}}/Orders/{{orderId}}/stream"
+          }
+        },
+        {
+          "name": "Place Order (single item)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('orderId', json.id);",
+            "if (json.payment && json.payment.providerTransactionId) {",
+            "  pm.collectionVariables.set('paymentProviderTxId', json.payment.providerTransactionId);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{orders_api}}/Orders",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"basketClientId\": \"{{basketClientId}}\",\n  \"items\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"quantity\": 1,\n      \"price\": 899.99\n    }\n  ],\n  \"shippingAddress\": {\n    \"street\": \"Calle Mayor\",\n    \"number\": \"42\",\n    \"additionalInformation\": \"Piso 3A\",\n    \"zipCode\": \"28013\",\n    \"city\": \"Madrid\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Place Order (multiple items)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.id) pm.collectionVariables.set('orderId', json.id);",
+            "if (json.payment && json.payment.providerTransactionId) {",
+            "  pm.collectionVariables.set('paymentProviderTxId', json.payment.providerTransactionId);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{orders_api}}/Orders",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"basketClientId\": \"{{basketClientId}}\",\n  \"items\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"quantity\": 2,\n      \"price\": 899.99\n    },\n    {\n      \"productID\": \"00000000-0000-0000-0000-000000000001\",\n      \"quantity\": 1,\n      \"price\": 249.99\n    }\n  ],\n  \"shippingAddress\": {\n    \"street\": \"Paseo de la Castellana\",\n    \"number\": \"100\",\n    \"additionalInformation\": \"Oficina 512\",\n    \"zipCode\": \"28046\",\n    \"city\": \"Madrid\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "url": "{{orders_api}}/Orders/{{orderId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Webhook - Payment SUCCESS",
+          "request": {
+            "method": "POST",
+            "url": "{{payments_api}}/api/payments/webhook",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Signature", "value": "Signature" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{paymentProviderTxId}}\",\n  \"amount\": 899.99,\n  \"currency\": \"EUR\",\n  \"status\": \"success\",\n  \"externalId\": \"{{orderId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Webhook - Payment FAILED",
+          "request": {
+            "method": "POST",
+            "url": "{{payments_api}}/api/payments/webhook",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Signature", "value": "Signature" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{paymentProviderTxId}}\",\n  \"amount\": 899.99,\n  \"currency\": \"EUR\",\n  \"status\": \"failed\",\n  \"externalId\": \"{{orderId}}\",\n  \"failureReason\": \"Card declined: insufficient funds\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Webhook - Payment CANCELLED",
+          "request": {
+            "method": "POST",
+            "url": "{{payments_api}}/api/payments/webhook",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Signature", "value": "Signature" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{paymentProviderTxId}}\",\n  \"amount\": 899.99,\n  \"currency\": \"EUR\",\n  \"status\": \"cancelled\",\n  \"externalId\": \"{{orderId}}\",\n  \"failureReason\": \"Customer cancelled the payment\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shipping",
+      "item": [
+        {
+          "name": "Get Shipping Status",
+          "request": {
+            "method": "GET",
+            "url": "{{shipping_api}}/api/shipping/{{orderId}}/status"
+          }
+        },
+        {
+          "name": "Get Shipping History",
+          "request": {
+            "method": "GET",
+            "url": "{{shipping_api}}/api/shipping/{{orderId}}/history"
+          }
+        },
+        {
+          "name": "Get Provider History",
+          "request": {
+            "method": "GET",
+            "url": "{{shipping_api}}/api/shipping/{{orderId}}/provider-history"
+          }
+        },
+        {
+          "name": "Webhook - Shipped",
+          "request": {
+            "method": "POST",
+            "url": "{{shipping_api}}/api/shipping/webhook",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingId\": \"{{$guid}}\",\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"Shipped\",\n  \"trackingNumber\": \"SEUR-ES-2024-78543\",\n  \"carrier\": \"SEUR\",\n  \"occurredAt\": \"2025-01-15T10:30:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Webhook - In Transit",
+          "request": {
+            "method": "POST",
+            "url": "{{shipping_api}}/api/shipping/webhook",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingId\": \"{{$guid}}\",\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"InTransit\",\n  \"trackingNumber\": \"SEUR-ES-2024-78543\",\n  \"carrier\": \"SEUR\",\n  \"occurredAt\": \"2025-01-16T08:00:00Z\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Webhook - Delivered",
+          "request": {
+            "method": "POST",
+            "url": "{{shipping_api}}/api/shipping/webhook",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingId\": \"{{$guid}}\",\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"Delivered\",\n  \"trackingNumber\": \"SEUR-ES-2024-78543\",\n  \"carrier\": \"SEUR\",\n  \"occurredAt\": \"2025-01-17T14:22:00Z\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operations",
+      "item": [
+        {
+          "name": "Get Pending Packages",
+          "request": {
+            "method": "GET",
+            "url": "{{operations_api}}/api/operations/pending-packages"
+          }
+        },
+        {
+          "name": "Start Processing",
+          "request": {
+            "method": "POST",
+            "url": "{{operations_api}}/api/operations/orders/{{orderId}}/start-processing",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationId\": \"{{$guid}}\",\n  \"customerName\": \"Maria Garcia\",\n  \"customerEmail\": \"{{customerEmail}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Mark Ready for Pickup",
+          "request": {
+            "method": "POST",
+            "url": "{{operations_api}}/api/operations/orders/{{orderId}}/ready-for-pickup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Maria Garcia\",\n  \"customerEmail\": \"{{customerEmail}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Report Issue - Damaged",
+          "request": {
+            "method": "POST",
+            "url": "{{operations_api}}/api/operations/orders/{{orderId}}/report-issue",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"issueType\": \"damaged\",\n  \"details\": \"Package corner crushed during warehouse handling, product box dented\",\n  \"reportedBy\": \"carlos.ops@eshop.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Report Issue - Missing Items",
+          "request": {
+            "method": "POST",
+            "url": "{{operations_api}}/api/operations/orders/{{orderId}}/report-issue",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"issueType\": \"missing_items\",\n  \"details\": \"Order contains 2 items but only 1 found in bin. Second item (headphones) not located.\",\n  \"reportedBy\": \"ana.ops@eshop.com\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications by Email",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "var json = pm.response.json();",
+            "if (json.length > 0) pm.collectionVariables.set('notificationId', json[0].id);"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{notifications_api}}/notifications?email={{customerEmail}}",
+              "host": ["{{notifications_api}}"],
+              "path": ["notifications"],
+              "query": [{ "key": "email", "value": "{{customerEmail}}" }]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "url": "{{notifications_api}}/notifications/{{notificationId}}/read"
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{notifications_api}}/notifications/read-all?email={{customerEmail}}",
+              "host": ["{{notifications_api}}"],
+              "path": ["notifications", "read-all"],
+              "query": [{ "key": "email", "value": "{{customerEmail}}" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

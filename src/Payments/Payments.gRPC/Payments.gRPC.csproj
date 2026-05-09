@@ -9,8 +9,8 @@
   <ItemGroup>
     <!-- TODO: swap back to the Payments.Domain nuget once ready -->
     <!-- <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" /> -->
-    <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-    <PackageReference Include="MassTransit" Version="9.0.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.80.0" />
+    <PackageReference Include="MassTransit" Version="9.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 

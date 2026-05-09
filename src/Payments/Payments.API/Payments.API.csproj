@@ -9,7 +9,7 @@
   <ItemGroup>
     <!-- TODO: revert to the Payments.Domain nuget once the package update process is completed -->
     <!-- <PackageReference Include="eShopAcademy.Payments.Domain" Version="1.0.0" /> -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>

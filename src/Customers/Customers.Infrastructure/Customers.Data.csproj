@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <!--<PackageReference Include="eShopAcademy.Customers.Domain" Version="1.0.1" />-->
-    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
-    <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
+    <PackageReference Include="MongoDB.Driver" Version="3.8.0" />
   </ItemGroup>
 
 	<ItemGroup>

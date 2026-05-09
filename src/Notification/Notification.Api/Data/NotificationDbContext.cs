@@ -13,6 +13,6 @@ public class NotificationDbContext
         _database = client.GetDatabase(databaseName);
     }
 
-    public IMongoCollection<NotificationMessage> Notifications =>
+    public virtual IMongoCollection<NotificationMessage> Notifications =>
         _database.GetCollection<NotificationMessage>("Notifications");
 }

@@ -46,6 +46,7 @@ public static class EnvironmentSetup
         var customersdb = mongo.AddDatabase("customers");
         var shippingdb = mongo.AddDatabase("shipping");
         var operationsdb = mongo.AddDatabase("operations");
+        var notificationsdb = mongo.AddDatabase("notifications");
         var sellersdb = mongo.AddDatabase("sellers");
 
         var postgres = builder.AddPostgres("postgres")

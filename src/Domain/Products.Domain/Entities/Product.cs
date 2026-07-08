@@ -28,7 +28,6 @@ public class Product : BaseEntity
     public bool IsDeal { get; set; }
     public double? DealPrice { get; set; }
     public bool IsNewRelease { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public List<ProductSpec> Specs { get; set; } = [];
     public List<ProductFaq> Faqs { get; set; } = [];
 }

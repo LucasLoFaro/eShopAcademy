@@ -7,7 +7,7 @@ export interface Seller {
   address: SellerAddress;
   accumulatedSalesAmount: number;
   accumulatedCommissionsAmount: number;
-  publishedProducts: number;
+  publishedProductIds: string[];
   ledgerEntries: number;
 }
 

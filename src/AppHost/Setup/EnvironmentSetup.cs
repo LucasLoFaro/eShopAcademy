@@ -50,6 +50,7 @@ public static class EnvironmentSetup
         var sellersdb = mongo.AddDatabase("sellers");
 
         var postgres = builder.AddPostgres("postgres")
+            .WithImageTag("17.6")
             .WithDataVolume("postgres-data")
             .WithLifetime(ContainerLifetime.Persistent);
 
@@ -72,6 +73,12 @@ public static class EnvironmentSetup
             .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
             .WithLifetime(ContainerLifetime.Persistent);
 
+        var storage = builder.AddAzureStorage("storage")
+            .RunAsEmulator(emulator => emulator
+                .WithDataVolume("azurite-data")
+                .WithLifetime(ContainerLifetime.Persistent));
+        var productImages = storage.AddBlobs("productimages");
+
         var sendGridApiKey = builder.AddParameter("sendgrid-apikey", secret: true);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
@@ -84,7 +91,7 @@ public static class EnvironmentSetup
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
-        SellersExtensions.Configure(sellersApi, sellersService, sellersEventsProcessor, sellersdb, rabbit);
+        SellersExtensions.Configure(sellersApi, sellersService, sellersEventsProcessor, sellersdb, rabbit, productImages);
         GatewayExtensions.Configure(gateway);
     }
 }

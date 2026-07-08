@@ -7,13 +7,15 @@ public static class SellersExtensions
         IResourceBuilder<ProjectResource> sellersService,
         IResourceBuilder<ProjectResource> sellersEventsProcessor,
         IResourceBuilder<MongoDBDatabaseResource> sellersdb,
-        IResourceBuilder<RabbitMQServerResource> rabbit)
+        IResourceBuilder<RabbitMQServerResource> rabbit,
+        IResourceBuilder<IResourceWithConnectionString> productImages)
     {
         sellersApi
             .WithReference(sellersdb)
             .WaitFor(sellersdb)
             .WithReference(rabbit)
             .WaitFor(rabbit)
+            .WithReference(productImages)
             .WithCommonEnvironments()
             .WithHttpEndpoint(port: 8010, name: "sellers-api")
             .WithEnvironment("SellersSpaOrigin", "http://localhost:5174,http://localhost:58010")

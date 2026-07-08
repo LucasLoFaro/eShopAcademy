@@ -1,10 +1,35 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState, Component, type ReactNode } from "react";
 import { useSeller } from "../hooks/useSeller";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../auth/msalConfig";
 import { Link } from "react-router";
 
 const RemoteSellerDashboard = lazy(() => import("eshopSellers/SellerDashboard"));
+
+class RemoteErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="max-w-4xl mx-auto py-12 px-4 text-center">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-700">Seller module unavailable</h2>
+          <p className="mt-2 text-gray-500">
+            The sellers microfrontend could not be loaded. Make sure it's running on port 5174.
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="mt-4 inline-block rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700 transition"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function SellerDashboardPage() {
   const { data: seller, isLoading, error } = useSeller();
@@ -68,15 +93,17 @@ export default function SellerDashboardPage() {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className="p-8 text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-amber-400 border-t-transparent rounded-full mx-auto" />
-          <p className="mt-4 text-gray-500">Loading seller module...</p>
-        </div>
-      }
-    >
-      <RemoteSellerDashboard token={token} />
-    </Suspense>
+    <RemoteErrorBoundary>
+      <Suspense
+        fallback={
+          <div className="p-8 text-center">
+            <div className="animate-spin h-8 w-8 border-4 border-amber-400 border-t-transparent rounded-full mx-auto" />
+            <p className="mt-4 text-gray-500">Loading seller module...</p>
+          </div>
+        }
+      >
+        <RemoteSellerDashboard token={token} />
+      </Suspense>
+    </RemoteErrorBoundary>
   );
 }

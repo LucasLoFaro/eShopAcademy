@@ -26,7 +26,8 @@ var operationsApi = builder.AddProject<Projects.Operations_Api>("eshopacademy-op
 var operationsService = builder.AddProject<Projects.Operations_Service>("eshopacademy-operations-service");
 
 // Sellers
-var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api");
+var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api")
+                        .WithReference(productsApi);
 var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-sellers-service");
 var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
 
@@ -71,11 +72,9 @@ var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-we
                       .WithEndpoint("http", e => e.Port = 5173)
                       .WithEnvironment("VITE_GATEWAY_URL", gateway.GetEndpoint("gateway"));
 
-// Sellers Frontend Microfrontend (React + Vite)
-var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Sellers/Frontend")
-                             .WithEndpoint("http", e => e.Port = 5174)
-                             .WithEnvironment("VITE_SELLERS_API_BASE_URL", sellersApi.GetEndpoint("sellers-api"))
-                             .WithEnvironment("VITE_DEFAULT_SELLER_ID", "00000000-0000-0000-0000-000000000000");
+// Sellers Frontend Microfrontend (React + Vite - Module Federation remote)
+var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Frontend/eshop-sellers")
+                             .WithEndpoint("http", e => e.Port = 5174);
 
 
 if (builder.Environment.IsDevelopment())

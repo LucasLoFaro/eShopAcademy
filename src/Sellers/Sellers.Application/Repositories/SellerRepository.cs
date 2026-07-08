@@ -1,5 +1,8 @@
 using Domain.Sellers.Entities;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace Sellers.Application.Repositories;
@@ -7,6 +10,11 @@ namespace Sellers.Application.Repositories;
 public class SellerRepository : ISellerRepository
 {
     private readonly IMongoCollection<Seller> _collection;
+
+    static SellerRepository()
+    {
+        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+    }
 
     public SellerRepository(IConfiguration configuration)
     {

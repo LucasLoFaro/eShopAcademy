@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAccessToken } from "./api/client";
 import App from "./App";
-import "./index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

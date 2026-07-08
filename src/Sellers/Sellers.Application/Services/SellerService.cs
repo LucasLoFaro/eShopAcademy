@@ -31,6 +31,44 @@ public class SellerService : ISellerService
         return await _repository.CreateAsync(seller, cancellationToken);
     }
 
+    public async Task<Seller> RegisterAsync(string identityObjectId, RegisterSellerRequest request, CancellationToken cancellationToken)
+    {
+        var seller = new Seller
+        {
+            IdentityObjectId = identityObjectId,
+            Name = request.Name,
+            Email = request.Email,
+            TaxId = request.TaxId,
+            Address = request.Address,
+            Status = SellerStatus.PendingApproval,
+            VerificationStatus = DocumentVerificationStatus.Pending
+        };
+
+        var created = await _repository.CreateAsync(seller, cancellationToken);
+
+        await _publishEndpoint.Publish(new SellerRegistrationRequestedEvent
+        {
+            SellerId = created.Id,
+            Name = created.Name,
+            Email = created.Email,
+            TaxId = created.TaxId,
+            DocumentUrl = request.DocumentUrl
+        }, cancellationToken);
+
+        await _publishEndpoint.Publish(new SellerTaxVerificationRequestedEvent
+        {
+            SellerId = created.Id,
+            Name = created.Name,
+            Email = created.Email,
+            TaxId = created.TaxId
+        }, cancellationToken);
+
+        return created;
+    }
+
+    public Task<Seller?> GetByIdentityAsync(string identityObjectId, CancellationToken cancellationToken)
+        => _repository.GetByIdentityAsync(identityObjectId, cancellationToken);
+
     public Task<IReadOnlyList<Seller>> GetAllAsync(CancellationToken cancellationToken)
         => _repository.GetAllAsync(cancellationToken);
 

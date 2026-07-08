@@ -10,6 +10,8 @@ import WishlistPage from "./pages/WishlistPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderListPage from "./pages/OrderListPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
+import SellerRegistrationPage from "./pages/SellerRegistrationPage";
+import SellerDashboardPage from "./pages/SellerDashboardPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +33,8 @@ function App() {
             <Route path="checkout" element={<RequireAuth><CheckoutPage /></RequireAuth>} />
             <Route path="orders" element={<RequireAuth><OrderListPage /></RequireAuth>} />
             <Route path="orders/:id" element={<RequireAuth><OrderDetailPage /></RequireAuth>} />
+            <Route path="sell/register" element={<RequireAuth><SellerRegistrationPage /></RequireAuth>} />
+            <Route path="sell/dashboard" element={<RequireAuth><SellerDashboardPage /></RequireAuth>} />
           </Route>
         </Routes>
       </BrowserRouter>

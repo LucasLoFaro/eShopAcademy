@@ -37,6 +37,11 @@ public class SellerRepository : ISellerRepository
         return await _collection.Find(s => s.Id == sellerId).FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<Seller?> GetByIdentityAsync(string identityObjectId, CancellationToken cancellationToken)
+    {
+        return await _collection.Find(s => s.IdentityObjectId == identityObjectId).FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Seller>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _collection.Find(_ => true).ToListAsync(cancellationToken);

@@ -10,6 +10,12 @@ builder.AddServiceDefaults()
     {
         cfg.ReceiveEndpoint("seller-orders-submitted", e =>
             e.ConfigureConsumer<OrderSubmittedForSellerConsumer>(context));
+
+        cfg.ReceiveEndpoint("seller-document-verification", e =>
+            e.ConfigureConsumer<SellerDocumentVerificationConsumer>(context));
+
+        cfg.ReceiveEndpoint("seller-tax-billing-verification", e =>
+            e.ConfigureConsumer<SellerTaxBillingVerificationConsumer>(context));
     }, typeof(OrderSubmittedForSellerConsumer).Assembly);
 
 builder.Services.AddSingleton<ISellerRepository, SellerRepository>();

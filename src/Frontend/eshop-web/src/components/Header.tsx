@@ -6,6 +6,7 @@ import { useUser } from "../hooks/useUser";
 import { useBasket, useRemoveFromBasket, useAddToBasket } from "../hooks/useBasket";
 import { useWishlist } from "../hooks/useWishlist";
 import { useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead } from "../hooks/useNotifications";
+import { useSeller } from "../hooks/useSeller";
 
 const BellIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -60,12 +61,15 @@ export default function Header() {
   const { data: notifications = [] } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
+  const { data: sellerData } = useSeller();
   const [basketOpen, setBasketOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const basketRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
@@ -79,6 +83,7 @@ export default function Header() {
       if (basketRef.current && !basketRef.current.contains(e.target as Node)) setBasketOpen(false);
       if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -102,16 +107,68 @@ export default function Header() {
           </div>
           <div className="flex items-center gap-4 shrink-0">
             {isAuthenticated && user ? (
-              <div className="hidden sm:flex items-center gap-2">
-                {user.photoUrl ? (
-                  <img src={user.photoUrl} alt={user.name} className="h-8 w-8 rounded-full border-2 border-amber-400 object-cover" />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-amber-400 bg-gray-700 text-xs font-bold">{user.name.charAt(0).toUpperCase()}</div>
+              <div ref={userMenuRef} className="relative hidden sm:block">
+                <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 hover:text-amber-400 transition">
+                  {user.photoUrl ? (
+                    <img src={user.photoUrl} alt={user.name} className="h-8 w-8 rounded-full border-2 border-amber-400 object-cover" />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-amber-400 bg-gray-700 text-xs font-bold">{user.name.charAt(0).toUpperCase()}</div>
+                  )}
+                  <div className="text-xs text-left">
+                    <p className="text-gray-400">Hello, {user.name.split(" ")[0]}</p>
+                    <p className="font-semibold text-white">Account ▾</p>
+                  </div>
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl z-[100] py-1">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold truncate">{user.name}</p>
+                    </div>
+                    <Link to="/wishlist" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      Wishlist
+                      {wishlistCount > 0 && <span className="ml-auto text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-medium">{wishlistCount}</span>}
+                    </Link>
+                    <Link to="/orders" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      Orders
+                    </Link>
+                    <div className="border-t border-gray-100 my-1" />
+                    {sellerData && sellerData.status === "Active" ? (
+                      <Link to="/sell/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                        </svg>
+                        <span className="text-emerald-700 font-medium">Seller Dashboard</span>
+                      </Link>
+                    ) : sellerData && sellerData.status === "PendingApproval" ? (
+                      <div className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Seller (Pending Approval)
+                      </div>
+                    ) : (
+                      <Link to="/sell/register" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Start Selling
+                      </Link>
+                    )}
+                    <div className="border-t border-gray-100 my-1" />
+                    <button onClick={() => { setUserMenuOpen(false); handleLogout(instance); }} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition w-full text-left text-red-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Sign out
+                    </button>
+                  </div>
                 )}
-                <div className="text-xs">
-                  <p className="text-gray-400">Hello, {user.name.split(" ")[0]}</p>
-                  <button onClick={() => handleLogout(instance)} className="font-semibold text-white hover:text-amber-400">Sign out</button>
-                </div>
               </div>
             ) : (
               <button onClick={() => handleLogin(instance)} className="text-xs text-left">
@@ -186,17 +243,6 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            )}
-            {isAuthenticated && (
-              <Link to="/wishlist" className="relative flex items-center gap-1 hover:text-amber-400">
-                <div className="relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  {wishlistCount > 0 && <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">{wishlistCount}</span>}
-                </div>
-                <span className="hidden text-xs font-bold sm:block">Wishlist</span>
-              </Link>
             )}
             <div ref={basketRef} className="relative z-50">
               <button onClick={() => isAuthenticated && setBasketOpen(!basketOpen)} onMouseEnter={() => isAuthenticated && setBasketOpen(true)} className="relative flex items-center gap-1 hover:text-amber-400">
@@ -285,6 +331,24 @@ export default function Header() {
           </div>
           <div className="h-5 w-px bg-gray-600 mx-1" />
           {navLinks.map((link) => <Link key={link.label} to={link.href} className="whitespace-nowrap hover:bg-gray-700 px-3 py-2 rounded transition">{link.label}</Link>)}
+          {isAuthenticated && (
+            <>
+              <div className="h-5 w-px bg-gray-600 mx-1" />
+              {sellerData && sellerData.status === "Active" ? (
+                <Link to="/sell/dashboard" className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold px-3 py-1 rounded-full text-xs hover:from-emerald-400 hover:to-teal-400 transition">
+                  <span>🏪</span> Seller Dashboard
+                </Link>
+              ) : sellerData && sellerData.status === "PendingApproval" ? (
+                <span className="whitespace-nowrap flex items-center gap-1.5 bg-gray-600 text-gray-300 font-bold px-3 py-1 rounded-full text-xs cursor-default">
+                  <span>⏳</span> Verification Pending
+                </span>
+              ) : (
+                <Link to="/sell/register" className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold px-3 py-1 rounded-full text-xs hover:from-indigo-400 hover:to-purple-400 transition">
+                  <span>💰</span> Start Selling
+                </Link>
+              )}
+            </>
+          )}
           <Link to="/search?deals=true" className="ml-auto flex items-center gap-1.5 whitespace-nowrap bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 font-bold px-3 py-1 rounded-full text-xs hover:from-amber-400 hover:to-orange-400 transition">
             <span>🔥</span> Special Offers
           </Link>

@@ -15,8 +15,10 @@ api.interceptors.request.use(async (config) => {
         ...loginRequest,
         account: accounts[0],
       });
-      config.headers.Authorization = `Bearer ${response.accessToken}`;
-      console.log("[Auth] Token acquired for request:", config.url);
+      const token = response.accessToken;
+      if (token && token.split(".").length === 3) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     } catch (error: any) {
       console.error("[Auth] Token acquisition failed:", error);
       

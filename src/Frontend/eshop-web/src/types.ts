@@ -198,6 +198,47 @@ export interface PaymentMethod {
   enabled: boolean;
 }
 
+// Sellers
+export interface Seller {
+  id: string;
+  name: string;
+  email: string;
+  taxId: string;
+  status: SellerStatus;
+  address: SellerAddress;
+  accumulatedSalesAmount: number;
+  accumulatedCommissionsAmount: number;
+  publishedProducts: number;
+  ledgerEntries: number;
+}
+
+export type SellerStatus = "PendingApproval" | "Active" | "Suspended" | "Rejected";
+
+export interface SellerAddress {
+  street: string;
+  number: string;
+  additionalInformation: string;
+  zipCode: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+export interface DocumentAnalysisResult {
+  name: string;
+  taxId: string;
+  email: string;
+  address: SellerAddress;
+}
+
+export interface RegisterSellerRequest {
+  name: string;
+  email: string;
+  taxId: string;
+  address: SellerAddress;
+  documentUrl: string;
+}
+
 // Checkout State
 export interface CheckoutData {
   address?: Address;

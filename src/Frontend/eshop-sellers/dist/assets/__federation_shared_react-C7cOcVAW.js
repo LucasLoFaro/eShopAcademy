@@ -1,5 +1,5 @@
 import { g as getDefaultExportFromCjs } from './_commonjsHelpers-B85MJLTf.js';
-import { r as requireReact } from './index-B1280Vi5.js';
+import { r as requireReact } from './index-Cbh_awb4.js';
 
 var reactExports = requireReact();
 const index = /*@__PURE__*/getDefaultExportFromCjs(reactExports);

@@ -331,24 +331,6 @@ export default function Header() {
           </div>
           <div className="h-5 w-px bg-gray-600 mx-1" />
           {navLinks.map((link) => <Link key={link.label} to={link.href} className="whitespace-nowrap hover:bg-gray-700 px-3 py-2 rounded transition">{link.label}</Link>)}
-          {isAuthenticated && (
-            <>
-              <div className="h-5 w-px bg-gray-600 mx-1" />
-              {sellerData && sellerData.status === "Active" ? (
-                <Link to="/sell/dashboard" className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold px-3 py-1 rounded-full text-xs hover:from-emerald-400 hover:to-teal-400 transition">
-                  <span>🏪</span> Seller Dashboard
-                </Link>
-              ) : sellerData && sellerData.status === "PendingApproval" ? (
-                <span className="whitespace-nowrap flex items-center gap-1.5 bg-gray-600 text-gray-300 font-bold px-3 py-1 rounded-full text-xs cursor-default">
-                  <span>⏳</span> Verification Pending
-                </span>
-              ) : (
-                <Link to="/sell/register" className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold px-3 py-1 rounded-full text-xs hover:from-indigo-400 hover:to-purple-400 transition">
-                  <span>💰</span> Start Selling
-                </Link>
-              )}
-            </>
-          )}
           <Link to="/search?deals=true" className="ml-auto flex items-center gap-1.5 whitespace-nowrap bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 font-bold px-3 py-1 rounded-full text-xs hover:from-amber-400 hover:to-orange-400 transition">
             <span>🔥</span> Special Offers
           </Link>

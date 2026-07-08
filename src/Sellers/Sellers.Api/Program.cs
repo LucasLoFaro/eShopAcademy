@@ -5,6 +5,8 @@ using Sellers.Application.Services;
 using ServiceDefaults;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,13 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddSingleton<ISellerRepository, SellerRepository>();
 builder.Services.AddScoped<ISellerService, SellerService>();
+
+builder.AddAzureBlobClient("productimages");
+
+builder.Services.AddHttpClient("products-api", client =>
+{
+    client.BaseAddress = new Uri("https+http://eshopacademy-products-api");
+}).AddServiceDiscovery();
 
 var app = builder.Build();
 
@@ -242,6 +251,88 @@ app.MapPost("/api/sellers/analyze-document", (IFormFile document) =>
     return Results.Ok(result);
 }).RequireAuthorization("sellers-authenticated")
   .DisableAntiforgery();
+
+app.MapPost("/api/sellers/products/upload-image", async (
+    IFormFile file,
+    BlobServiceClient blobServiceClient,
+    CancellationToken cancellationToken) =>
+{
+    if (file is null || file.Length == 0)
+    {
+        return Results.BadRequest("No file provided.");
+    }
+
+    var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp", "image/gif" };
+    if (!allowedTypes.Contains(file.ContentType.ToLower()))
+    {
+        return Results.BadRequest("Invalid file type. Only JPEG, PNG, WebP and GIF are allowed.");
+    }
+
+    var containerClient = blobServiceClient.GetBlobContainerClient("product-images");
+    await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
+
+    var extension = Path.GetExtension(file.FileName);
+    var blobName = $"{Guid.NewGuid():N}{extension}";
+    var blobClient = containerClient.GetBlobClient(blobName);
+
+    await using var stream = file.OpenReadStream();
+    await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = file.ContentType }, cancellationToken: cancellationToken);
+
+    return Results.Ok(new { url = blobClient.Uri.ToString() });
+}).RequireAuthorization("sellers-authenticated")
+  .DisableAntiforgery();
+
+app.MapPost("/api/sellers/products", async (
+    PublishProductRequest request,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    IHttpClientFactory httpClientFactory,
+    CancellationToken cancellationToken) =>
+{
+    var oid = GetUserObjectId(user);
+    if (string.IsNullOrEmpty(oid))
+    {
+        return Results.Unauthorized();
+    }
+
+    var seller = await sellerService.GetByIdentityAsync(oid, cancellationToken);
+    if (seller is null)
+    {
+        return Results.Forbid();
+    }
+
+    var product = new
+    {
+        Id = Guid.NewGuid(),
+        request.Name,
+        request.Price,
+        request.Description,
+        request.ImageUrl,
+        request.CategoryId,
+        SellerId = seller.Id,
+        request.AdditionalImages,
+        request.AboutHtml,
+        Rating = 0.0,
+        ReviewCount = 0,
+        IsBestSeller = false,
+        IsDeal = false,
+        IsNewRelease = true,
+        CreatedAt = DateTime.UtcNow,
+        request.Specs,
+        request.Faqs
+    };
+
+    var client = httpClientFactory.CreateClient("products-api");
+    var response = await client.PostAsJsonAsync("/api/product", product, cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.Problem("Failed to create product in the catalog.", statusCode: 502);
+    }
+
+    await sellerService.AssignPublishedProductsAsync(seller.Id, [product.Id], cancellationToken);
+    return Results.Created($"/api/products/{product.Id}", product);
+}).RequireAuthorization("sellers-authenticated");
 
 app.Run();
 

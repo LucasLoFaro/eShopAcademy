@@ -13,6 +13,7 @@ public class ProductServiceTests
 {
     private Mock<IProductsRepository> _repository = null!;
     private Mock<IProductMessagingService> _messaging = null!;
+    private Mock<IContentModerationService> _moderation = null!;
     private ProductService _sut = null!;
 
     [SetUp]
@@ -20,7 +21,10 @@ public class ProductServiceTests
     {
         _repository = new Mock<IProductsRepository>();
         _messaging = new Mock<IProductMessagingService>();
-        _sut = new ProductService(_repository.Object, _messaging.Object);
+        _moderation = new Mock<IContentModerationService>();
+        _moderation.Setup(m => m.ModerateProductAsync(It.IsAny<Product>()))
+            .ReturnsAsync(new ContentModerationResult(true));
+        _sut = new ProductService(_repository.Object, _messaging.Object, _moderation.Object);
     }
 
     [Test]

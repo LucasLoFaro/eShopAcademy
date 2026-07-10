@@ -72,7 +72,7 @@ public class OrderService : IOrderService
 
         order.TotalPrice = order.Items.Sum(i => i.Quantity * i.Price);
 
-        var notificationUrl = "http://payments-api/api/payments/webhook";
+        var notificationUrl = "http://eshopacademy-payments-api/api/payments/webhook";
         var payment = await _paymentClient.InitPaymentAsync(order.TotalPrice, "USD", notificationUrl, order.Id);
         if (payment == null)
             throw new InvalidOperationException("There was an error creating the payment");

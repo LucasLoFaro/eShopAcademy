@@ -21,6 +21,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> paymentsApi,
         IResourceBuilder<ProjectResource> paymentsGrpc,
         IResourceBuilder<ProjectResource> paymentsMessaging,
+        IResourceBuilder<ProjectResource> pspSimulator,
         IResourceBuilder<ProjectResource> shippingApi,
         IResourceBuilder<ProjectResource> shippingService,
         IResourceBuilder<ProjectResource> notificationService,
@@ -77,7 +78,7 @@ public static class EnvironmentSetup
             .RunAsEmulator(emulator => emulator
                 .WithDataVolume("azurite-data")
                 .WithLifetime(ContainerLifetime.Persistent));
-        var productImages = storage.AddBlobs("productimages");
+        var productImages = builder.AddConnectionString("productimages");
 
         var sendGridApiKey = builder.AddParameter("sendgrid-apikey", secret: true);
 
@@ -85,7 +86,7 @@ public static class EnvironmentSetup
         ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
-        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, wiremock, rabbit);
+        PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, rabbit);
         ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
         NotificationExtensions.Configure(notificationService, notificationApi, notificationsdb, rabbit, sendGridApiKey);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);

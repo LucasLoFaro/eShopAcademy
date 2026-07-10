@@ -39,6 +39,7 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
 builder.Services.AddTransient<IProductMessagingService, ProductMessagingService>();
 builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
 
 var app = builder.Build();
 

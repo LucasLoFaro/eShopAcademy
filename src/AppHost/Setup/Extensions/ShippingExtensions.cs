@@ -20,9 +20,7 @@ public static class ShippingExtensions
             .WithCommonEnvironments()
             .WithHttpEndpoint(port: 8007, name: "shipping-api")
             .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
-            .WithEnvironment("Shipping__Provider__BaseUrl", "http://wiremock:8080")
-            .WithEnvironment("AZURE_CLIENT_ID", "bdcf29bc-ebed-428f-9b86-e3d84d9a2314")
-            .WithEnvironment("AZURE_CLIENT_SECRET", "ceL8Q~xXDZOCEjzSCB16Gv-cpDQxy7iKNcT6-cxX");
+            .WithEnvironment("Shipping__Provider__BaseUrl", "http://wiremock:8080");
 
         shippingService
             .WithReference(shippingdb)
@@ -33,8 +31,6 @@ public static class ShippingExtensions
             .WithCommonEnvironments()
             .WithEnvironment("WireMock__BaseUrl", "http://wiremock:8080")
             .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
-            .WithEnvironment("Shipping__Provider__BaseUrl", "http://wiremock:8080")
-            .WithEnvironment("AZURE_CLIENT_ID", "bdcf29bc-ebed-428f-9b86-e3d84d9a2314")
-            .WithEnvironment("AZURE_CLIENT_SECRET", "ceL8Q~xXDZOCEjzSCB16Gv-cpDQxy7iKNcT6-cxX");
+            .WithEnvironment("Shipping__Provider__BaseUrl", "http://wiremock:8080");
     }
 }

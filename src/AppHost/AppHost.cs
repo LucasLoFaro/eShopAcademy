@@ -21,6 +21,9 @@ var paymentsApi = builder.AddProject<Projects.Payments_API>("eshopacademy-paymen
 var paymentsGrpc = builder.AddProject<Projects.Payments_gRPC>("eshopacademy-payments-grpc");
 var paymentsMessaging = builder.AddProject<Projects.Payments_Messaging>("eshopacademy-payments-messaging");
 
+// PSP Simulator (external payment provider mock)
+var pspSimulator = builder.AddProject<Projects.PSP_Simulator>("eshopacademy-psp-simulator");
+
 // Operations
 var operationsApi = builder.AddProject<Projects.Operations_Api>("eshopacademy-operations-api");
 var operationsService = builder.AddProject<Projects.Operations_Service>("eshopacademy-operations-service");
@@ -78,7 +81,7 @@ var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Fr
 
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, shippingApi, shippingService, notificationService, notificationApi, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, shippingApi, shippingService, notificationService, notificationApi, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
 
 
 // Build and run the distributed application

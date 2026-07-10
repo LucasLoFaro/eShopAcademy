@@ -13,8 +13,7 @@ builder.Services.AddGrpc();
 builder.Services.AddScoped<ISignatureHelper, SignatureHelper>();
 builder.Services.AddTransient<IPaymentMessagingClient, PaymentMessagingClient>();
 
-var pspUrl = builder.Configuration.GetConnectionString("external-services-mocks")!;
-//var pspUrl = "http://external-services-mocks:8080";
+var pspUrl = builder.Configuration["services:eshopacademy-psp-simulator:psp-simulator:0"]!;
 builder.Services.AddHttpClient<PaymentService>(client => { client.BaseAddress = new Uri(pspUrl); });
 builder.WebHost.ConfigureKestrel(o =>
 {

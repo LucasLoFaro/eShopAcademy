@@ -10,12 +10,14 @@ public class ProductService : IProductService
 {
     private readonly IProductsRepository _productsRepository;
     private readonly IProductMessagingService _messaging;
+    private readonly IContentModerationService _moderation;
 
 
-    public ProductService(IProductsRepository productsRepository, IProductMessagingService messagingServiceClient)
+    public ProductService(IProductsRepository productsRepository, IProductMessagingService messagingServiceClient, IContentModerationService moderation)
     {
         _productsRepository = productsRepository;
         _messaging = messagingServiceClient;
+        _moderation = moderation;
     }
 
     public async Task<IEnumerable<Product>> GetAllAsync()
@@ -30,6 +32,10 @@ public class ProductService : IProductService
     // These two should send the stock integration events as well
     public async Task AddOrUpdateAsync(Product product)
     {
+        var moderationResult = await _moderation.ModerateProductAsync(product);
+        if (!moderationResult.IsApproved)
+            throw new InvalidOperationException($"Product content moderation failed: {moderationResult.RejectionReason}");
+
         await _productsRepository.AddOrUpdateAsync(product);
         await _messaging.SendProductUpdate(product);
     }

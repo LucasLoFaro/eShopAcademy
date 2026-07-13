@@ -1,4 +1,4 @@
-import { Q as QueryClient, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-DvG-EKxQ.js';
+import { Q as QueryClient, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-DUkXVRYF.js';
 import { r as requireReact } from './index-B1280Vi5.js';
 import { r as requireReactDom } from './index-Cauge8MD.js';
 

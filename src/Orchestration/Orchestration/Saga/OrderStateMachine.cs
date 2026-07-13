@@ -171,7 +171,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Publish(ctx => new ConfirmPickupCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    ShippingId = ctx.Saga.ShipmentId,
+                    ShippingId = ctx.Saga.CorrelationId,
                     ReadyAt = ctx.Message.ReadyAt
                 })
                 .Publish(ctx => new UpdateOrderStatusCommand

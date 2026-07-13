@@ -9471,6 +9471,41 @@ function PublishProductPage({ onBack, editProduct }) {
 }
 
 const {useState,useRef,useEffect} = await importShared('react');
+function SortableHeader({
+  label,
+  active,
+  dir,
+  onClick,
+  align = "left"
+}) {
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: `px-4 py-3 ${align === "right" ? "text-right" : ""}`, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+    "button",
+    {
+      onClick,
+      className: `inline-flex items-center gap-1 uppercase text-xs font-semibold transition hover:text-gray-900 ${active ? "text-gray-900" : "text-gray-600"}`,
+      children: [
+        label,
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-[10px] leading-none", children: active ? dir === "asc" ? "▲" : "▼" : "↕" }, void 0, false, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 28,
+          columnNumber: 9
+        }, this)
+      ]
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+      lineNumber: 23,
+      columnNumber: 7
+    },
+    this
+  ) }, void 0, false, {
+    fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+    lineNumber: 22,
+    columnNumber: 5
+  }, this);
+}
 function App() {
   const { data: seller, isLoading, refetch } = useSeller();
   const { data: products = [], isLoading: loadingProducts } = useSellerProducts(seller?.id, seller?.publishedProductIds);
@@ -9482,6 +9517,8 @@ function App() {
   const [page, setPage] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [productSortKey, setProductSortKey] = useState("createdAt");
+  const [productSortDir, setProductSortDir] = useState("desc");
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockProduct, setStockProduct] = useState(null);
   const [showBusinessInfo, setShowBusinessInfo] = useState(false);
@@ -9496,7 +9533,7 @@ function App() {
       refetch();
     } }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 28,
+      lineNumber: 62,
       columnNumber: 12
     }, this);
   }
@@ -9515,7 +9552,7 @@ function App() {
       false,
       {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 33,
+        lineNumber: 67,
         columnNumber: 7
       },
       this
@@ -9536,7 +9573,7 @@ function App() {
       false,
       {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 42,
+        lineNumber: 76,
         columnNumber: 7
       },
       this
@@ -9546,28 +9583,28 @@ function App() {
     return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "p-8 text-center", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "animate-spin h-8 w-8 border-4 border-amber-400 border-t-transparent rounded-full mx-auto" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 53,
+        lineNumber: 87,
         columnNumber: 9
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "mt-4 text-gray-500", children: "Loading seller dashboard..." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 54,
+        lineNumber: 88,
         columnNumber: 9
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 52,
+      lineNumber: 86,
       columnNumber: 7
     }, this);
   }
   if (!seller) {
     return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "p-8 text-center", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Seller account not found." }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 62,
+      lineNumber: 96,
       columnNumber: 9
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 61,
+      lineNumber: 95,
       columnNumber: 7
     }, this);
   }
@@ -9575,26 +9612,26 @@ function App() {
     return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "p-8", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-amber-50 border border-amber-200 rounded-xl p-8 text-center", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-5xl mb-4", children: "⏳" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 71,
+        lineNumber: 105,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "text-2xl font-bold text-amber-800 mb-2", children: "Verification Pending" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 72,
+        lineNumber: 106,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-amber-700", children: "Your seller account is being verified. You'll receive a notification once approved." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 73,
+        lineNumber: 107,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 70,
+      lineNumber: 104,
       columnNumber: 9
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 69,
+      lineNumber: 103,
       columnNumber: 7
     }, this);
   }
@@ -9602,26 +9639,26 @@ function App() {
     return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "p-8", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-red-50 border border-red-200 rounded-xl p-8 text-center", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-5xl mb-4", children: "❌" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 85,
+        lineNumber: 119,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "text-2xl font-bold text-red-800 mb-2", children: "Registration Rejected" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 86,
+        lineNumber: 120,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-red-700", children: "Your seller registration was not approved. Please contact support for more information." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 87,
+        lineNumber: 121,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 84,
+      lineNumber: 118,
       columnNumber: 9
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 83,
+      lineNumber: 117,
       columnNumber: 7
     }, this);
   }
@@ -9632,7 +9669,7 @@ function App() {
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h1", { className: "text-2xl font-bold text-gray-900", children: "Sales" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 104,
+            lineNumber: 138,
             columnNumber: 15
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-500", children: [
@@ -9641,29 +9678,29 @@ function App() {
             seller.email
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 105,
+            lineNumber: 139,
             columnNumber: 15
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 103,
+          lineNumber: 137,
           columnNumber: 13
         }, this) }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 102,
+          lineNumber: 136,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-3", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium", children: [
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "h-2 w-2 rounded-full bg-emerald-500" }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 110,
+              lineNumber: 144,
               columnNumber: 15
             }, this),
             "Active"
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 109,
+            lineNumber: 143,
             columnNumber: 13
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
@@ -9676,11 +9713,11 @@ function App() {
                 " Business Info",
                 /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("svg", { className: `w-4 h-4 transition-transform ${showBusinessInfo ? "rotate-180" : ""}`, fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M19 9l-7 7-7-7" }, void 0, false, {
                   fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 119,
+                  lineNumber: 153,
                   columnNumber: 17
                 }, this) }, void 0, false, {
                   fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 118,
+                  lineNumber: 152,
                   columnNumber: 15
                 }, this)
               ]
@@ -9689,101 +9726,101 @@ function App() {
             true,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 113,
+              lineNumber: 147,
               columnNumber: 13
             },
             this
           )
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 108,
+          lineNumber: 142,
           columnNumber: 11
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 101,
+        lineNumber: 135,
         columnNumber: 9
       }, this),
       showBusinessInfo && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Tax ID" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 128,
+            lineNumber: 162,
             columnNumber: 15
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: seller.taxId }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 129,
+            lineNumber: 163,
             columnNumber: 15
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 127,
+          lineNumber: 161,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Email" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 132,
+            lineNumber: 166,
             columnNumber: 15
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: seller.email }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 133,
+            lineNumber: 167,
             columnNumber: 15
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 131,
+          lineNumber: 165,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Published Products" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 136,
+            lineNumber: 170,
             columnNumber: 15
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: seller.publishedProductIds.length }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 137,
+            lineNumber: 171,
             columnNumber: 15
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 135,
+          lineNumber: 169,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Ledger Entries" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 140,
+            lineNumber: 174,
             columnNumber: 15
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: seller.ledgerEntries }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 141,
+            lineNumber: 175,
             columnNumber: 15
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 139,
+          lineNumber: 173,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 126,
+        lineNumber: 160,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 100,
+      lineNumber: 134,
       columnNumber: 7
     }, this),
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white border border-gray-200 rounded-xl p-4 mb-6", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between divide-x divide-gray-200", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex-1 text-center px-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xs text-gray-500 uppercase tracking-wide", children: "Revenue" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 151,
+          lineNumber: 185,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xl font-bold text-gray-900", children: [
@@ -9791,18 +9828,18 @@ function App() {
           seller.accumulatedSalesAmount.toFixed(2)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 152,
+          lineNumber: 186,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 150,
+        lineNumber: 184,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex-1 text-center px-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xs text-gray-500 uppercase tracking-wide", children: "Commissions" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 155,
+          lineNumber: 189,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xl font-bold text-gray-900", children: [
@@ -9810,18 +9847,18 @@ function App() {
           seller.accumulatedCommissionsAmount.toFixed(2)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 156,
+          lineNumber: 190,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 154,
+        lineNumber: 188,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex-1 text-center px-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xs text-gray-500 uppercase tracking-wide", children: "Net Earnings" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 159,
+          lineNumber: 193,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: `text-xl font-bold ${netEarnings >= 0 ? "text-emerald-600" : "text-red-600"}`, children: [
@@ -9829,274 +9866,75 @@ function App() {
           netEarnings.toFixed(2)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 160,
+          lineNumber: 194,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 158,
+        lineNumber: 192,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 149,
+      lineNumber: 183,
       columnNumber: 9
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 148,
+      lineNumber: 182,
       columnNumber: 7
     }, this),
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white border border-gray-200 rounded-xl p-6 mb-6", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "text-lg font-semibold text-gray-900 mb-4", children: "Latest Sells" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 169,
+        lineNumber: 203,
         columnNumber: 9
       }, this),
-      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "overflow-x-auto", children: loadingPackages ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400", children: "Loading..." }, void 0, false, {
-        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 172,
-        columnNumber: 13
-      }, this) : sellerPackages.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-8", children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-4xl mb-2", children: "🛒" }, void 0, false, {
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+        SalesTable,
+        {
+          packages: sellerPackages,
+          loading: loadingPackages,
+          onRowClick: (pkg) => setOrderDetailsPkg(pkg),
+          onConfirm: (pkg) => startProcessing.mutate(pkg.orderId),
+          confirmDisabled: startProcessing.isPending,
+          onMarkReady: (pkg) => markReady.mutate(pkg.orderId),
+          markReadyDisabled: markReady.isPending,
+          onReportIssue: (pkg) => {
+            setReportIssuePkg(pkg);
+            setIssueDetails("");
+          },
+          reportIssueDisabled: reportIssue.isPending,
+          onTrackShipping: (pkg) => setTrackingOrderId(pkg.orderId)
+        },
+        void 0,
+        false,
+        {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 175,
-          columnNumber: 15
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "No sells yet." }, void 0, false, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 176,
-          columnNumber: 15
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400 mt-1", children: "Orders will appear here as customers purchase your products." }, void 0, false, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 177,
-          columnNumber: 15
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 174,
-        columnNumber: 13
-      }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("table", { className: "w-full text-sm text-left", children: [
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("thead", { className: "bg-gray-50 text-gray-600 uppercase text-xs", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Customer" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 183,
-            columnNumber: 19
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Product" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 184,
-            columnNumber: 19
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Qty" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 185,
-            columnNumber: 19
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Status" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 186,
-            columnNumber: 19
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Updated" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 187,
-            columnNumber: 19
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3 text-right", children: "Actions" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 188,
-            columnNumber: 19
-          }, this)
-        ] }, void 0, true, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 182,
-          columnNumber: 17
-        }, this) }, void 0, false, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 181,
-          columnNumber: 15
-        }, this),
-        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tbody", { className: "divide-y divide-gray-100", children: sellerPackages.map((pkg) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { className: "hover:bg-gray-50 cursor-pointer", onClick: () => setOrderDetailsPkg(pkg), children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 font-medium text-gray-900", children: pkg.customerName || "—" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 194,
-            columnNumber: 21
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-700", children: pkg.items.length > 0 ? pkg.items.length === 1 ? pkg.items[0].productName || pkg.items[0].productId.slice(0, 8) : `${pkg.items[0].productName || pkg.items[0].productId.slice(0, 8)} +${pkg.items.length - 1}` : "—" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 195,
-            columnNumber: 21
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-700", children: pkg.items.reduce((sum, i) => sum + i.quantity, 0) || "—" }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 202,
-            columnNumber: 21
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${pkg.status === "Pending" ? "bg-yellow-100 text-yellow-800" : pkg.status === "Preparing" ? "bg-blue-100 text-blue-800" : pkg.status === "ReadyForPickup" ? "bg-emerald-100 text-emerald-800" : pkg.status === "Dispatched" ? "bg-purple-100 text-purple-800" : pkg.status === "Failed" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`, children: pkg.status === "ReadyForPickup" ? "Ready for Pickup" : pkg.status }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 206,
-            columnNumber: 23
-          }, this) }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 205,
-            columnNumber: 21
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-500", children: new Date(pkg.updatedAt).toLocaleDateString() }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 217,
-            columnNumber: 21
-          }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-right", onClick: (e) => e.stopPropagation(), children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-end gap-2", children: [
-            pkg.status === "Pending" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => startProcessing.mutate(pkg.orderId),
-                  disabled: startProcessing.isPending,
-                  className: "rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1.5 text-xs font-medium hover:bg-emerald-100 transition disabled:opacity-50",
-                  children: "✓ Confirm"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 224,
-                  columnNumber: 29
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => {
-                    setReportIssuePkg(pkg);
-                    setIssueDetails("");
-                  },
-                  disabled: reportIssue.isPending,
-                  className: "rounded-lg bg-red-50 text-red-700 px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition disabled:opacity-50",
-                  children: "⚠ Report Issue"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 231,
-                  columnNumber: 29
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 223,
-              columnNumber: 27
-            }, this),
-            pkg.status === "Preparing" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => markReady.mutate(pkg.orderId),
-                  disabled: markReady.isPending,
-                  className: "rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1.5 text-xs font-medium hover:bg-emerald-100 transition disabled:opacity-50",
-                  children: "✓ Ready for Pickup"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 242,
-                  columnNumber: 29
-                },
-                this
-              ),
-              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-                "button",
-                {
-                  onClick: () => {
-                    setReportIssuePkg(pkg);
-                    setIssueDetails("");
-                  },
-                  disabled: reportIssue.isPending,
-                  className: "rounded-lg bg-red-50 text-red-700 px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition disabled:opacity-50",
-                  children: "⚠ Report Issue"
-                },
-                void 0,
-                false,
-                {
-                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                  lineNumber: 249,
-                  columnNumber: 29
-                },
-                this
-              )
-            ] }, void 0, true, {
-              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 241,
-              columnNumber: 27
-            }, this),
-            (pkg.status === "ReadyForPickup" || pkg.status === "Dispatched") && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
-              "button",
-              {
-                onClick: () => setTrackingOrderId(pkg.orderId),
-                className: "rounded-lg bg-purple-50 text-purple-700 px-3 py-1.5 text-xs font-medium hover:bg-purple-100 transition",
-                children: "🚚 Track Shipping"
-              },
-              void 0,
-              false,
-              {
-                fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 259,
-                columnNumber: 27
-              },
-              this
-            )
-          ] }, void 0, true, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 221,
-            columnNumber: 23
-          }, this) }, void 0, false, {
-            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 220,
-            columnNumber: 21
-          }, this)
-        ] }, pkg.orderId, true, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 193,
-          columnNumber: 19
-        }, this)) }, void 0, false, {
-          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 191,
-          columnNumber: 15
-        }, this)
-      ] }, void 0, true, {
-        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 180,
-        columnNumber: 13
-      }, this) }, void 0, false, {
-        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 170,
-        columnNumber: 9
-      }, this)
+          lineNumber: 204,
+          columnNumber: 9
+        },
+        this
+      )
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 168,
+      lineNumber: 202,
       columnNumber: 7
     }, this),
     orderDetailsPkg && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/40", onClick: () => setOrderDetailsPkg(null), children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 p-6", onClick: (e) => e.stopPropagation(), children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { className: "text-lg font-semibold text-gray-900", children: "Order Details" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 281,
+          lineNumber: 223,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { onClick: () => setOrderDetailsPkg(null), className: "text-gray-400 hover:text-gray-600 text-xl", children: "×" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 282,
+          lineNumber: 224,
           columnNumber: 15
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 280,
+        lineNumber: 222,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-4", children: [
@@ -10104,104 +9942,104 @@ function App() {
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Order ID" }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 287,
+              lineNumber: 229,
               columnNumber: 19
             }, this),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900 break-all", children: orderDetailsPkg.orderId }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 288,
+              lineNumber: 230,
               columnNumber: 19
             }, this)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 286,
+            lineNumber: 228,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Status" }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 291,
+              lineNumber: 233,
               columnNumber: 19
             }, this),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${orderDetailsPkg.status === "Pending" ? "bg-yellow-100 text-yellow-800" : orderDetailsPkg.status === "Preparing" ? "bg-blue-100 text-blue-800" : orderDetailsPkg.status === "ReadyForPickup" ? "bg-emerald-100 text-emerald-800" : orderDetailsPkg.status === "Dispatched" ? "bg-purple-100 text-purple-800" : orderDetailsPkg.status === "Failed" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`, children: orderDetailsPkg.status === "ReadyForPickup" ? "Ready for Pickup" : orderDetailsPkg.status }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 292,
+              lineNumber: 234,
               columnNumber: 19
             }, this)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 290,
+            lineNumber: 232,
             columnNumber: 17
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 285,
+          lineNumber: 227,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h4", { className: "text-sm font-medium text-gray-700 mb-2", children: "Customer Information" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 305,
+            lineNumber: 247,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "grid grid-cols-2 gap-4 text-sm", children: [
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Name" }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 308,
+                lineNumber: 250,
                 columnNumber: 21
               }, this),
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: orderDetailsPkg.customerName || "—" }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 309,
+                lineNumber: 251,
                 columnNumber: 21
               }, this)
             ] }, void 0, true, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 307,
+              lineNumber: 249,
               columnNumber: 19
             }, this),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Email" }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 312,
+                lineNumber: 254,
                 columnNumber: 21
               }, this),
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: orderDetailsPkg.customerEmail || "—" }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 313,
+                lineNumber: 255,
                 columnNumber: 21
               }, this)
             ] }, void 0, true, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 311,
+              lineNumber: 253,
               columnNumber: 19
             }, this)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 306,
+            lineNumber: 248,
             columnNumber: 17
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 304,
+          lineNumber: 246,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h4", { className: "text-sm font-medium text-gray-700 mb-2", children: "Products" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 318,
+            lineNumber: 260,
             columnNumber: 17
           }, this),
           orderDetailsPkg.items.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400", children: "No product details available." }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 320,
+            lineNumber: 262,
             columnNumber: 19
           }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-2", children: [
             orderDetailsPkg.items.map((item, idx) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm", children: [
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "font-medium text-gray-900", children: item.productName || item.productId.slice(0, 8) }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 325,
+                lineNumber: 267,
                 columnNumber: 25
               }, this),
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-gray-600", children: [
@@ -10209,76 +10047,76 @@ function App() {
                 item.quantity
               ] }, void 0, true, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 326,
+                lineNumber: 268,
                 columnNumber: 25
               }, this)
             ] }, idx, true, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 324,
+              lineNumber: 266,
               columnNumber: 23
             }, this)),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between px-3 py-2 text-sm font-medium border-t border-gray-200 mt-2 pt-2", children: [
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-gray-700", children: "Total Items" }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 330,
+                lineNumber: 272,
                 columnNumber: 23
               }, this),
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-gray-900", children: orderDetailsPkg.items.reduce((sum, i) => sum + i.quantity, 0) }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 331,
+                lineNumber: 273,
                 columnNumber: 23
               }, this)
             ] }, void 0, true, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 329,
+              lineNumber: 271,
               columnNumber: 21
             }, this)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 322,
+            lineNumber: 264,
             columnNumber: 19
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 317,
+          lineNumber: 259,
           columnNumber: 15
         }, this),
         orderDetailsPkg.preparedAt && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4 text-sm", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Prepared At" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 338,
+            lineNumber: 280,
             columnNumber: 19
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: new Date(orderDetailsPkg.preparedAt).toLocaleString() }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 339,
+            lineNumber: 281,
             columnNumber: 19
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 337,
+          lineNumber: 279,
           columnNumber: 17
         }, this),
         orderDetailsPkg.readyAt && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4 text-sm", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Ready At" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 344,
+            lineNumber: 286,
             columnNumber: 19
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: new Date(orderDetailsPkg.readyAt).toLocaleString() }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 345,
+            lineNumber: 287,
             columnNumber: 19
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 343,
+          lineNumber: 285,
           columnNumber: 17
         }, this),
         orderDetailsPkg.status === "Failed" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4 text-sm", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Issue" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 350,
+            lineNumber: 292,
             columnNumber: 19
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-red-700", children: [
@@ -10287,17 +10125,17 @@ function App() {
             orderDetailsPkg.issueDetails
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 351,
+            lineNumber: 293,
             columnNumber: 19
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 349,
+          lineNumber: 291,
           columnNumber: 17
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 284,
+        lineNumber: 226,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "mt-6 flex justify-end", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
@@ -10311,39 +10149,39 @@ function App() {
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 356,
+          lineNumber: 298,
           columnNumber: 15
         },
         this
       ) }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 355,
+        lineNumber: 297,
         columnNumber: 13
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 279,
+      lineNumber: 221,
       columnNumber: 11
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 278,
+      lineNumber: 220,
       columnNumber: 9
     }, this),
     reportIssuePkg && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/40", onClick: () => setReportIssuePkg(null), children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6", onClick: (e) => e.stopPropagation(), children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { className: "text-lg font-semibold text-gray-900", children: "Report Issue & Cancel Order" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 372,
+          lineNumber: 314,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { onClick: () => setReportIssuePkg(null), className: "text-gray-400 hover:text-gray-600 text-xl", children: "×" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 373,
+          lineNumber: 315,
           columnNumber: 15
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 371,
+        lineNumber: 313,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-600 mb-4", children: [
@@ -10353,25 +10191,25 @@ function App() {
           "..."
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 376,
+          lineNumber: 318,
           columnNumber: 21
         }, this),
         " for ",
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "font-medium", children: reportIssuePkg.customerName || "unknown customer" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 376,
+          lineNumber: 318,
           columnNumber: 102
         }, this),
         " will be cancelled."
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 375,
+        lineNumber: 317,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "mb-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "What went wrong?" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 379,
+          lineNumber: 321,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
@@ -10387,14 +10225,14 @@ function App() {
           false,
           {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 380,
+            lineNumber: 322,
             columnNumber: 15
           },
           this
         )
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 378,
+        lineNumber: 320,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-end gap-3", children: [
@@ -10409,7 +10247,7 @@ function App() {
           false,
           {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 389,
+            lineNumber: 331,
             columnNumber: 15
           },
           this
@@ -10431,35 +10269,35 @@ function App() {
           false,
           {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 395,
+            lineNumber: 337,
             columnNumber: 15
           },
           this
         )
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 388,
+        lineNumber: 330,
         columnNumber: 13
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 370,
+      lineNumber: 312,
       columnNumber: 11
     }, this) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 369,
+      lineNumber: 311,
       columnNumber: 9
     }, this),
     trackingOrderId && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(ShippingTrackingModal, { orderId: trackingOrderId, onClose: () => setTrackingOrderId(void 0) }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 414,
+      lineNumber: 356,
       columnNumber: 9
     }, this),
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white border border-gray-200 rounded-xl p-6", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h2", { className: "text-lg font-semibold text-gray-900", children: "Products" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 420,
+          lineNumber: 362,
           columnNumber: 11
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
@@ -10473,35 +10311,35 @@ function App() {
           false,
           {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 421,
+            lineNumber: 363,
             columnNumber: 11
           },
           this
         )
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 419,
+        lineNumber: 361,
         columnNumber: 9
       }, this),
       seller.publishedProductIds.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-8", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-4xl mb-2", children: "📦" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 431,
+          lineNumber: 373,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "No products published yet." }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 432,
+          lineNumber: 374,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400 mt-1", children: "Start listing your products to begin selling on eShop Academy." }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 433,
+          lineNumber: 375,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 430,
+        lineNumber: 372,
         columnNumber: 11
       }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
         ProductsTable,
@@ -10516,6 +10354,13 @@ function App() {
           currentPage,
           pageSize,
           onPageChange: setCurrentPage,
+          sortKey: productSortKey,
+          sortDir: productSortDir,
+          onSortChange: (key, dir) => {
+            setProductSortKey(key);
+            setProductSortDir(dir);
+            setCurrentPage(1);
+          },
           onEdit: (product) => {
             setEditingProduct(product);
             setPage("edit");
@@ -10534,19 +10379,19 @@ function App() {
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 436,
+          lineNumber: 378,
           columnNumber: 11
         },
         this
       )
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 418,
+      lineNumber: 360,
       columnNumber: 7
     }, this)
   ] }, void 0, true, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 98,
+    lineNumber: 132,
     columnNumber: 5
   }, this);
 }
@@ -10577,48 +10422,48 @@ function ShippingTrackingModal({ orderId, onClose }) {
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between mb-4", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h3", { className: "text-lg font-semibold text-gray-900", children: "Shipping Tracking" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 479,
+        lineNumber: 424,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { onClick: onClose, className: "text-gray-400 hover:text-gray-600 text-xl", children: "×" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 480,
+        lineNumber: 425,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 478,
+      lineNumber: 423,
       columnNumber: 9
     }, this),
     isLoading && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400 py-4 text-center", children: "Loading shipping info..." }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 483,
+      lineNumber: 428,
       columnNumber: 23
     }, this),
     isError && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-red-500 py-4 text-center", children: "Unable to load shipping information." }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 484,
+      lineNumber: 429,
       columnNumber: 21
     }, this),
     !isLoading && !isError && history.length === 0 && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-8", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-4xl mb-2", children: "📦" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 487,
+        lineNumber: 432,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "No shipping information available yet." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 488,
+        lineNumber: 433,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400 mt-1", children: "Tracking will appear once the carrier picks up the package." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 489,
+        lineNumber: 434,
         columnNumber: 13
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 486,
+      lineNumber: 431,
       columnNumber: 11
     }, this),
     latest && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-4", children: [
@@ -10626,104 +10471,104 @@ function ShippingTrackingModal({ orderId, onClose }) {
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Carrier" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 497,
+            lineNumber: 442,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: latest.carrier || "—" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 498,
+            lineNumber: 443,
             columnNumber: 17
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 496,
+          lineNumber: 441,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "Tracking Number" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 501,
+            lineNumber: 446,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-medium text-gray-900", children: latest.trackingNumber || "—" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 502,
+            lineNumber: 447,
             columnNumber: 17
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 500,
+          lineNumber: 445,
           columnNumber: 15
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 495,
+        lineNumber: 440,
         columnNumber: 13
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "border-t border-gray-100 pt-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h4", { className: "text-sm font-medium text-gray-700 mb-3", children: "Status History" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 507,
+          lineNumber: 452,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "relative", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 509,
+            lineNumber: 454,
             columnNumber: 17
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-4", children: [...history].reverse().map((entry, idx) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-start gap-3 relative", children: [
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: `w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 z-10 bg-white ${statusColor(entry.status)}`, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-xs", children: idx === 0 ? "●" : "○" }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 514,
+              lineNumber: 459,
               columnNumber: 25
             }, this) }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 513,
+              lineNumber: 458,
               columnNumber: 23
             }, this),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex-1 min-w-0", children: [
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(entry.status)}`, children: entry.status.replace(/_/g, " ") }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 520,
+                lineNumber: 465,
                 columnNumber: 27
               }, this) }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 519,
+                lineNumber: 464,
                 columnNumber: 25
               }, this),
               /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xs text-gray-500 mt-0.5", children: new Date(entry.occurredAt).toLocaleString() }, void 0, false, {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 524,
+                lineNumber: 469,
                 columnNumber: 25
               }, this)
             ] }, void 0, true, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 518,
+              lineNumber: 463,
               columnNumber: 23
             }, this)
           ] }, idx, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 512,
+            lineNumber: 457,
             columnNumber: 21
           }, this)) }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 510,
+            lineNumber: 455,
             columnNumber: 17
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 508,
+          lineNumber: 453,
           columnNumber: 15
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 506,
+        lineNumber: 451,
         columnNumber: 13
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 494,
+      lineNumber: 439,
       columnNumber: 11
     }, this),
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "mt-6 flex items-center justify-between gap-3", children: [
@@ -10740,28 +10585,421 @@ function ShippingTrackingModal({ orderId, onClose }) {
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 538,
+          lineNumber: 483,
           columnNumber: 13
         },
         this
       ) ,
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { onClick: onClose, className: "rounded-lg bg-gray-100 text-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-200 transition", children: "Close" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 547,
+        lineNumber: 492,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 536,
+      lineNumber: 481,
       columnNumber: 9
     }, this)
   ] }, void 0, true, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 477,
+    lineNumber: 422,
     columnNumber: 7
   }, this) }, void 0, false, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 476,
+    lineNumber: 421,
+    columnNumber: 5
+  }, this);
+}
+function SalesTable({
+  packages,
+  loading,
+  onRowClick,
+  onConfirm,
+  confirmDisabled,
+  onMarkReady,
+  markReadyDisabled,
+  onReportIssue,
+  reportIssueDisabled,
+  onTrackShipping
+}) {
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortKey, setSortKey] = useState("updated");
+  const [sortDir, setSortDir] = useState("desc");
+  const pageSize = 5;
+  const productLabel = (pkg) => pkg.items.length > 0 ? pkg.items.length === 1 ? pkg.items[0].productName || pkg.items[0].productId.slice(0, 8) : `${pkg.items[0].productName || pkg.items[0].productId.slice(0, 8)} +${pkg.items.length - 1}` : "";
+  const qtyOf = (pkg) => pkg.items.reduce((sum, i) => sum + i.quantity, 0);
+  const term = search.toLowerCase();
+  const filtered = packages.filter(
+    (pkg) => (pkg.customerName || "").toLowerCase().includes(term) || productLabel(pkg).toLowerCase().includes(term) || pkg.status.toLowerCase().includes(term)
+  );
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    switch (sortKey) {
+      case "customer":
+        cmp = (a.customerName || "").localeCompare(b.customerName || "");
+        break;
+      case "product":
+        cmp = productLabel(a).localeCompare(productLabel(b));
+        break;
+      case "qty":
+        cmp = qtyOf(a) - qtyOf(b);
+        break;
+      case "status":
+        cmp = a.status.localeCompare(b.status);
+        break;
+      case "updated":
+        cmp = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+        break;
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginated = sorted.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+    setCurrentPage(1);
+  };
+  if (loading) {
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400", children: "Loading..." }, void 0, false, {
+      fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+      lineNumber: 582,
+      columnNumber: 12
+    }, this);
+  }
+  if (packages.length === 0) {
+    return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-8", children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-4xl mb-2", children: "🛒" }, void 0, false, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 588,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-500", children: "No sells yet." }, void 0, false, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 589,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-400 mt-1", children: "Orders will appear here as customers purchase your products." }, void 0, false, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 590,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+      lineNumber: 587,
+      columnNumber: 7
+    }, this);
+  }
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-4", children: [
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+      "input",
+      {
+        type: "text",
+        placeholder: "Search sells...",
+        value: search,
+        onChange: (e) => {
+          setSearch(e.target.value);
+          setCurrentPage(1);
+        },
+        className: "w-full md:w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+      },
+      void 0,
+      false,
+      {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 597,
+        columnNumber: 7
+      },
+      this
+    ),
+    filtered.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-6 text-gray-500 text-sm", children: "No sells match your search." }, void 0, false, {
+      fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+      lineNumber: 606,
+      columnNumber: 9
+    }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("table", { className: "w-full text-sm text-left", children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("thead", { className: "bg-gray-50 text-gray-600 uppercase text-xs", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Customer", active: sortKey === "customer", dir: sortDir, onClick: () => toggleSort("customer") }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 613,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Product", active: sortKey === "product", dir: sortDir, onClick: () => toggleSort("product") }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 614,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Qty", active: sortKey === "qty", dir: sortDir, onClick: () => toggleSort("qty") }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 615,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Status", active: sortKey === "status", dir: sortDir, onClick: () => toggleSort("status") }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 616,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Updated", active: sortKey === "updated", dir: sortDir, onClick: () => toggleSort("updated") }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 617,
+            columnNumber: 19
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3 text-right", children: "Actions" }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 618,
+            columnNumber: 19
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 612,
+          columnNumber: 17
+        }, this) }, void 0, false, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 611,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tbody", { className: "divide-y divide-gray-100", children: paginated.map((pkg) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { className: "hover:bg-gray-50 cursor-pointer", onClick: () => onRowClick(pkg), children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 font-medium text-gray-900", children: pkg.customerName || "—" }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 624,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-700", children: productLabel(pkg) || "—" }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 625,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-700", children: qtyOf(pkg) || "—" }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 626,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${pkg.status === "Pending" ? "bg-yellow-100 text-yellow-800" : pkg.status === "Preparing" ? "bg-blue-100 text-blue-800" : pkg.status === "ReadyForPickup" ? "bg-emerald-100 text-emerald-800" : pkg.status === "Dispatched" ? "bg-purple-100 text-purple-800" : pkg.status === "Failed" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"}`, children: pkg.status === "ReadyForPickup" ? "Ready for Pickup" : pkg.status }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 628,
+            columnNumber: 23
+          }, this) }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 627,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-500", children: new Date(pkg.updatedAt).toLocaleDateString() }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 639,
+            columnNumber: 21
+          }, this),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-right", onClick: (e) => e.stopPropagation(), children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-end gap-2", children: [
+            pkg.status === "Pending" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+                "button",
+                {
+                  onClick: () => onConfirm(pkg),
+                  disabled: confirmDisabled,
+                  className: "rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1.5 text-xs font-medium hover:bg-emerald-100 transition disabled:opacity-50",
+                  children: "✓ Confirm"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+                  lineNumber: 646,
+                  columnNumber: 29
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+                "button",
+                {
+                  onClick: () => onReportIssue(pkg),
+                  disabled: reportIssueDisabled,
+                  className: "rounded-lg bg-red-50 text-red-700 px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition disabled:opacity-50",
+                  children: "⚠ Report Issue"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+                  lineNumber: 653,
+                  columnNumber: 29
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+              lineNumber: 645,
+              columnNumber: 27
+            }, this),
+            pkg.status === "Preparing" && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+                "button",
+                {
+                  onClick: () => onMarkReady(pkg),
+                  disabled: markReadyDisabled,
+                  className: "rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1.5 text-xs font-medium hover:bg-emerald-100 transition disabled:opacity-50",
+                  children: "✓ Ready for Pickup"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+                  lineNumber: 664,
+                  columnNumber: 29
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+                "button",
+                {
+                  onClick: () => onReportIssue(pkg),
+                  disabled: reportIssueDisabled,
+                  className: "rounded-lg bg-red-50 text-red-700 px-3 py-1.5 text-xs font-medium hover:bg-red-100 transition disabled:opacity-50",
+                  children: "⚠ Report Issue"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+                  lineNumber: 671,
+                  columnNumber: 29
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+              lineNumber: 663,
+              columnNumber: 27
+            }, this),
+            (pkg.status === "ReadyForPickup" || pkg.status === "Dispatched") && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+              "button",
+              {
+                onClick: () => onTrackShipping(pkg),
+                className: "rounded-lg bg-purple-50 text-purple-700 px-3 py-1.5 text-xs font-medium hover:bg-purple-100 transition",
+                children: "🚚 Track Shipping"
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+                lineNumber: 681,
+                columnNumber: 27
+              },
+              this
+            )
+          ] }, void 0, true, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 643,
+            columnNumber: 23
+          }, this) }, void 0, false, {
+            fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+            lineNumber: 642,
+            columnNumber: 21
+          }, this)
+        ] }, pkg.orderId, true, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 623,
+          columnNumber: 19
+        }, this)) }, void 0, false, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 621,
+          columnNumber: 15
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 610,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 609,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between pt-2", children: [
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-xs text-gray-500", children: [
+          "Showing ",
+          (safePage - 1) * pageSize + 1,
+          "–",
+          Math.min(safePage * pageSize, sorted.length),
+          " of ",
+          sorted.length
+        ] }, void 0, true, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 698,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+            "button",
+            {
+              onClick: () => setCurrentPage(safePage - 1),
+              disabled: safePage === 1,
+              className: "rounded px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition",
+              children: "Previous"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+              lineNumber: 702,
+              columnNumber: 15
+            },
+            this
+          ),
+          Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+            "button",
+            {
+              onClick: () => setCurrentPage(p),
+              className: `rounded px-2.5 py-1.5 text-xs font-medium transition ${p === safePage ? "bg-indigo-600 text-white" : "text-gray-700 bg-gray-100 hover:bg-gray-200"}`,
+              children: p
+            },
+            p,
+            false,
+            {
+              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+              lineNumber: 710,
+              columnNumber: 17
+            },
+            this
+          )),
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
+            "button",
+            {
+              onClick: () => setCurrentPage(safePage + 1),
+              disabled: safePage === totalPages,
+              className: "rounded px-2.5 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition",
+              children: "Next"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+              lineNumber: 722,
+              columnNumber: 15
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+          lineNumber: 701,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+        lineNumber: 697,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+      lineNumber: 608,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
+    lineNumber: 596,
     columnNumber: 5
   }, this);
 }
@@ -10773,6 +11011,9 @@ function ProductsTable({
   currentPage,
   pageSize,
   onPageChange,
+  sortKey,
+  sortDir,
+  onSortChange,
   onEdit,
   onRemove,
   onManageStock
@@ -10780,8 +11021,33 @@ function ProductsTable({
   const filtered = products.filter(
     (p) => p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    switch (sortKey) {
+      case "name":
+        cmp = a.name.localeCompare(b.name);
+        break;
+      case "category":
+        cmp = (a.category?.name ?? "").localeCompare(b.category?.name ?? "");
+        break;
+      case "price":
+        cmp = a.price - b.price;
+        break;
+      case "createdAt":
+        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        break;
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const paginated = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      onSortChange(key, sortDir === "asc" ? "desc" : "asc");
+    } else {
+      onSortChange(key, "asc");
+    }
+  };
   return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
       "input",
@@ -10796,54 +11062,54 @@ function ProductsTable({
       false,
       {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 587,
+        lineNumber: 800,
         columnNumber: 7
       },
       this
     ),
     loading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-6 text-gray-500 text-sm", children: "Loading products..." }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 596,
+      lineNumber: 809,
       columnNumber: 9
     }, this) : filtered.length === 0 ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "text-center py-6 text-gray-500 text-sm", children: searchTerm ? "No products match your search." : "No products found." }, void 0, false, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 598,
+      lineNumber: 811,
       columnNumber: 9
     }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(jsxDevRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "overflow-visible", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("table", { className: "w-full text-sm text-left", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("thead", { className: "bg-gray-50 text-gray-600 uppercase text-xs", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { children: [
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Product" }, void 0, false, {
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Product", active: sortKey === "name", dir: sortDir, onClick: () => toggleSort("name") }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 607,
+            lineNumber: 820,
             columnNumber: 19
           }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Category" }, void 0, false, {
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Category", active: sortKey === "category", dir: sortDir, onClick: () => toggleSort("category") }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 608,
+            lineNumber: 821,
             columnNumber: 19
           }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Price" }, void 0, false, {
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Price", active: sortKey === "price", dir: sortDir, onClick: () => toggleSort("price") }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 609,
+            lineNumber: 822,
             columnNumber: 19
           }, this),
-          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3", children: "Created" }, void 0, false, {
+          /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(SortableHeader, { label: "Created", active: sortKey === "createdAt", dir: sortDir, onClick: () => toggleSort("createdAt") }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 610,
+            lineNumber: 823,
             columnNumber: 19
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("th", { className: "px-4 py-3 text-right", children: "Actions" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 611,
+            lineNumber: 824,
             columnNumber: 19
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 606,
+          lineNumber: 819,
           columnNumber: 17
         }, this) }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 605,
+          lineNumber: 818,
           columnNumber: 15
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tbody", { className: "divide-y divide-gray-100", children: paginated.map((product) => /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("tr", { className: "hover:bg-gray-50", children: [
@@ -10859,28 +11125,28 @@ function ProductsTable({
               false,
               {
                 fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-                lineNumber: 619,
+                lineNumber: 832,
                 columnNumber: 25
               },
               this
             ),
             /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "font-medium text-gray-900 truncate max-w-[200px]", children: product.name }, void 0, false, {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 624,
+              lineNumber: 837,
               columnNumber: 25
             }, this)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 618,
+            lineNumber: 831,
             columnNumber: 23
           }, this) }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 617,
+            lineNumber: 830,
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-600", children: product.category?.name ?? "—" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 629,
+            lineNumber: 842,
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-900 font-medium", children: [
@@ -10888,12 +11154,12 @@ function ProductsTable({
             product.price.toFixed(2)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 632,
+            lineNumber: 845,
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-gray-500", children: new Date(product.createdAt).toLocaleDateString() }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 635,
+            lineNumber: 848,
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("td", { className: "px-4 py-3 text-right", children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(
@@ -10908,31 +11174,31 @@ function ProductsTable({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 639,
+              lineNumber: 852,
               columnNumber: 23
             },
             this
           ) }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 638,
+            lineNumber: 851,
             columnNumber: 21
           }, this)
         ] }, product.id, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 616,
+          lineNumber: 829,
           columnNumber: 19
         }, this)) }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 614,
+          lineNumber: 827,
           columnNumber: 15
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 604,
+        lineNumber: 817,
         columnNumber: 13
       }, this) }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 603,
+        lineNumber: 816,
         columnNumber: 11
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center justify-between pt-2", children: [
@@ -10940,12 +11206,12 @@ function ProductsTable({
           "Showing ",
           (currentPage - 1) * pageSize + 1,
           "–",
-          Math.min(currentPage * pageSize, filtered.length),
+          Math.min(currentPage * pageSize, sorted.length),
           " of ",
-          filtered.length
+          sorted.length
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 654,
+          lineNumber: 867,
           columnNumber: 13
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-1", children: [
@@ -10961,7 +11227,7 @@ function ProductsTable({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 658,
+              lineNumber: 871,
               columnNumber: 15
             },
             this
@@ -10977,7 +11243,7 @@ function ProductsTable({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 666,
+              lineNumber: 879,
               columnNumber: 17
             },
             this
@@ -10994,29 +11260,29 @@ function ProductsTable({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 678,
+              lineNumber: 891,
               columnNumber: 15
             },
             this
           )
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 657,
+          lineNumber: 870,
           columnNumber: 13
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 653,
+        lineNumber: 866,
         columnNumber: 11
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 602,
+      lineNumber: 815,
       columnNumber: 9
     }, this)
   ] }, void 0, true, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 586,
+    lineNumber: 799,
     columnNumber: 5
   }, this);
 }
@@ -11047,22 +11313,22 @@ function MeatballsMenu({
         children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("svg", { className: "w-5 h-5 text-gray-500", fill: "currentColor", viewBox: "0 0 20 20", children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("circle", { cx: "4", cy: "10", r: "2" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 725,
+            lineNumber: 938,
             columnNumber: 25
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("circle", { cx: "10", cy: "10", r: "2" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 726,
+            lineNumber: 939,
             columnNumber: 25
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("circle", { cx: "16", cy: "10", r: "2" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 727,
+            lineNumber: 940,
             columnNumber: 25
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 724,
+          lineNumber: 937,
           columnNumber: 23
         }, this)
       },
@@ -11070,7 +11336,7 @@ function MeatballsMenu({
       false,
       {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 719,
+        lineNumber: 932,
         columnNumber: 21
       },
       this
@@ -11090,7 +11356,7 @@ function MeatballsMenu({
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 732,
+          lineNumber: 945,
           columnNumber: 25
         },
         this
@@ -11109,7 +11375,7 @@ function MeatballsMenu({
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 738,
+          lineNumber: 951,
           columnNumber: 25
         },
         this
@@ -11128,19 +11394,19 @@ function MeatballsMenu({
         false,
         {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 744,
+          lineNumber: 957,
           columnNumber: 25
         },
         this
       )
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 731,
+      lineNumber: 944,
       columnNumber: 23
     }, this)
   ] }, void 0, true, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 718,
+    lineNumber: 931,
     columnNumber: 19
   }, this);
 }
@@ -11157,30 +11423,30 @@ function ManageStockPage({
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-4 mb-8", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("button", { onClick: onBack, className: "text-gray-500 hover:text-gray-700", children: "← Back" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 774,
+        lineNumber: 987,
         columnNumber: 23
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h1", { className: "text-2xl font-bold text-gray-900", children: "Manage Stock" }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 775,
+        lineNumber: 988,
         columnNumber: 23
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 773,
+      lineNumber: 986,
       columnNumber: 21
     }, this),
     /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-white border border-gray-200 rounded-xl p-6 space-y-6", children: [
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex items-center gap-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("img", { src: product.imageUrl, alt: product.name, className: "h-16 w-16 rounded object-cover bg-gray-100" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 780,
+          lineNumber: 993,
           columnNumber: 25
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "font-semibold text-gray-900", children: product.name }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 782,
+            lineNumber: 995,
             columnNumber: 27
           }, this),
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-500", children: [
@@ -11188,51 +11454,51 @@ function ManageStockPage({
             product.price.toFixed(2)
           ] }, void 0, true, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 783,
+            lineNumber: 996,
             columnNumber: 27
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 781,
+          lineNumber: 994,
           columnNumber: 25
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 779,
+        lineNumber: 992,
         columnNumber: 23
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "bg-gray-50 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-sm text-gray-500 mb-1", children: "Current Stock" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 788,
+          lineNumber: 1001,
           columnNumber: 25
         }, this),
         isLoading ? /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-gray-400 text-sm", children: "Loading..." }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 790,
+          lineNumber: 1003,
           columnNumber: 27
         }, this) : /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-3xl font-bold text-gray-900", children: [
           currentStock,
           " ",
           /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("span", { className: "text-base font-normal text-gray-500", children: "units" }, void 0, false, {
             fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-            lineNumber: 792,
+            lineNumber: 1005,
             columnNumber: 90
           }, this)
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 792,
+          lineNumber: 1005,
           columnNumber: 27
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 787,
+        lineNumber: 1e3,
         columnNumber: 23
       }, this),
       /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("label", { className: "block text-sm font-medium text-gray-700 mb-1", children: "Add Stock" }, void 0, false, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 797,
+          lineNumber: 1010,
           columnNumber: 25
         }, this),
         /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { className: "flex gap-3", children: [
@@ -11251,7 +11517,7 @@ function ManageStockPage({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 799,
+              lineNumber: 1012,
               columnNumber: 27
             },
             this
@@ -11274,39 +11540,39 @@ function ManageStockPage({
             false,
             {
               fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-              lineNumber: 808,
+              lineNumber: 1021,
               columnNumber: 27
             },
             this
           )
         ] }, void 0, true, {
           fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-          lineNumber: 798,
+          lineNumber: 1011,
           columnNumber: 25
         }, this)
       ] }, void 0, true, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 796,
+        lineNumber: 1009,
         columnNumber: 23
       }, this),
       updateStock.isSuccess && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-emerald-600 text-sm", children: "✓ Stock updated successfully." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 825,
+        lineNumber: 1038,
         columnNumber: 25
       }, this),
       updateStock.isError && /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { className: "text-red-600 text-sm", children: "Failed to update stock. Please try again." }, void 0, false, {
         fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-        lineNumber: 828,
+        lineNumber: 1041,
         columnNumber: 25
       }, this)
     ] }, void 0, true, {
       fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-      lineNumber: 778,
+      lineNumber: 991,
       columnNumber: 21
     }, this)
   ] }, void 0, true, {
     fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/App.tsx",
-    lineNumber: 772,
+    lineNumber: 985,
     columnNumber: 19
   }, this);
 }

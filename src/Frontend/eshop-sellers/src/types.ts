@@ -24,12 +24,17 @@ export interface SellerAddress {
 }
 
 export interface SellerLedgerEntry {
-  id: string;
-  type: string;
-  amount: number;
-  notes: string;
+  entryId: string;
   orderId: string;
+  orderItemId: string;
+  grossAmount: number;
+  commissionAmount: number;
+  netAmount: number;
+  type: string;
   createdAt: string;
+  notes: string;
+  isProcessed: boolean;
+  processedAt: string | null;
 }
 
 export interface SellerFinancialSummary {

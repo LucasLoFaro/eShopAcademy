@@ -47,15 +47,7 @@
     <ProjectReference Include="..\Stock\Stock.API\Stock.API.csproj" />
     <ProjectReference Include="..\Stock\Stock.gRPC\Stock.gRPC.csproj" />
     <ProjectReference Include="..\Stock\Stock.Messaging.Processor\Stock.Messaging.Processor.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Mocks\psp-make-payment.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mocks\dhl-schedule-shipping.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Shipping\Shipping.Simulator\Shipping.Simulator.csproj" />
   </ItemGroup>
 
 </Project>

@@ -14,7 +14,7 @@ public static class BasketExtensions
             .WithReference(rabbit)
             .WaitFor(rabbit)
             .WithCommonEnvironments()
-            .WithHttpEndpoint(port: 8004, name: "redis");
+            .WithHttpEndpoint(port: 8004, name: "basket-api");
 
         basketEvents
             .WithReference(redis)

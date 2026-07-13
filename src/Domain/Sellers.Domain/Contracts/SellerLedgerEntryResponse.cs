@@ -12,7 +12,9 @@ public record SellerLedgerEntryResponse(
     decimal NetAmount,
     SellerLedgerEntryType Type,
     DateTime CreatedAt,
-    string Notes)
+    string Notes,
+    bool IsProcessed,
+    DateTime? ProcessedAt)
 {
     public static SellerLedgerEntryResponse FromEntry(SellerLedgerEntry entry) =>
         new(
@@ -24,5 +26,7 @@ public record SellerLedgerEntryResponse(
             entry.NetAmount,
             entry.Type,
             entry.CreatedAt,
-            entry.Notes);
+            entry.Notes,
+            entry.IsProcessed,
+            entry.ProcessedAt);
 }

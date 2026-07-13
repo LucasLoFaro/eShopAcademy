@@ -24,6 +24,7 @@ public static class EnvironmentSetup
         IResourceBuilder<ProjectResource> pspSimulator,
         IResourceBuilder<ProjectResource> shippingApi,
         IResourceBuilder<ProjectResource> shippingService,
+        IResourceBuilder<ProjectResource> shippingSimulator,
         IResourceBuilder<ProjectResource> notificationService,
         IResourceBuilder<ProjectResource> notificationApi,
         IResourceBuilder<ProjectResource> customersApi,
@@ -70,10 +71,6 @@ public static class EnvironmentSetup
             .WithManagementPlugin()     // (user/pass: guest/guest)
             .WithLifetime(ContainerLifetime.Persistent);
 
-        var wiremock = builder.AddWiremock("external-services-mocks")
-            .WithHttpEndpoint(port: 8090, targetPort: 8080, name: "external-services-mocks")
-            .WithLifetime(ContainerLifetime.Persistent);
-
         var storage = builder.AddAzureStorage("storage")
             .RunAsEmulator(emulator => emulator
                 .WithDataVolume("azurite-data")
@@ -87,7 +84,7 @@ public static class EnvironmentSetup
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, rabbit);
-        ShippingExtensions.Configure(shippingApi, shippingService, wiremock, rabbit, shippingdb);
+        ShippingExtensions.Configure(shippingApi, shippingService, shippingSimulator, rabbit, shippingdb, redis);
         NotificationExtensions.Configure(notificationService, notificationApi, notificationsdb, rabbit, sendGridApiKey);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);

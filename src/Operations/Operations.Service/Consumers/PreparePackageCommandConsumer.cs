@@ -28,8 +28,17 @@ public class PreparePackageCommandConsumer : IConsumer<PreparePackageCommand>
         {
             OrderId = message.OrderId,
             ReservationId = message.ReservationId,
+            SellerId = message.SellerId,
+            CustomerName = message.CustomerName,
+            CustomerEmail = message.CustomerEmail,
             Status = PackageStatus.Pending,
-            PreparedAt = DateTime.UtcNow
+            PreparedAt = DateTime.UtcNow,
+            Items = message.Items.Select(i => new PackageItem
+            {
+                ProductId = i.ProductId,
+                ProductName = i.ProductName,
+                Quantity = i.Quantity
+            }).ToList()
         };
 
         await _repository.CreateOrUpdateAsync(package, context.CancellationToken);

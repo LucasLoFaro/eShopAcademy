@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,21 @@ builder.AddAzureBlobClient("productimages");
 builder.Services.AddHttpClient("products-api", client =>
 {
     client.BaseAddress = new Uri("https+http://eshopacademy-products-api");
+}).AddServiceDiscovery();
+
+builder.Services.AddHttpClient("shipping-api", client =>
+{
+    client.BaseAddress = new Uri("https+http://eshopacademy-shipping-api");
+}).AddServiceDiscovery();
+
+builder.Services.AddHttpClient("orders-api", client =>
+{
+    client.BaseAddress = new Uri("https+http://eshopacademy-orders-api");
+}).AddServiceDiscovery();
+
+builder.Services.AddHttpClient("stock-api", client =>
+{
+    client.BaseAddress = new Uri("http://_stock-api.eshopacademy-stock-api");
 }).AddServiceDiscovery();
 
 var app = builder.Build();
@@ -182,6 +198,143 @@ app.MapGet("/api/sellers/{sellerId:guid}/financial-summary", async (
         seller.AccumulatedSalesAmount - seller.AccumulatedCommissionsAmount,
         seller.Ledger.Count));
 }).RequireAuthorization("sellers-authenticated");
+
+app.MapGet("/api/sellers/{sellerId:guid}/sales", async (
+    Guid sellerId,
+    int? skip,
+    int? take,
+    bool? pendingOnly,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null)
+    {
+        return Results.NotFound();
+    }
+
+    var sales = seller.Ledger
+        .Where(e => e.Type == Domain.Sellers.Enums.SellerLedgerEntryType.Sale)
+        .Where(e => pendingOnly != true || !e.IsProcessed)
+        .OrderByDescending(e => e.CreatedAt)
+        .Skip(Math.Max(skip ?? 0, 0))
+        .Take(Math.Clamp(take ?? 50, 1, 500))
+        .Select(SellerLedgerEntryResponse.FromEntry);
+
+    return Results.Ok(sales);
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("GetSellerSales");
+
+app.MapPost("/api/sellers/{sellerId:guid}/sales/{entryId:guid}/mark-processed", async (
+    Guid sellerId,
+    Guid entryId,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.MarkSaleAsProcessedAsync(sellerId, entryId, cancellationToken);
+    if (seller is null)
+    {
+        return Results.NotFound();
+    }
+
+    var entry = seller.Ledger.First(e => e.EntryId == entryId);
+    return Results.Ok(SellerLedgerEntryResponse.FromEntry(entry));
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("MarkSaleAsProcessed");
+
+app.MapGet("/api/sellers/{sellerId:guid}/sales/{entryId:guid}/shipping-status", async (
+    Guid sellerId,
+    Guid entryId,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    IHttpClientFactory httpClientFactory,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null)
+    {
+        return Results.NotFound();
+    }
+
+    var entry = seller.Ledger.FirstOrDefault(e => e.EntryId == entryId);
+    if (entry is null)
+    {
+        return Results.NotFound();
+    }
+
+    var client = httpClientFactory.CreateClient("shipping-api");
+    var response = await client.GetAsync($"/api/shipping/{entry.OrderId}/status", cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.NotFound("Shipping status not available.");
+    }
+
+    var shippingStatus = await response.Content.ReadFromJsonAsync<object>(cancellationToken);
+    return Results.Ok(shippingStatus);
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("GetSaleShippingStatus");
+
+app.MapGet("/api/sellers/{sellerId:guid}/sales/{entryId:guid}/bill", async (
+    Guid sellerId,
+    Guid entryId,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    IHttpClientFactory httpClientFactory,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null)
+    {
+        return Results.NotFound();
+    }
+
+    var entry = seller.Ledger.FirstOrDefault(e => e.EntryId == entryId);
+    if (entry is null)
+    {
+        return Results.NotFound();
+    }
+
+    var client = httpClientFactory.CreateClient("orders-api");
+    var response = await client.GetAsync($"/orders/{entry.OrderId}", cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.NotFound("Order billing information not available.");
+    }
+
+    var order = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+
+    if (order.TryGetProperty("billing", out var billing))
+    {
+        return Results.Ok(billing);
+    }
+
+    return Results.NotFound("Billing information not found for this order.");
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("GetSaleBill");
 
 app.MapPost("/api/sellers/register", async (
     RegisterSellerRequest request,
@@ -331,8 +484,96 @@ app.MapPost("/api/sellers/products", async (
     }
 
     await sellerService.AssignPublishedProductsAsync(seller.Id, [product.Id], cancellationToken);
+
+    if (request.InitialStock > 0)
+    {
+        var stockClient = httpClientFactory.CreateClient("stock-api");
+        var stockForm = new MultipartFormDataContent();
+        stockForm.Add(new StringContent(product.Id.ToString()), "ProductGuid");
+        stockForm.Add(new StringContent(request.InitialStock.ToString()), "Quantity");
+        stockForm.Add(new StringContent("WH-01"), "Warehouse");
+        await stockClient.PostAsync("/api/stock/Increase", stockForm, cancellationToken);
+    }
+
     return Results.Created($"/api/products/{product.Id}", product);
 }).RequireAuthorization("sellers-authenticated");
+
+app.MapGet("/api/sellers/{sellerId:guid}/products/{productId:guid}/stock", async (
+    Guid sellerId,
+    Guid productId,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    IHttpClientFactory httpClientFactory,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null || !seller.PublishedProductIds.Contains(productId))
+    {
+        return Results.NotFound();
+    }
+
+    var client = httpClientFactory.CreateClient("stock-api");
+    var response = await client.GetAsync($"/api/stock/{productId}", cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.Ok(new { productId, quantity = 0, warehouse = "N/A" });
+    }
+
+    var stock = await response.Content.ReadFromJsonAsync<object>(cancellationToken);
+    return Results.Ok(stock);
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("GetProductStock");
+
+app.MapPost("/api/sellers/{sellerId:guid}/products/{productId:guid}/stock", async (
+    Guid sellerId,
+    Guid productId,
+    StockUpdateRequest stockRequest,
+    ClaimsPrincipal user,
+    ISellerService sellerService,
+    IHttpClientFactory httpClientFactory,
+    CancellationToken cancellationToken) =>
+{
+    if (!await CanAccessSellerAsync(user, sellerId, sellerService, cancellationToken))
+    {
+        return Results.Forbid();
+    }
+
+    var seller = await sellerService.GetByIdAsync(sellerId, cancellationToken);
+    if (seller is null || !seller.PublishedProductIds.Contains(productId))
+    {
+        return Results.NotFound();
+    }
+
+    var client = httpClientFactory.CreateClient("stock-api");
+    var form = new MultipartFormDataContent();
+    form.Add(new StringContent(productId.ToString()), "ProductGuid");
+    form.Add(new StringContent(stockRequest.Quantity.ToString()), "Quantity");
+    form.Add(new StringContent(stockRequest.Warehouse ?? "WH-01"), "Warehouse");
+
+    var endpoint = stockRequest.Quantity >= 0 ? "/api/stock/Increase" : "/api/stock/Decrease";
+    var absQuantity = Math.Abs(stockRequest.Quantity);
+    var absForm = new MultipartFormDataContent();
+    absForm.Add(new StringContent(productId.ToString()), "ProductGuid");
+    absForm.Add(new StringContent(absQuantity.ToString()), "Quantity");
+    absForm.Add(new StringContent(stockRequest.Warehouse ?? "WH-01"), "Warehouse");
+
+    var response = await client.PostAsync(endpoint, absForm, cancellationToken);
+
+    if (!response.IsSuccessStatusCode)
+    {
+        return Results.Problem("Failed to update stock.", statusCode: 502);
+    }
+
+    var result = await response.Content.ReadFromJsonAsync<object>(cancellationToken);
+    return Results.Ok(result);
+}).RequireAuthorization("sellers-authenticated")
+  .WithName("UpdateProductStock");
 
 app.Run();
 
@@ -364,3 +605,5 @@ static async Task<bool> CanAccessSellerAsync(ClaimsPrincipal user, Guid sellerId
     var seller = await sellerService.GetByIdentityAsync(oid, cancellationToken);
     return seller is not null && seller.Id == sellerId;
 }
+
+record StockUpdateRequest(int Quantity, string? Warehouse);

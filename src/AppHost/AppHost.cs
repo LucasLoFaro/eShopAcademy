@@ -28,15 +28,10 @@ var pspSimulator = builder.AddProject<Projects.PSP_Simulator>("eshopacademy-psp-
 var operationsApi = builder.AddProject<Projects.Operations_Api>("eshopacademy-operations-api");
 var operationsService = builder.AddProject<Projects.Operations_Service>("eshopacademy-operations-service");
 
-// Sellers
-var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api")
-                        .WithReference(productsApi);
-var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-sellers-service");
-var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
-
 // Shipping
 var shippingApi = builder.AddProject<Projects.Shipping_Api>("eshopacademy-shipping-api");
 var shippingService = builder.AddProject<Projects.Shipping_Service>("eshopacademy-shipping-service");
+var shippingSimulator = builder.AddProject<Projects.Shipping_Simulator>("eshopacademy-shipping-simulator");
 
 // Customer
 var customersApi = builder.AddProject<Projects.Customers_Api>("eshopacademy-customers-api");
@@ -54,6 +49,15 @@ var ordersApi = builder.AddProject<Projects.Orders_API>("eshopacademy-orders-api
                         .WithReference(paymentsGrpc);
 var ordersMessaging = builder.AddProject<Projects.Orders_Messaging>("eshopacademy-orders-messaging");
 
+// Sellers
+var sellersApi = builder.AddProject<Projects.Sellers_Api>("eshopacademy-sellers-api")
+                        .WithReference(productsApi)
+                        .WithReference(shippingApi)
+                        .WithReference(ordersApi)
+                        .WithReference(stockApi);
+var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-sellers-service");
+var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
+
 // Notification
 var notificationService = builder.AddProject<Projects.Notification_Service>("eshopacademy-notification-service");
 var notificationApi = builder.AddProject<Projects.Notification_Api>("eshopacademy-notification-api");
@@ -68,20 +72,23 @@ var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")
                      .WithReference(shippingApi)
                      .WithReference(operationsApi)
                      .WithReference(notificationApi)
-                     .WithReference(sellersApi);
+                     .WithReference(sellersApi)
+                     .WithReference(stockApi);
 
 // Consumer Frontend (React + Vite)
 var frontend = builder.AddViteApp("eshopacademy-frontend", "../Frontend/eshop-web")
                       .WithEndpoint("http", e => e.Port = 5173)
-                      .WithEnvironment("VITE_GATEWAY_URL", gateway.GetEndpoint("gateway"));
+                      .WithEnvironment("VITE_GATEWAY_URL", gateway.GetEndpoint("gateway"))
+                      .WithEnvironment("VITE_SHIPPING_SIMULATOR_URL", shippingSimulator.GetEndpoint("shipping-simulator"));
 
 // Sellers Frontend Microfrontend (React + Vite - Module Federation remote)
 var sellersFrontend = builder.AddViteApp("eshopacademy-sellers-frontend", "../Frontend/eshop-sellers")
-                             .WithEndpoint("http", e => e.Port = 5174);
+                             .WithEndpoint("http", e => e.Port = 5174)
+                             .WithEnvironment("VITE_SHIPPING_SIMULATOR_URL", shippingSimulator.GetEndpoint("shipping-simulator"));
 
 
 if (builder.Environment.IsDevelopment())
-EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, shippingApi, shippingService, notificationService, notificationApi, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
+EnvironmentSetup.SetupLocalInfrastructure(builder, basketApi, basketEvents, productsApi, productsGrpc, ordersApi, ordersOrchestration, ordersMessaging, stockApi, stockGrpc, stockMessaging, paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, shippingApi, shippingService, shippingSimulator, notificationService, notificationApi, customersApi, customersMessaging, operationsApi, operationsService, sellersApi, sellersService, sellersEventsProcessor, gateway);
 
 
 // Build and run the distributed application

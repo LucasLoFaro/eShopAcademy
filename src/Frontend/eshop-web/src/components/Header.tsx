@@ -141,9 +141,9 @@ export default function Header() {
                     {sellerData && sellerData.status === "Active" ? (
                       <Link to="/sell/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v1m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-emerald-700 font-medium">Seller Dashboard</span>
+                        <span className="text-emerald-700 font-medium">Business</span>
                       </Link>
                     ) : sellerData && sellerData.status === "PendingApproval" ? (
                       <div className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400">
@@ -177,24 +177,16 @@ export default function Header() {
               </button>
             )}
             {isAuthenticated && (
-              <Link to="/orders" className="hidden sm:block text-xs hover:text-amber-400">
-                <span className="text-gray-400">Returns</span>
-                <p className="font-bold">&amp; Orders</p>
-              </Link>
-            )}
-            {isAuthenticated && (
               <div ref={notifRef} className="relative z-50">
                 <button onClick={() => setNotifOpen(!notifOpen)} onMouseEnter={() => setNotifOpen(true)} className="relative flex items-center gap-1 hover:text-amber-400">
                   <div className="relative">
                     <BellIcon />
                     {unreadCount > 0 && <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">{unreadCount}</span>}
                   </div>
-                  <span className="hidden text-xs font-bold sm:block">Notifications</span>
                 </button>
                 {notifOpen && (
                   <div onMouseLeave={() => setNotifOpen(false)} className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl z-[100]">
                     <div className="border-b p-3 flex items-center justify-between">
-                      <h3 className="font-semibold text-sm">Notifications</h3>
                       {unreadCount > 0 && (
                         <button onClick={() => markAllRead.mutate()} className="text-xs text-amber-600 hover:text-amber-700 font-medium">
                           Mark all read
@@ -250,7 +242,6 @@ export default function Header() {
                   <CartIcon />
                   {itemCount > 0 && <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-xs font-bold text-gray-900">{itemCount}</span>}
                 </div>
-                <span className="hidden text-xs font-bold sm:block">Cart</span>
               </button>
               {basketOpen && isAuthenticated && (
                 <div onMouseLeave={() => setBasketOpen(false)} className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl z-[100]">

@@ -157,4 +157,24 @@ public class SellerService : ISellerService
 
         return updatedSeller;
     }
+
+    public async Task<Seller?> MarkSaleAsProcessedAsync(Guid sellerId, Guid entryId, CancellationToken cancellationToken)
+    {
+        var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
+        if (seller is null)
+        {
+            return null;
+        }
+
+        var entry = seller.Ledger.FirstOrDefault(e => e.EntryId == entryId);
+        if (entry is null)
+        {
+            return null;
+        }
+
+        entry.IsProcessed = true;
+        entry.ProcessedAt = DateTime.UtcNow;
+
+        return await _repository.UpdateAsync(seller, cancellationToken);
+    }
 }

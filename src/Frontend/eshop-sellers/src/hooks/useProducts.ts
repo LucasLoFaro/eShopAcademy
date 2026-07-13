@@ -11,6 +11,7 @@ export interface PublishProductPayload {
   aboutHtml: string;
   specs: { label: string; value: string }[];
   faqs: { question: string; answer: string }[];
+  initialStock: number;
 }
 
 export interface Category {
@@ -121,6 +122,39 @@ export function useCategories() {
         }
       }
       return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+    },
+  });
+}
+
+export interface ProductStock {
+  productID: string;
+  quantity: number;
+  warehouse: string;
+}
+
+export function useProductStock(sellerId: string | undefined, productId: string | undefined) {
+  return useQuery<ProductStock[]>({
+    queryKey: ["product-stock", sellerId, productId],
+    queryFn: async () => {
+      const { data } = await api.get(`/api/sellers/${sellerId}/products/${productId}/stock`);
+      return Array.isArray(data) ? data : [data];
+    },
+    enabled: !!sellerId && !!productId,
+  });
+}
+
+export function useUpdateProductStock(sellerId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, Error, { productId: string; quantity: number; warehouse?: string }>({
+    mutationFn: async ({ productId, quantity, warehouse }) => {
+      const { data } = await api.post(`/api/sellers/${sellerId}/products/${productId}/stock`, {
+        quantity,
+        warehouse: warehouse ?? "WH-01",
+      });
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["product-stock", sellerId, variables.productId] });
     },
   });
 }

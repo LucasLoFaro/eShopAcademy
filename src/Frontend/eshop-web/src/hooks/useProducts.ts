@@ -53,3 +53,21 @@ export function useProduct(id: string) {
     enabled: !!id,
   });
 }
+
+export function useProductStock(id: string) {
+  return useQuery<number>({
+    queryKey: ["productStock", id],
+    queryFn: async () => {
+      try {
+        const { data } = await api.get(`/api/stock/${id}`);
+        if (Array.isArray(data)) {
+          return data.reduce((sum, s) => sum + (s.quantity ?? 0), 0);
+        }
+        return data?.quantity ?? 0;
+      } catch {
+        return 0;
+      }
+    },
+    enabled: !!id,
+  });
+}

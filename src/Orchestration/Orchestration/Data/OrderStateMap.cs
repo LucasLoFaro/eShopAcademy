@@ -26,6 +26,7 @@ public class OrderStateMap : SagaClassMap<OrderState>
         entity.Property(x => x.BasketClientId);
         entity.Property(x => x.PaymentId);
         entity.Property(x => x.ReservationId);
+        entity.Property(x => x.ShipmentId);
         entity.Property(x => x.TotalAmount);
         entity.Property(x => x.ProviderTransactionId)
               .HasMaxLength(256)

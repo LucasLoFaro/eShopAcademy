@@ -148,6 +148,7 @@ const { id } = useParams<{ id: string }>();
 const { data: order, isLoading, error } = useOrder(id!);
 const location = useLocation();
 const paymentUrl = (location.state as { paymentUrl?: string })?.paymentUrl;
+const simulatorUrl = import.meta.env.VITE_SHIPPING_SIMULATOR_URL as string | undefined;
 
 // Subscribe to real-time order status updates via SSE
 const isTerminal = order?.status === "Delivered" || order?.status === "Cancelled";
@@ -226,7 +227,12 @@ useOrderStatusStream(isTerminal ? undefined : id);
           <div className="divide-y">
             {order.items?.map((item, idx) => (
               <div key={idx} className="flex justify-between py-2 text-sm">
-                <span>
+                <span className="flex items-center gap-1">
+                  {item.product?.stock != null && item.product.stock <= 5 && (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-label="Limited availability">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                  )}
                   {item.product?.name ?? item.productID} × {item.quantity}
                 </span>
                 <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
@@ -301,6 +307,19 @@ useOrderStatusStream(isTerminal ? undefined : id);
                 </div>
               )}
             </dl>
+            {simulatorUrl && order.shipping?.status && (
+              <a
+                href={`${simulatorUrl}/shipment/by-order/${order.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                View on shipping provider
+              </a>
+            )}
           </section>
         </div>
       </div>

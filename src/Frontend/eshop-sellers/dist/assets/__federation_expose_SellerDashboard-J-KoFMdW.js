@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-Yp2-s75R.js';
-import { Q as QueryClient, s as setAccessToken, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-BnRdwO9S.js';
+import { Q as QueryClient, s as setAccessToken, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-DvG-EKxQ.js';
 
 const {useEffect,useState} = await importShared('react');
 const queryClient = new QueryClient({

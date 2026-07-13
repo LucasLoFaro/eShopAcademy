@@ -37,6 +37,7 @@ export default function PublishProductPage({ onBack, editProduct }: PublishProdu
   const [faqs, setFaqs] = useState<ProductFaq[]>(
     editProduct?.faqs?.length ? editProduct.faqs : [{ question: "", answer: "" }]
   );
+  const [initialStock, setInitialStock] = useState(0);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
@@ -98,6 +99,7 @@ export default function PublishProductPage({ onBack, editProduct }: PublishProdu
       aboutHtml,
       specs: specs.filter((s) => s.label && s.value),
       faqs: faqs.filter((f) => f.question && f.answer),
+      initialStock,
     };
 
     if (isEditing && editProduct) {
@@ -190,6 +192,22 @@ export default function PublishProductPage({ onBack, editProduct }: PublishProdu
               </select>
             </div>
           </div>
+
+          {!isEditing && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Initial Stock</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={initialStock}
+                onChange={(e) => setInitialStock(parseInt(e.target.value) || 0)}
+                className="w-full md:w-48 rounded-lg border border-gray-300 px-4 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="0"
+              />
+              <p className="text-xs text-gray-400 mt-1">Number of units available for sale. You can adjust stock later from the dashboard.</p>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Short Description *</label>

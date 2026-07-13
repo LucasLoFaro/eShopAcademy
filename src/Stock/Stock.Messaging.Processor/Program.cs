@@ -3,6 +3,7 @@ using Infrastructure.Services;
 using MassTransit;
 using ServiceDefaults;
 using Stock.Messaging.Processor.Consumers;
+using MassTransit;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -13,6 +14,8 @@ builder.AddServiceDefaults()
             e.ConfigureConsumer<CommitStockReservationConsumer>(context));
         cfg.ReceiveEndpoint("release-stock-reservation", e =>
             e.ConfigureConsumer<ReleaseStockReservationConsumer>(context));
+        cfg.ReceiveEndpoint("product-published-stock", e =>
+            e.ConfigureConsumer<ProductPublishedConsumer>(context));
     }, typeof(CommitStockReservationConsumer).Assembly);
 
 builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock")!, "stock"));

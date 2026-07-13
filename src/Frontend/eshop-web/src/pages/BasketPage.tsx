@@ -33,7 +33,16 @@ export default function BasketPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-blue-700">{item.product.name}</p>
-                    <p className="text-xs text-green-700 mt-0.5">In Stock</p>
+                    {item.product.stock != null && item.product.stock <= 5 ? (
+                      <p className="flex items-center gap-1 text-xs font-semibold text-orange-600 mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                        Limited availability
+                      </p>
+                    ) : (
+                      <p className="text-xs text-green-700 mt-0.5">In Stock</p>
+                    )}
                     <p className="text-xs text-gray-500 mt-0.5">${item.product.price.toFixed(2)} each</p>
                   </div>
                   <div className="flex items-center gap-1 border rounded-lg px-1">

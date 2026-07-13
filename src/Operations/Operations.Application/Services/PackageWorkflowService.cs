@@ -28,6 +28,54 @@ public class PackageWorkflowService : IPackageWorkflowService
     public Task<IReadOnlyList<Package>> GetPendingPackagesAsync(CancellationToken cancellationToken)
         => _repository.GetPendingAsync(cancellationToken);
 
+    public Task<IReadOnlyList<Package>> GetPendingPackagesBySellerAsync(Guid sellerId, CancellationToken cancellationToken)
+        => _repository.GetPendingBySellerAsync(sellerId, cancellationToken);
+
+    public Task<IReadOnlyList<Package>> GetPackagesBySellerAsync(Guid sellerId, int limit, CancellationToken cancellationToken)
+        => _repository.GetBySellerAsync(sellerId, limit, cancellationToken);
+
+    public async Task<Package?> StartProcessingBySellerAsync(Guid orderId, Guid sellerId, CancellationToken cancellationToken)
+    {
+        var package = await _repository.GetByOrderIdAndSellerAsync(orderId, sellerId, cancellationToken);
+        if (package is null)
+            return null;
+
+        package.Status = PackageStatus.Preparing;
+        package.PreparedAt = DateTime.UtcNow;
+        package.UpdatedAt = DateTime.UtcNow;
+
+        return await _repository.CreateOrUpdateAsync(package, cancellationToken);
+    }
+
+    public async Task<Package?> ReportProblemBySellerAsync(Guid orderId, Guid sellerId, ReportPackageProblemRequest request, CancellationToken cancellationToken)
+    {
+        var package = await _repository.GetByOrderIdAndSellerAsync(orderId, sellerId, cancellationToken);
+        if (package is null)
+            return null;
+
+        package.Status = PackageStatus.Failed;
+        package.IssueType = string.IsNullOrWhiteSpace(request.IssueType) ? "Unspecified" : request.IssueType!;
+        package.IssueDetails = request.Details ?? string.Empty;
+        package.ReportedBy = request.ReportedBy ?? string.Empty;
+        package.IssueReportedAt = DateTime.UtcNow;
+        package.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await _repository.CreateOrUpdateAsync(package, cancellationToken);
+
+        await _publishEndpoint.Publish<PackageIssueReportedEvent>(new
+        {
+            OrderId = updated.OrderId,
+            updated.CustomerName,
+            updated.CustomerEmail,
+            updated.IssueType,
+            updated.IssueDetails,
+            updated.ReportedBy,
+            ReportedAt = updated.IssueReportedAt ?? DateTime.UtcNow
+        }, cancellationToken);
+
+        return updated;
+    }
+
     public Task<Package> StartProcessingAsync(Guid orderId, StartPackageProcessingRequest request, CancellationToken cancellationToken)
         => UpdatePackageAsync(orderId, request.ReservationId, request.CustomerName, request.CustomerEmail, PackageStatus.Preparing, cancellationToken, setReadyAt: false);
 
@@ -44,6 +92,34 @@ public class PackageWorkflowService : IPackageWorkflowService
         }, cancellationToken);
 
         return package;
+    }
+
+    public async Task<Package?> MarkReadyForPickupBySellerAsync(Guid orderId, Guid sellerId, MarkOrderReadyRequest request, CancellationToken cancellationToken)
+    {
+        var package = await _repository.GetByOrderIdAndSellerAsync(orderId, sellerId, cancellationToken);
+        if (package is null)
+            return null;
+
+        package.Status = PackageStatus.ReadyForPickup;
+        package.ReadyAt = DateTime.UtcNow;
+        package.UpdatedAt = DateTime.UtcNow;
+
+        if (!string.IsNullOrWhiteSpace(request.CustomerName))
+            package.CustomerName = request.CustomerName;
+        if (!string.IsNullOrWhiteSpace(request.CustomerEmail))
+            package.CustomerEmail = request.CustomerEmail;
+
+        var updated = await _repository.CreateOrUpdateAsync(package, cancellationToken);
+
+        await _publishEndpoint.Publish<OrderReadyForPickupEvent>(new
+        {
+            OrderId = updated.OrderId,
+            updated.CustomerName,
+            updated.CustomerEmail,
+            ReadyAt = updated.ReadyAt ?? DateTime.UtcNow
+        }, cancellationToken);
+
+        return updated;
     }
 
     public async Task<Package> ReportProblemAsync(Guid orderId, ReportPackageProblemRequest request, CancellationToken cancellationToken)

@@ -21,6 +21,6 @@ public static class NotificationExtensions
             .WithReference(notificationsdb)
             .WaitFor(notificationsdb)
             .WithCommonEnvironments()
-            .WithHttpEndpoint(port: 8010, name: "notification-api");
+            .WithHttpEndpoint(port: 8011, name: "notification-api");
     }
 }

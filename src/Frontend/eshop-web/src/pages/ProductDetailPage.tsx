@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router";
-import { useProduct } from "../hooks/useProducts";
+import { useProduct, useProductStock } from "../hooks/useProducts";
 import { useAddToBasket } from "../hooks/useBasket";
 import { useWishlist } from "../hooks/useWishlist";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
@@ -22,6 +22,7 @@ function Stars({ rating }: { rating: number }) {
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, error } = useProduct(id!);
+  const { data: stock } = useProductStock(id!);
   const addToBasket = useAddToBasket();
   const { toggle, isFavorite } = useWishlist();
   const isAuthenticated = useIsAuthenticated();
@@ -34,6 +35,8 @@ export default function ProductDetailPage() {
 
   const allImages = [product.imageUrl, ...(product.additionalImages ?? [])].filter(Boolean);
   const effectivePrice = product.dealPrice ?? product.price;
+  const availableStock = stock ?? product.stock;
+  const isLimitedStock = availableStock != null && availableStock <= 5;
 
   return (
     <>
@@ -85,7 +88,16 @@ export default function ProductDetailPage() {
               <span className="text-sm align-top">{(effectivePrice % 1).toFixed(2).slice(1)}</span>
             </p>
             <p className="mt-1 text-sm text-green-700">FREE delivery</p>
-            <p className="mt-1 text-sm text-green-700 font-bold">In Stock</p>
+            {isLimitedStock ? (
+              <p className="mt-1 flex items-center gap-1 text-sm font-bold text-orange-600">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                Limited availability
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-green-700 font-bold">In Stock</p>
+            )}
 
             <hr className="my-3" />
             <p className="text-sm text-gray-700 leading-relaxed">{product.description || "No description available."}</p>
@@ -99,7 +111,16 @@ export default function ProductDetailPage() {
                 <span className="text-sm align-top">{(effectivePrice % 1).toFixed(2).slice(1)}</span>
               </p>
               <p className="text-sm text-green-700 mb-3">FREE delivery</p>
-              <p className="text-sm text-green-700 font-bold mb-4">In Stock</p>
+              {isLimitedStock ? (
+                <p className="flex items-center gap-1 text-sm font-bold text-orange-600 mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                  Limited availability
+                </p>
+              ) : (
+                <p className="text-sm text-green-700 font-bold mb-4">In Stock</p>
+              )}
               {isAuthenticated ? (
                 <>
                   <button onClick={() => addToBasket.mutate({ productID: product.id, quantity: 1 })} disabled={addToBasket.isPending} className="w-full rounded-full bg-amber-400 py-2 text-sm font-medium text-gray-900 hover:bg-amber-500 disabled:opacity-50">

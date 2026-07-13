@@ -10,6 +10,8 @@ public class Package : BaseEntity
     public Guid OrderId { get; set; }
     [BsonRepresentation(BsonType.String)]
     public Guid? ReservationId { get; set; }
+    [BsonRepresentation(BsonType.String)]
+    public Guid? SellerId { get; set; }
     public PackageStatus Status { get; set; } = PackageStatus.Pending;
     public List<PackageItem> Items { get; set; } = new();
     public DateTime? PreparedAt { get; set; }

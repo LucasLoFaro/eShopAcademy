@@ -30,9 +30,27 @@ public class PackageRepository : IPackageRepository
         return await _collection.Find(p => p.Status == PackageStatus.Pending).ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Package>> GetPendingBySellerAsync(Guid sellerId, CancellationToken cancellationToken)
+    {
+        return await _collection.Find(p => p.Status == PackageStatus.Pending && p.SellerId == sellerId).ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Package>> GetBySellerAsync(Guid sellerId, int limit, CancellationToken cancellationToken)
+    {
+        return await _collection.Find(p => p.SellerId == sellerId)
+            .SortByDescending(p => p.UpdatedAt)
+            .Limit(limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Package?> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken)
     {
         return await _collection.Find(p => p.OrderId == orderId).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<Package?> GetByOrderIdAndSellerAsync(Guid orderId, Guid sellerId, CancellationToken cancellationToken)
+    {
+        return await _collection.Find(p => p.OrderId == orderId && p.SellerId == sellerId).FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<Package> CreateOrUpdateAsync(Package package, CancellationToken cancellationToken)

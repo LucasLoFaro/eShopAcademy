@@ -12,6 +12,8 @@ builder.AddServiceDefaults()
     {   
         cfg.ReceiveEndpoint("prepare-package", e =>
             e.ConfigureConsumer<PreparePackageCommandConsumer>(context));
+        cfg.ReceiveEndpoint("operations-seller-stamp", e =>
+            e.ConfigureConsumer<PackageSellerStampConsumer>(context));
     }, typeof(PreparePackageCommandConsumer).Assembly);
 
 builder.Services.AddSingleton<IPackageRepository, PackageRepository>();

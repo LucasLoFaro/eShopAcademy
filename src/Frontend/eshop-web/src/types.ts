@@ -16,6 +16,7 @@ export interface Product {
   dealPrice?: number | null;
   isNewRelease?: boolean;
   createdAt?: string;
+  stock?: number;
   specs?: ProductSpec[];
   faqs?: ProductFaq[];
 }
@@ -96,7 +97,7 @@ export interface OrderItem {
   productID: string;
   quantity: number;
   price: number;
-  product: { name: string; imageUrl: string };
+  product: { name: string; imageUrl: string; stock?: number };
 }
 
 export interface OrderPaymentInfo {

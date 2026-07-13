@@ -130,6 +130,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(ShippingScheduled)
                 .Then(ctx => Console.WriteLine($"[Saga] Shipping scheduled for order {ctx.Saga.CorrelationId}, Tracking {ctx.Message.TrackingNumber}"))
+                .Then(ctx => ctx.Saga.ShipmentId = ctx.Message.ShipmentId)
                 .Publish(ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
@@ -150,7 +151,9 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Publish(ctx => new PreparePackageCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    ReservationId = ctx.Message.ReservationId
+                    ReservationId = ctx.Message.ReservationId,
+                    CustomerName = ctx.Saga.CustomerName,
+                    CustomerEmail = ctx.Saga.CustomerEmail
                 })
                 .Publish(ctx => new UpdateOrderStatusCommand
                 {
@@ -168,7 +171,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Publish(ctx => new ConfirmPickupCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    ShippingId = ctx.Saga.CorrelationId,
+                    ShippingId = ctx.Saga.ShipmentId,
                     ReadyAt = ctx.Message.ReadyAt
                 })
                 .Publish(ctx => new UpdateOrderStatusCommand

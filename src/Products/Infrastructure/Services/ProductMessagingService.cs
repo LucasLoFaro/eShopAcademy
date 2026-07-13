@@ -39,4 +39,17 @@ public class ProductMessagingService : IProductMessagingService
 
         await _publishEndpoint.Publish(command, ct);
     }
+
+    public async Task SendProductPublished(Product product, CancellationToken ct = default)
+    {
+        var @event = new ProductPublishedEvent()
+        {
+            ProductId = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            SellerId = product.SellerId
+        };
+
+        await _publishEndpoint.Publish(@event, ct);
+    }
 }

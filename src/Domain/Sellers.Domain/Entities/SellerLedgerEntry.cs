@@ -13,4 +13,6 @@ public class SellerLedgerEntry
     public SellerLedgerEntryType Type { get; set; } = SellerLedgerEntryType.Sale;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string Notes { get; set; } = string.Empty;
+    public bool IsProcessed { get; set; }
+    public DateTime? ProcessedAt { get; set; }
 }

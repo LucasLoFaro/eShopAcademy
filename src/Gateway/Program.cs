@@ -54,23 +54,18 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("spa", policy =>
-    {
-        policy.WithOrigins(
-                builder.Configuration.GetValue<string>("SpaOrigin") ?? "http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
+    options.AddPolicy("allowAll", policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
 var app = builder.Build();
 
-app.UseDefaultEndpoints();
-app.UseCors("spa");
+app.UseRouting();
+app.UseCors("allowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+app.UseDefaultEndpoints();
 app.MapReverseProxy();
 
 app.Run();

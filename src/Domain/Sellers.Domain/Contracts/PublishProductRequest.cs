@@ -9,7 +9,8 @@ public record PublishProductRequest(
     List<string> AdditionalImages,
     string AboutHtml,
     List<ProductSpecRequest> Specs,
-    List<ProductFaqRequest> Faqs);
+    List<ProductFaqRequest> Faqs,
+    int InitialStock = 0);
 
 public record ProductSpecRequest(string Label, string Value);
 

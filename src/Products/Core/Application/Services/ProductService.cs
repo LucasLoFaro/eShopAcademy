@@ -36,8 +36,15 @@ public class ProductService : IProductService
         if (!moderationResult.IsApproved)
             throw new InvalidOperationException($"Product content moderation failed: {moderationResult.RejectionReason}");
 
+        var isNew = await _productsRepository.GetByIdAsync(product.Id) is null;
+
         await _productsRepository.AddOrUpdateAsync(product);
         await _messaging.SendProductUpdate(product);
+
+        if (isNew)
+        {
+            await _messaging.SendProductPublished(product);
+        }
     }
 
     public async Task DeleteAsync(Product product)

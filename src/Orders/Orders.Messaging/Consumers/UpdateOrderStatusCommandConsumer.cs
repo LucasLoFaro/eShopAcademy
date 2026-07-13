@@ -146,8 +146,13 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
                 await context.Publish(new OrderSellerSaleRegistrationRequestedEvent
                 {
                     OrderId = order.Id,
+                    CustomerName = command.CustomerName,
+                    CustomerEmail = command.CustomerEmail,
                     SellerId = item.Product.SellerId,
                     OrderItemId = item.Id,
+                    ProductId = item.ProductID,
+                    ProductName = item.Product?.Name ?? string.Empty,
+                    Quantity = item.Quantity,
                     GrossAmount = grossAmount,
                     CommissionAmount = commissionAmount,
                     Notes = $"Auto-generated from payment capture. CommissionRate={_sellerCommissionRate:P2}"

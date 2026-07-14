@@ -1,7 +1,7 @@
 ﻿using Core.Application.Interfaces.Services;
-using Microsoft.EntityFrameworkCore;
 using Domain.Products.Entities;
 using Infrastructure.Data;
+using MongoDB.Driver;
 
 
 namespace Data;
@@ -179,7 +179,7 @@ public static class ProductSeedData
             [CatLaptops]     = new() { Id = CatLaptops,     Name = "Laptops" },
         };
 
-        var productsExist = await context.Products.AsNoTracking().FirstOrDefaultAsync() != null;
+        var productsExist = await context.Products.Find(Builders<Product>.Filter.Empty).AnyAsync();
         if (!productsExist)
         {
 
@@ -258,13 +258,10 @@ public static class ProductSeedData
                 p.Faqs = DefaultFaqs(p.Name);
             }
 
-            // Save each product individually to avoid EF Core owned-entity
-            // tracking conflicts (multiple Category instances share the same Id).
+            // Save each product individually to preserve the existing seeding flow.
             foreach (var product in products)
             {
-                context.Products.Add(product);
-                await context.SaveChangesAsync();
-                context.ChangeTracker.Clear();
+                await context.Products.InsertOneAsync(product);
             }
 
             foreach (var product in products)
@@ -273,7 +270,7 @@ public static class ProductSeedData
         else
         {
             // Backfill: patch any existing products that are missing the embedded Category or have old image URLs
-            var allProducts = await context.Products.ToListAsync();
+            var allProducts = await context.Products.Find(Builders<Product>.Filter.Empty).ToListAsync();
             var toUpdate = allProducts
                 .Where(p => p.Category == null && categoryMap.ContainsKey(p.CategoryId))
                 .ToList();
@@ -294,7 +291,9 @@ public static class ProductSeedData
                     p.AdditionalImages = [Img(catImg, "left"), Img(catImg, "right"), Img(catImg, "entropy")];
                 }
 
-                await context.SaveChangesAsync();
+                foreach (var p in toUpdate)
+                    await context.Products.ReplaceOneAsync(
+                        Builders<Product>.Filter.Eq(x => x.Id, p.Id), p);
             }
 
             // Always republish all products so the basket Redis product cache is restored

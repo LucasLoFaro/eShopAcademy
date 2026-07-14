@@ -1,58 +1,49 @@
 ﻿using Core.Application.Interfaces.Data;
-using Microsoft.EntityFrameworkCore;
 using Domain.Products.Contracts;
 using Domain.Products.Entities;
-using AutoMapper;
+using MongoDB.Driver;
 
 
 namespace Infrastructure.Data.Repositories;
 
 public class ProductsRepository : IProductsRepository
 {
-    private readonly ProductDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly IMongoCollection<Product> _products;
 
-    public ProductsRepository(ProductDbContext context, IMapper mapper)
+    public ProductsRepository(ProductDbContext context)
     {
-        _context = context;
-        _mapper = mapper;
+        _products = context.Products;
     }
 
     public async Task<IEnumerable<Product>> GetAllAsync()
-        => await _context.Products.ToListAsync();
+        => await _products.Find(Builders<Product>.Filter.Empty).ToListAsync();
 
     public async Task<Product?> GetByIdAsync(Guid id)
-        => await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        => await _products.Find(Builders<Product>.Filter.Eq(p => p.Id, id)).FirstOrDefaultAsync();
 
     public async Task<Product?> GetMostExpensive()
-        => await _context.Products
-                .OrderByDescending(p => p.Price)
+        => await _products
+                .Find(Builders<Product>.Filter.Empty)
+                .SortByDescending(p => p.Price)
                 .FirstOrDefaultAsync();
 
     public async Task AddOrUpdateAsync(Product product)
     {
-        var existingProduct = await GetByIdAsync(product.Id);
-
-        if (existingProduct == null)
-            _context.Products.Add(product);
-        else
-            _mapper.Map(product, existingProduct);
-
-        await _context.SaveChangesAsync();
+        var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
+        await _products.ReplaceOneAsync(filter, product, new ReplaceOptions { IsUpsert = true });
     }
 
 
     public async Task DeleteAsync(Product product)
     {
-        _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
+        await _products.DeleteOneAsync(Builders<Product>.Filter.Eq(p => p.Id, product.Id));
     }
 
     public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter)
     {
-        // Cosmos DB emulator has limited query translation, so we filter in memory.
-        // This matches the pattern used by the existing GetAllAsync/Get endpoint.
-        var products = await _context.Products.ToListAsync();
+        // MongoDB supports server-side querying, but the current filtering logic
+        // is kept in memory to preserve the existing behavior.
+        var products = await _products.Find(Builders<Product>.Filter.Empty).ToListAsync();
         var results = products.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(filter.SearchText))

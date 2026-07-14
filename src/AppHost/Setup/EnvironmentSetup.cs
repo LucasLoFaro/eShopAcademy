@@ -50,6 +50,7 @@ public static class EnvironmentSetup
         var operationsdb = mongo.AddDatabase("operations");
         var notificationsdb = mongo.AddDatabase("notifications");
         var sellersdb = mongo.AddDatabase("sellers");
+        var productsdb = mongo.AddDatabase("products");
 
         var postgres = builder.AddPostgres("postgres")
             .WithImageTag("17.6")
@@ -60,9 +61,6 @@ public static class EnvironmentSetup
         var orchestrationdb = postgres.AddDatabase("orchestration");        
 
         postgres.WithPgAdmin()
-            .WithLifetime(ContainerLifetime.Persistent);
-        
-        var cosmosdb = builder.AddCosmosDb("cosmosdb")
             .WithLifetime(ContainerLifetime.Persistent);
 
         var rabbit = builder.AddRabbitMQ("rabbit")
@@ -80,7 +78,7 @@ public static class EnvironmentSetup
         var sendGridApiKey = builder.AddParameter("sendgrid-apikey", secret: true);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
-        ProductsExtensions.Configure(productsApi, productsGrpc, cosmosdb, rabbit);
+        ProductsExtensions.Configure(productsApi, productsGrpc, productsdb, rabbit);
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, rabbit);

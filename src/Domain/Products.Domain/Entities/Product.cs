@@ -1,4 +1,6 @@
 ﻿using Domain.Product.Entities;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Products.Entities;
@@ -17,6 +19,7 @@ public class Product : BaseEntity
 
     public string CategoryId { get; set; } = "";
     public Category? Category { get; set; }
+    [BsonRepresentation(BsonType.String)]
     public Guid SellerId { get; set; }
 
     // ── Enhanced fields ──

@@ -17,8 +17,7 @@
     <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="MassTransit" Version="9.1.2" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.5.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="10.0.9" />
+    <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
   </ItemGroup>
 
   <ItemGroup>

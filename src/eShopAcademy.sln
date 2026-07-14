@@ -90,9 +90,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHost", "AppHost\AppHost.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults", "ServiceDefaults\ServiceDefaults.csproj", "{9E761A76-169C-4615-873D-D5088079E291}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notification", "Notification", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Service", "Notification\Notification.Service\Notification.Service.csproj", "{9770C129-7709-CBD2-3487-273D2B44CFB2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Service", "Notifications\Notifications.Service\Notifications.Service.csproj", "{9770C129-7709-CBD2-3487-273D2B44CFB2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Operations", "Operations", "{9811E37C-8AF3-4AF8-ACE3-CD971B6209F1}"
 EndProject
@@ -140,7 +140,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customers.Data", "Customers\Customers.Infrastructure\Customers.Data.csproj", "{9994F47B-4C95-47C5-BA38-F1F4F78D0F47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Domain", "Notification\Notification.Domain\Notification.Domain.csproj", "{3C43619D-62AA-4DFB-873A-8715C15A22B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Domain", "Notifications\Notifications.Domain\Notifications.Domain.csproj", "{3C43619D-62AA-4DFB-873A-8715C15A22B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Application", "Shipping\Shipping.Application\Shipping.Application.csproj", "{4BB2AC90-C703-4588-9E4D-A6AC304C7378}"
 EndProject
@@ -174,7 +174,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Operations.Tests", "Operati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A60ECF3A-D73A-E315-1127-27E64F6DA120}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Tests", "Notification\Tests\Notification.Tests.csproj", "{A15143BE-149A-4545-B29E-DCCC9CB80B31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Tests", "Notifications\Tests\Notifications.Tests.csproj", "{A15143BE-149A-4545-B29E-DCCC9CB80B31}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B140D5FC-2A53-044A-97BA-15C3D704E7A7}"
 EndProject
@@ -197,7 +197,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C8
 		Frontend\eshop-web\vite.config.ts = Frontend\eshop-web\vite.config.ts
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "Notification\Notification.Api\Notification.Api.csproj", "{05E39293-1D45-3F8B-E655-8F19718C89AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.Api", "Notifications\Notifications.Api\Notifications.Api.csproj", "{05E39293-1D45-3F8B-E655-8F19718C89AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sellers", "Sellers", "{DF65D1F4-57F8-B431-3AC1-079C5DC2BCBB}"
 EndProject

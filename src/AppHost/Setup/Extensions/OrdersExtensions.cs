@@ -1,5 +1,4 @@
-﻿using AppHost.Setup.Resources;
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 
 namespace AppHost.Setup.Extensions;
 

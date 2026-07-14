@@ -1,6 +1,4 @@
-﻿using AppHost.Setup.Resources;
-
-namespace AppHost.Setup.Extensions;
+﻿namespace AppHost.Setup.Extensions;
 
 public static class PaymentsExtensions
 {

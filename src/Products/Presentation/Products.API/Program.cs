@@ -1,11 +1,11 @@
 using Core.Application.Interfaces.Services;
 using Core.Application.Interfaces.Data;
 using Infrastructure.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Core.Application.Services;
 using Infrastructure.Services;
-using Microsoft.Azure.Cosmos;
 using Infrastructure.Data;
+using Domain.Products.Entities;
+using MongoDB.Driver;
 using ServiceDefaults;
 using Data;
 
@@ -19,23 +19,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
 
 //Inject services
-builder.Services.AddDbContext<ProductDbContext>(options =>
-    options.UseCosmos(
-        builder.Configuration.GetConnectionString("cosmosdb")!,
-        databaseName: "eShopAcademy",
-        cosmosOptions =>
-        {
-            cosmosOptions.HttpClientFactory(() =>
-            {
-                var handler = new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                };
-
-                return new HttpClient(handler);
-            });
-            cosmosOptions.ConnectionMode(ConnectionMode.Gateway);
-        }));
+builder.Services.AddSingleton(sp => new ProductDbContext(builder.Configuration.GetConnectionString("products"), "products"));
 builder.Services.AddTransient<IProductMessagingService, ProductMessagingService>();
 builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
@@ -56,9 +40,8 @@ static async Task SeedTestData(WebApplication app)
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-        await db.Database.EnsureCreatedAsync();
 
-        if (await db.Products.AsNoTracking().FirstOrDefaultAsync() != null)
+        if (await db.Products.Find(Builders<Product>.Filter.Empty).AnyAsync())
             return;
 
         var messagingService = scope.ServiceProvider.GetRequiredService<IProductMessagingService>();

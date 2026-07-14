@@ -26,8 +26,8 @@
     <ProjectReference Include="..\Customers\Customers.Api\Customers.Api.csproj" />
     <ProjectReference Include="..\Customers\Customers.Messaging\Customers.Messaging.csproj" />
     <ProjectReference Include="..\Gateway\Gateway.csproj" />
-    <ProjectReference Include="..\Notification\Notification.Api\Notification.Api.csproj" />
-    <ProjectReference Include="..\Notification\Notification.Service\Notification.Service.csproj" />
+    <ProjectReference Include="..\Notifications\Notifications.Api\Notifications.Api.csproj" />
+    <ProjectReference Include="..\Notifications\Notifications.Service\Notifications.Service.csproj" />
     <ProjectReference Include="..\Operations\Operations.Api\Operations.Api.csproj" />
     <ProjectReference Include="..\Operations\Operations.Service\Operations.Service.csproj" />
     <ProjectReference Include="..\Orchestration\Orchestration\Orchestration.csproj" />

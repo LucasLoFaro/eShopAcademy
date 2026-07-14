@@ -1,7 +1,7 @@
-﻿using MongoDB.Bson;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Domain.Product.Entities;
+namespace Domain.Notifications.Entities;
 
 public class BaseEntity
 {

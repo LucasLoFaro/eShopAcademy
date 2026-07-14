@@ -59,8 +59,8 @@ var sellersService = builder.AddProject<Projects.Sellers_Service>("eshopacademy-
 var sellersEventsProcessor = builder.AddProject<Projects.Sellers_EventsProcessor>("eshopacademy-sellers-events");
 
 // Notification
-var notificationService = builder.AddProject<Projects.Notification_Service>("eshopacademy-notification-service");
-var notificationApi = builder.AddProject<Projects.Notification_Api>("eshopacademy-notification-api");
+var notificationService = builder.AddProject<Projects.Notifications_Service>("eshopacademy-notification-service");
+var notificationApi = builder.AddProject<Projects.Notifications_Api>("eshopacademy-notification-api");
 
 // API Gateway
 var gateway = builder.AddProject<Projects.Gateway>("eshopacademy-gateway")

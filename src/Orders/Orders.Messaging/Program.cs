@@ -1,5 +1,4 @@
 using Infrastructure.Data;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orders.Messaging.Consumers;
 using ServiceDefaults;
@@ -7,12 +6,12 @@ using ServiceDefaults;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults()
-.WithMassTransit((context, cfg) =>
+.WithMassTransit(messaging =>
 {
-    cfg.ReceiveEndpoint("cancel-order-command", e =>
-        e.ConfigureConsumer<CancelOrderCommandConsumer>(context));
-    cfg.ReceiveEndpoint("update-order-status-command", e =>
-        e.ConfigureConsumer<UpdateOrderStatusCommandConsumer>(context));
+    messaging.ReceiveEndpoint<CancelOrderCommandConsumer>("cancel-order-command");
+    messaging.ReceiveEndpoint<UpdateOrderStatusCommandConsumer>(
+        "update-order-status-command",
+        endpoint => endpoint.ConcurrentMessageLimit = 1);
 }, typeof(CancelOrderCommandConsumer).Assembly);
 
 var ordersConnectionString = builder.Configuration.GetConnectionString("orders");

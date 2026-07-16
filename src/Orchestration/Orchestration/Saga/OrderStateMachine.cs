@@ -98,23 +98,23 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     ctx.Saga.PaymentId = ctx.Message.PaymentId;
                     Console.WriteLine($"[Saga] Payment completed for order {ctx.Saga.CorrelationId}");
                 })
-                .Publish(ctx => new CommitStockReservationCommand
+                .Send(new Uri("queue:commit-stock-reservation"), ctx => new CommitStockReservationCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId
                 })
-                .Publish(ctx => new EmptyBasketCommand
+                .Send(new Uri("queue:empty-basket"), ctx => new EmptyBasketCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ClientId = ctx.Saga.BasketClientId
                 })
-                .Publish(ctx => new ScheduleShippingCommand
+                .Send(new Uri("queue:schedule-shipping"), ctx => new ScheduleShippingCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     DestinationAddress = ctx.Saga.DestinationAddress
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -131,7 +131,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(ShippingScheduled)
                 .Then(ctx => Console.WriteLine($"[Saga] Shipping scheduled for order {ctx.Saga.CorrelationId}, Tracking {ctx.Message.TrackingNumber}"))
                 .Then(ctx => ctx.Saga.ShipmentId = ctx.Message.ShipmentId)
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -148,14 +148,14 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     Console.WriteLine($"[Saga] Stock committed for order {ctx.Saga.CorrelationId}");
                 })
-                .Publish(ctx => new PreparePackageCommand
+                .Send(new Uri("queue:prepare-package"), ctx => new PreparePackageCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Message.ReservationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -168,13 +168,13 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(OrderReadyForPickup)
                 .Then(ctx => Console.WriteLine("[Saga] Order {0} ready for pickup.", ctx.Saga.CorrelationId))
-                .Publish(ctx => new ConfirmPickupCommand
+                .Send(new Uri("queue:confirm-shipping"), ctx => new ConfirmPickupCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
-                    ShippingId = ctx.Saga.CorrelationId,
+                    ShippingId = ctx.Saga.ShipmentId,
                     ReadyAt = ctx.Message.ReadyAt
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -188,7 +188,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(OrderShipped)
                 .Then(ctx => Console.WriteLine($"[Saga] Order shipped: {ctx.Saga.CorrelationId}"))
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -204,20 +204,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             // --- Failure compensation handling ---
             When(PaymentTimeout.Received)
                 .Then(ctx => Console.WriteLine($"[Saga] Payment timeout for order {ctx.Saga.CorrelationId}"))
-                .Publish(ctx => new ReleaseStockReservationCommand
+                .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId,
                     Reason = "Payment not received within 5 minutes"
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -229,20 +229,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(PaymentFailed)
                 .Then(ctx => Console.WriteLine($"[Saga] Payment failed for order {ctx.Saga.CorrelationId}"))
-                .Publish(ctx => new ReleaseStockReservationCommand
+                .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId,
                     Reason = ctx.Message.Reason
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -254,7 +254,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(StockReservationCommitFailed)
                 .Then(ctx => Console.WriteLine($"[Saga] Stock commit failed for order {ctx.Saga.CorrelationId}"))
-                .Publish(ctx => new RefundPaymentCommand
+                .Send(new Uri("queue:refund-payment"), ctx => new RefundPaymentCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     PaymentId = ctx.Saga.PaymentId,
@@ -262,19 +262,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     Amount = ctx.Saga.TotalAmount,
                     Reason = ctx.Message.Reason
                 })
-                .Publish(ctx => new CancelShippingCommand
+                .Send(new Uri("queue:cancel-shipping"), ctx => new CancelShippingCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ShippingId = ctx.Saga.CorrelationId
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -292,7 +292,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     ctx.Saga.IssueReportedAt = ctx.Message.ReportedAt;
                     Console.WriteLine($"[Saga] Package issue for order {ctx.Saga.CorrelationId}: {ctx.Message.IssueType}");
                 })
-                .Publish(ctx => new RefundPaymentCommand
+                .Send(new Uri("queue:refund-payment"), ctx => new RefundPaymentCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     PaymentId = ctx.Saga.PaymentId,
@@ -300,25 +300,25 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     Amount = ctx.Saga.TotalAmount,
                     Reason = $"Package issue: {ctx.Message.IssueType}"
                 })
-                .Publish(ctx => new ReleaseStockReservationCommand
+                .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId,
                     Reason = $"Package issue: {ctx.Message.IssueType}"
                 })
-                .Publish(ctx => new CancelShippingCommand
+                .Send(new Uri("queue:cancel-shipping"), ctx => new CancelShippingCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ShippingId = ctx.Saga.CorrelationId
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -330,7 +330,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
             When(ShippingFailed)
                 .Then(ctx => Console.WriteLine($"[Saga] Shipping failed for order {ctx.Saga.CorrelationId}: {ctx.Message.Reason}"))
-                .Publish(ctx => new RefundPaymentCommand
+                .Send(new Uri("queue:refund-payment"), ctx => new RefundPaymentCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     PaymentId = ctx.Saga.PaymentId,
@@ -338,20 +338,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     Amount = ctx.Saga.TotalAmount,
                     Reason = $"Shipping failed: {ctx.Message.Reason}"
                 })
-                .Publish(ctx => new ReleaseStockReservationCommand
+                .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     ReservationId = ctx.Saga.ReservationId,
                     Reason = $"Shipping failed: {ctx.Message.Reason}"
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -372,7 +372,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
@@ -389,7 +389,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             
             When(ShippingFailed)
                 .Then(ctx => Console.WriteLine($"[Saga] Shipping failed after ship for order {ctx.Saga.CorrelationId}: {ctx.Message.Reason}"))
-                .Publish(ctx => new RefundPaymentCommand
+                .Send(new Uri("queue:refund-payment"), ctx => new RefundPaymentCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     PaymentId = ctx.Saga.PaymentId,
@@ -397,14 +397,14 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                     Amount = ctx.Saga.TotalAmount,
                     Reason = $"Shipping failed after dispatch: {ctx.Message.Reason}"
                 })
-                .Publish(ctx => new UpdateOrderStatusCommand
+                .Send(new Uri("queue:update-order-status-command"), ctx => new UpdateOrderStatusCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,
                     CustomerEmail = ctx.Saga.CustomerEmail,
                     Status = "Cancelled",
                 })
-                .Publish(ctx => new CancelOrderCommand
+                .Send(new Uri("queue:cancel-order-command"), ctx => new CancelOrderCommand
                 {
                     OrderId = ctx.Saga.CorrelationId,
                     CustomerName = ctx.Saga.CustomerName,

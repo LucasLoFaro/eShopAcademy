@@ -1,4 +1,3 @@
-using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using ServiceDefaults;
@@ -39,16 +38,12 @@ builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>(
 });
 
 builder.AddServiceDefaults()
-    .WithMassTransit((context, cfg) =>
+    .WithMassTransit(messaging =>
     {
-        cfg.ReceiveEndpoint("schedule-shipping", e =>
-            e.ConfigureConsumer<ScheduleShippingCommandConsumer>(context));
-        cfg.ReceiveEndpoint("cancel-shipping", e =>
-            e.ConfigureConsumer<CancelShippingCommandConsumer>(context));
-        cfg.ReceiveEndpoint("order-delivered", e =>
-            e.ConfigureConsumer<OrderDeliveredEventConsumer>(context));
-        cfg.ReceiveEndpoint("confirm-shipping", e =>
-            e.ConfigureConsumer<ConfirmPickupCommandConsumer>(context));
+        messaging.ReceiveEndpoint<ScheduleShippingCommandConsumer>("schedule-shipping");
+        messaging.ReceiveEndpoint<CancelShippingCommandConsumer>("cancel-shipping");
+        messaging.ReceiveEndpoint<OrderDeliveredEventConsumer>("order-delivered");
+        messaging.ReceiveEndpoint<ConfirmPickupCommandConsumer>("confirm-shipping");
     }, typeof(ScheduleShippingCommandConsumer).Assembly);
 
 var host = builder.Build();

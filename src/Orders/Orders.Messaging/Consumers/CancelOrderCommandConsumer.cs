@@ -67,7 +67,8 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
 
         if (order.Stock?.ReservationId is { } reservationId && reservationId != Guid.Empty)
         {
-            await context.Publish(new ReleaseStockReservationCommand
+            var releaseStock = await context.GetSendEndpoint(new Uri("queue:release-stock-reservation"));
+            await releaseStock.Send(new ReleaseStockReservationCommand
             {
                 OrderId = order.Id,
                 ReservationId = reservationId,
@@ -77,7 +78,8 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
 
         if (order.Payment?.Id is { } paymentId && paymentId != Guid.Empty)
         {
-            await context.Publish(new RefundPaymentCommand
+            var refundPayment = await context.GetSendEndpoint(new Uri("queue:refund-payment"));
+            await refundPayment.Send(new RefundPaymentCommand
             {
                 OrderId = order.Id,
                 PaymentId = paymentId,

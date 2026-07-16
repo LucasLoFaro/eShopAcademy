@@ -84,25 +84,17 @@ public class CancelOrderCommandConsumerTests
         _orders.Setup(r => r.UpdateAsync(order, It.IsAny<CancellationToken>()))
                .Returns(Task.CompletedTask);
 
-        foreach (var setup in new Action<Mock<ConsumeContext<CancelOrderCommand>>>[]
-        {
-            ctx => ctx.Setup(c => c.Publish(It.IsAny<OrderCancelledEvent>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask),
-            ctx => ctx.Setup(c => c.Publish(It.IsAny<OrderStatusUpdatedEvent>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask),
-            ctx => ctx.Setup(c => c.Publish(It.IsAny<ReleaseStockReservationCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask),
-            ctx => ctx.Setup(c => c.Publish(It.IsAny<RefundPaymentCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask),
-        })
-        {
-            var context2 = new Mock<ConsumeContext<CancelOrderCommand>>();
-            setup(context2);
-        }
-
         var context = new Mock<ConsumeContext<CancelOrderCommand>>();
+        var releaseStock = new Mock<ISendEndpoint>();
+        var refundPayment = new Mock<ISendEndpoint>();
         context.Setup(c => c.Message).Returns(command);
         context.Setup(c => c.CancellationToken).Returns(CancellationToken.None);
         context.Setup(c => c.Publish(It.IsAny<OrderCancelledEvent>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         context.Setup(c => c.Publish(It.IsAny<OrderStatusUpdatedEvent>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        context.Setup(c => c.Publish(It.IsAny<ReleaseStockReservationCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        context.Setup(c => c.Publish(It.IsAny<RefundPaymentCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        context.Setup(c => c.GetSendEndpoint(new Uri("queue:release-stock-reservation"))).ReturnsAsync(releaseStock.Object);
+        context.Setup(c => c.GetSendEndpoint(new Uri("queue:refund-payment"))).ReturnsAsync(refundPayment.Object);
+        releaseStock.Setup(e => e.Send(It.IsAny<ReleaseStockReservationCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        refundPayment.Setup(e => e.Send(It.IsAny<RefundPaymentCommand>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act
         await CreateSut().Consume(context.Object);
@@ -111,9 +103,9 @@ public class CancelOrderCommandConsumerTests
         order.Status.Should().Be(OrderStatus.Cancelled);
         _orders.Verify(r => r.UpdateAsync(order, It.IsAny<CancellationToken>()), Times.Once);
 
-        // Assert: compensation events published
+        // Assert: facts are published and commands are sent to deterministic endpoints
         context.Verify(c => c.Publish(It.IsAny<OrderCancelledEvent>(), It.IsAny<CancellationToken>()), Times.Once);
-        context.Verify(c => c.Publish(It.IsAny<ReleaseStockReservationCommand>(), It.IsAny<CancellationToken>()), Times.Once);
-        context.Verify(c => c.Publish(It.IsAny<RefundPaymentCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        releaseStock.Verify(e => e.Send(It.IsAny<ReleaseStockReservationCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        refundPayment.Verify(e => e.Send(It.IsAny<RefundPaymentCommand>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

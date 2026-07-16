@@ -26,7 +26,9 @@ public static partial class Extentions
                             kv.SetCredential(new DefaultAzureCredential());
                         })
                         .Select("common:*", LabelFilter.Null)
-                        .Select($"{builder.Environment.ApplicationName}:*", LabelFilter.Null);
+                        .Select($"{builder.Environment.ApplicationName}:*", LabelFilter.Null)
+                        .TrimKeyPrefix("common:")
+                        .TrimKeyPrefix($"{builder.Environment.ApplicationName}:");
                 });
             }
         }

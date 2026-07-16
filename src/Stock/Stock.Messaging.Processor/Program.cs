@@ -1,21 +1,16 @@
 using Infrastructure.Data;
 using Infrastructure.Services;
-using MassTransit;
 using ServiceDefaults;
 using Stock.Messaging.Processor.Consumers;
-using MassTransit;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults()
-    .WithMassTransit((context, cfg) =>
+    .WithMassTransit(messaging =>
     {
-        cfg.ReceiveEndpoint("commit-stock-reservation", e =>
-            e.ConfigureConsumer<CommitStockReservationConsumer>(context));
-        cfg.ReceiveEndpoint("release-stock-reservation", e =>
-            e.ConfigureConsumer<ReleaseStockReservationConsumer>(context));
-        cfg.ReceiveEndpoint("product-published-stock", e =>
-            e.ConfigureConsumer<ProductPublishedConsumer>(context));
+        messaging.ReceiveEndpoint<CommitStockReservationConsumer>("commit-stock-reservation");
+        messaging.ReceiveEndpoint<ReleaseStockReservationConsumer>("release-stock-reservation");
+        messaging.ReceiveEndpoint<ProductPublishedConsumer>("product-published-stock");
     }, typeof(CommitStockReservationConsumer).Assembly);
 
 builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock")!, "stock"));

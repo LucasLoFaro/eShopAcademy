@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.2.11415.280
@@ -216,6 +217,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSP.Simulator", "PSP\PSP.Simulator\PSP.Simulator.csproj", "{CE81E225-6042-437A-8862-C2D84C8B3218}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Simulator", "Shipping\Shipping.Simulator\Shipping.Simulator.csproj", "{04B75C7D-C5E7-48A0-ABF2-4B756383FFB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDefaults.Tests", "ServiceDefaults.Tests\ServiceDefaults.Tests.csproj", "{F27962C2-0788-4776-804D-244DB16C662E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -995,6 +1000,18 @@ Global
 		{04B75C7D-C5E7-48A0-ABF2-4B756383FFB0}.Release|x64.Build.0 = Release|Any CPU
 		{04B75C7D-C5E7-48A0-ABF2-4B756383FFB0}.Release|x86.ActiveCfg = Release|Any CPU
 		{04B75C7D-C5E7-48A0-ABF2-4B756383FFB0}.Release|x86.Build.0 = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|x64.Build.0 = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|x64.ActiveCfg = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|x64.Build.0 = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F27962C2-0788-4776-804D-244DB16C662E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1083,6 +1100,7 @@ Global
 		{7A1DFDD8-2E4C-475E-98C0-5980064D830F} = {DF65D1F4-57F8-B431-3AC1-079C5DC2BCBB}
 		{CE81E225-6042-437A-8862-C2D84C8B3218} = {B6D41D09-F4FB-D98D-B3E8-24487E4CFE8D}
 		{04B75C7D-C5E7-48A0-ABF2-4B756383FFB0} = {B6D41D09-F4FB-D98D-B3E8-24487E4CFE8D}
+		{F27962C2-0788-4776-804D-244DB16C662E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4274B344-9898-451A-8F05-24BD02B0A9BA}

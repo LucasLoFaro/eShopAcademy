@@ -1,4 +1,3 @@
-using MassTransit;
 using Sellers.Application.Repositories;
 using Sellers.Service.Consumers;
 using ServiceDefaults;
@@ -6,16 +5,11 @@ using ServiceDefaults;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults()
-    .WithMassTransit((context, cfg) =>
+    .WithMassTransit(messaging =>
     {
-        cfg.ReceiveEndpoint("seller-orders-submitted", e =>
-            e.ConfigureConsumer<OrderSubmittedForSellerConsumer>(context));
-
-        cfg.ReceiveEndpoint("seller-document-verification", e =>
-            e.ConfigureConsumer<SellerDocumentVerificationConsumer>(context));
-
-        cfg.ReceiveEndpoint("seller-tax-billing-verification", e =>
-            e.ConfigureConsumer<SellerTaxBillingVerificationConsumer>(context));
+        messaging.ReceiveEndpoint<OrderSubmittedForSellerConsumer>("seller-orders-submitted");
+        messaging.ReceiveEndpoint<SellerDocumentVerificationConsumer>("seller-document-verification");
+        messaging.ReceiveEndpoint<SellerTaxBillingVerificationConsumer>("seller-tax-billing-verification");
     }, typeof(OrderSubmittedForSellerConsumer).Assembly);
 
 builder.Services.AddSingleton<ISellerRepository, SellerRepository>();

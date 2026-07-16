@@ -1,4 +1,3 @@
-using MassTransit;
 using Sellers.Application.Repositories;
 using Sellers.Application.Services;
 using Sellers.EventsProcessor.Consumers;
@@ -7,10 +6,9 @@ using ServiceDefaults;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults()
-    .WithMassTransit((context, cfg) =>
+    .WithMassTransit(messaging =>
     {
-        cfg.ReceiveEndpoint("seller-sale-registration-requested", e =>
-            e.ConfigureConsumer<OrderSellerSaleRegistrationRequestedConsumer>(context));
+        messaging.ReceiveEndpoint<OrderSellerSaleRegistrationRequestedConsumer>("seller-sale-registration-requested");
     }, typeof(OrderSellerSaleRegistrationRequestedConsumer).Assembly);
 
 builder.Services.AddSingleton<ISellerRepository, SellerRepository>();

@@ -10,7 +10,7 @@
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <!-- TODO: temporarily use the local Common.Domain until the new nuget is published -->
     <!-- <PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.3" /> -->
-    <PackageReference Include="MassTransit" Version="9.0.1" />
+    <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -13,8 +13,7 @@
     <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
     <PackageReference Include="Azure.AI.ContentSafety" Version="1.0.0" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
-    <PackageReference Include="MassTransit" Version="9.1.2" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="9.1.2" />
+    <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
   </ItemGroup>
 
   <ItemGroup>

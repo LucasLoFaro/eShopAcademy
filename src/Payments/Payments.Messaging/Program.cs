@@ -1,4 +1,3 @@
-using MassTransit;
 using Payments.Messaging;
 using Payments.Messaging.Consumers;
 using ServiceDefaults;
@@ -6,10 +5,9 @@ using ServiceDefaults;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults()
-       .WithMassTransit((context, cfg) =>
+       .WithMassTransit(messaging =>
         {
-            cfg.ReceiveEndpoint("refund-payment", e =>
-                e.ConfigureConsumer<RefundPaymentCommandConsumer>(context));
+            messaging.ReceiveEndpoint<RefundPaymentCommandConsumer>("refund-payment");
         }, typeof(RefundPaymentCommandConsumer).Assembly);
 
 var host = builder.Build();

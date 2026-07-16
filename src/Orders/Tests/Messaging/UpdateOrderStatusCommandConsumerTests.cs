@@ -112,4 +112,84 @@ public class UpdateOrderStatusCommandConsumerTests
         order.Status.Should().Be(OrderStatus.Processing);
         _orders.Verify(r => r.UpdateAsync(order, It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task Consume_PartialSagaUpdatesInAnyArrivalOrder_PreservesPaymentStockAndShippingFields()
+    {
+        var orderId = Guid.NewGuid();
+        var paymentId = Guid.NewGuid();
+        var reservationId = Guid.NewGuid();
+        var committedAt = DateTime.UtcNow;
+
+        var commands = new[]
+        {
+            new UpdateOrderStatusCommand
+            {
+                OrderId = orderId,
+                Status = "Paid",
+                PaymentId = paymentId,
+                PaymentStatus = "Captured",
+                ProviderTransactionId = "provider-transaction",
+                Amount = 99.99m,
+                PaidAt = committedAt.AddSeconds(-1)
+            },
+            new UpdateOrderStatusCommand
+            {
+                OrderId = orderId,
+                Status = "Processing",
+                ReservationId = reservationId,
+                StockCommittedAt = committedAt
+            },
+            new UpdateOrderStatusCommand
+            {
+                OrderId = orderId,
+                Status = "Paid",
+                ShippingStatus = "Scheduled",
+                TrackingNumber = "SIM-REGRESSION",
+                Carrier = "Simulator"
+            }
+        };
+
+        var arrivalOrders = new[]
+        {
+            new[] { 0, 1, 2 },
+            new[] { 0, 2, 1 },
+            new[] { 1, 0, 2 },
+            new[] { 1, 2, 0 },
+            new[] { 2, 0, 1 },
+            new[] { 2, 1, 0 }
+        };
+
+        foreach (var arrivalOrder in arrivalOrders)
+        {
+            var order = new Order { Id = orderId, Status = OrderStatus.Created };
+            var orders = new Mock<IOrderRepository>();
+            orders.Setup(repository => repository.GetByIdAsync(orderId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(order);
+            orders.Setup(repository => repository.UpdateAsync(order, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var consumer = new UpdateOrderStatusCommandConsumer(
+                orders.Object,
+                new ConfigurationBuilder().Build(),
+                NullLogger<UpdateOrderStatusCommandConsumer>.Instance);
+
+            foreach (var commandIndex in arrivalOrder)
+            {
+                var context = new Mock<ConsumeContext<UpdateOrderStatusCommand>>();
+                context.Setup(value => value.Message).Returns(commands[commandIndex]);
+                context.Setup(value => value.CancellationToken).Returns(CancellationToken.None);
+                await consumer.Consume(context.Object);
+            }
+
+            order.Payment.Id.Should().Be(paymentId);
+            order.Payment.Status.Should().Be(PaymentStatus.Captured);
+            order.Payment.ProviderTransactionId.Should().Be("provider-transaction");
+            order.Stock.ReservationId.Should().Be(reservationId);
+            order.Stock.CommittedAt.Should().Be(committedAt);
+            order.Shipping.Status.Should().Be(ShippingStatus.Scheduled);
+            order.Shipping.TrackingNumber.Should().Be("SIM-REGRESSION");
+            order.Shipping.Carrier.Should().Be("Simulator");
+        }
+    }
 }

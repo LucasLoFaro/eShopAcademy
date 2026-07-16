@@ -1,48 +1,69 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using MassTransit;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace ServiceDefaults;
 
 public static partial class Extentions
 {
     public static TBuilder WithMassTransit<TBuilder>(
-    this TBuilder builder,
-    Action<IBusRegistrationContext, IBusFactoryConfigurator>? configureEndpoints = null,
-    params Assembly[] assemblies) 
+        this TBuilder builder,
+        Action<MessagingHostConfigurator>? configure = null,
+        params Assembly[] assemblies)
         where TBuilder : IHostApplicationBuilder
     {
-        builder.Services.AddMassTransit(config =>
-        {
-            config.SetKebabCaseEndpointNameFormatter();
-            config.SetInMemorySagaRepositoryProvider();
+        var hostConfiguration = new MessagingHostConfigurator();
+        hostConfiguration.AddConsumersFrom(assemblies);
+        configure?.Invoke(hostConfiguration);
 
-            if (assemblies != null && assemblies.Length > 0)
+        var messagingOptions = MessagingOptionsResolver.Resolve(
+            builder.Configuration,
+            builder.Environment);
+
+        builder.Services.AddSingleton(messagingOptions);
+        builder.Services.AddSingleton<IOptions<MessagingOptions>>(Options.Create(messagingOptions));
+        builder.Services.AddSingleton(new MessagingRegistrationMetadata(
+            messagingOptions.Transport,
+            hostConfiguration.SchedulingEnabled
+                ? messagingOptions.Transport == MessagingTransport.RabbitMq
+                    ? MessagingScheduler.Quartz
+                    : MessagingScheduler.AzureServiceBusNative
+                : MessagingScheduler.None,
+            messagingOptions.Transport == MessagingTransport.RabbitMq ||
+            messagingOptions.AzureServiceBus.CreateTopology));
+        builder.Services.AddMassTransit(registration =>
+        {
+            registration.SetKebabCaseEndpointNameFormatter();
+
+            foreach (var assembly in hostConfiguration.ConsumerAssemblies)
             {
-                config.AddConsumers(assemblies);
-                config.AddSagas(assemblies);
-                config.AddSagaStateMachines(assemblies);
+                registration.AddConsumers(assembly);
             }
 
-            if (builder.Environment.IsDevelopment())
+            hostConfiguration.ConfigureRegistration?.Invoke(registration);
+
+            if (hostConfiguration.SchedulingEnabled &&
+                messagingOptions.Transport == MessagingTransport.RabbitMq)
             {
-                config.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(new Uri(builder.Configuration.GetConnectionString("rabbit")!));
-                    configureEndpoints?.Invoke(context, cfg);
-                    cfg.ConfigureEndpoints(context);
-                });
+                registration.AddQuartzConsumers();
+            }
+
+            if (messagingOptions.Transport == MessagingTransport.RabbitMq)
+            {
+                RabbitMqTransportConfigurator.Configure(
+                    registration,
+                    builder.Services,
+                    messagingOptions,
+                    hostConfiguration);
             }
             else
             {
-                config.UsingAzureServiceBus((context, cfg) =>
-                {
-                    cfg.Host(builder.Configuration.GetConnectionString("servicebus"));
-                    configureEndpoints?.Invoke(context, cfg);
-                    cfg.ConfigureEndpoints(context);
-                });
+                AzureServiceBusTransportConfigurator.Configure(
+                    registration,
+                    messagingOptions,
+                    hostConfiguration);
             }
         });
 

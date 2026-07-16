@@ -15,7 +15,7 @@
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <!-- TODO: remove once the Products.Domain package workflow is restored -->
     <!-- <PackageReference Include="eShopAcademy.Products.Domain" Version="1.0.0" /> -->
-    <PackageReference Include="MassTransit" Version="9.1.2" />
+    <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.5.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
   </ItemGroup>

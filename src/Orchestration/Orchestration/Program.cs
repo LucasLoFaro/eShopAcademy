@@ -3,7 +3,7 @@ using Domain.Common.States;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Orchestration.Data;
-using Quartz;
+using ServiceDefaults;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -12,8 +12,6 @@ builder.Logging.AddConsole();
 LogContext.ConfigureCurrentLogContext();
 
 var orchestrationConnectionString = builder.Configuration.GetConnectionString("orchestration");
-var rabbitConnectionString = builder.Configuration.GetConnectionString("rabbit");
-var serviceBusConnectionString = builder.Configuration.GetConnectionString("servicebus");
 
 builder.Services.AddDbContext<OrderSagaDbContext>(options =>
 {
@@ -21,52 +19,22 @@ builder.Services.AddDbContext<OrderSagaDbContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
-builder.Services.AddMassTransit(cfg =>
+builder.WithMassTransit(messaging =>
 {
-    cfg.SetKebabCaseEndpointNameFormatter();
-
-    cfg.AddSagaStateMachine<OrderStateMachine, OrderState>()
-        .EntityFrameworkRepository(r =>
-        {
-            r.ConcurrencyMode = ConcurrencyMode.Optimistic;
-            r.AddDbContext<DbContext, OrderSagaDbContext>((provider, options) =>
+    messaging.UseScheduler();
+    messaging.Registration(registration =>
+    {
+        registration.AddSagaStateMachine<OrderStateMachine, OrderState>()
+            .EntityFrameworkRepository(repository =>
             {
-                options.UseNpgsql(orchestrationConnectionString);
+                repository.ConcurrencyMode = ConcurrencyMode.Optimistic;
+                repository.AddDbContext<DbContext, OrderSagaDbContext>((_, options) =>
+                    options.UseNpgsql(orchestrationConnectionString));
             });
-        });
-
-    if (builder.Environment.IsDevelopment())
-    {
-        // RabbitMQ with Quartz scheduler
-        cfg.AddQuartzConsumers();
-        cfg.UsingRabbitMq((context, bus) =>
-        {
-            bus.Host(new Uri(rabbitConnectionString));
-            bus.UseMessageScheduler(new Uri("queue:quartz"));
-            bus.ConfigureEndpoints(context);
-        });
-    }
-    else
-    {
-        // Azure Service Bus with built-in scheduler
-        cfg.UsingAzureServiceBus((context, bus) =>
-        {
-            bus.Host(serviceBusConnectionString);
-            bus.UseServiceBusMessageScheduler();
-            bus.ConfigureEndpoints(context);
-        });
-    }
+    });
 });
 
-// Quartz scheduler for RabbitMQ (dev environment)
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddQuartz();
-    builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-}
-
 var host = builder.Build();
-
 
 using (var scope = host.Services.CreateScope())
 {
@@ -75,4 +43,3 @@ using (var scope = host.Services.CreateScope())
 }
 
 host.Run();
-

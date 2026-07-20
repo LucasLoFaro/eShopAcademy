@@ -35,10 +35,10 @@ IConsumer<OrderStatusUpdatedEvent>
         await PersistNotificationAsync(evt.OrderId, evt.CustomerEmail, evt.CustomerName,
             "Order Received",
             $"Your order #{evt.OrderId} has been received and is being processed.",
-            "OrderSubmitted");
+            "OrderSubmitted", context.CancellationToken);
 
         var html = _templateRenderer.Render("OrderSubmitted", BuildPlaceholders(evt));
-        await SendAsync(evt.CustomerEmail, $"Order #{evt.OrderId} — Received", html, "OrderSubmitted", evt.OrderId);
+        await SendAsync(evt.CustomerEmail, $"Order #{evt.OrderId} — Received", html, "OrderSubmitted", evt.OrderId, context.CancellationToken);
     }
 
     public async Task Consume(ConsumeContext<OrderStatusUpdatedEvent> context)
@@ -68,7 +68,7 @@ IConsumer<OrderStatusUpdatedEvent>
         }
 
         await PersistNotificationAsync(evt.OrderId, evt.CustomerEmail, evt.CustomerName,
-            notifTitle, notifMessage, templateName);
+            notifTitle, notifMessage, templateName, context.CancellationToken);
 
         var placeholders = BuildPlaceholders(evt);
         placeholders["Amount"] = evt.Amount?.ToString("N2") ?? "";
@@ -78,16 +78,14 @@ IConsumer<OrderStatusUpdatedEvent>
         placeholders["Reason"] = evt.Reason ?? "No reason provided";
 
         var html = _templateRenderer.Render(templateName, placeholders);
-        await SendAsync(evt.CustomerEmail, subject, html, templateName, evt.OrderId);
+        await SendAsync(evt.CustomerEmail, subject, html, templateName, evt.OrderId, context.CancellationToken);
     }
 
     private async Task PersistNotificationAsync(Guid orderId, string email, string name,
-        string title, string message, string type)
+        string title, string message, string type, CancellationToken cancellationToken)
     {
-        try
+        var notification = new NotificationMessage
         {
-            var notification = new NotificationMessage
-            {
                 Recipient = new NotificationRecipient
                 {
                     Name = string.IsNullOrWhiteSpace(name) ? "Customer" : name,
@@ -103,17 +101,19 @@ IConsumer<OrderStatusUpdatedEvent>
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow,
                 ModifiedAt = DateTime.UtcNow
-            };
+        };
 
-            await _dbContext.Notifications.InsertOneAsync(notification);
-            _logger.LogInformation("[Notification] Persisted '{Type}' notification for {Email}, order {OrderId}.",
-                type, email, orderId);
-        }
-        catch (Exception ex)
+        try
         {
-            _logger.LogError(ex, "[Notification] Failed to persist '{Type}' notification for {Email}, order {OrderId}.",
-                type, email, orderId);
+            await _dbContext.Notifications.InsertOneAsync(notification, cancellationToken: cancellationToken);
         }
+        catch (Exception exception)
+        {
+            NotificationMetrics.RecordFailure("in-app", exception is MongoDB.Driver.MongoException ? "database" : "unexpected");
+            NotificationMetrics.RecordConsumerRetry(nameof(OrderNotificationConsumer), "persistence");
+            throw;
+        }
+        _logger.LogInformation("Persisted notification type {Type} for order {OrderId}.", type, orderId);
     }
 
     private bool HasEmail(OrderEvent evt)
@@ -132,16 +132,18 @@ IConsumer<OrderStatusUpdatedEvent>
         ["Date"] = DateTime.UtcNow.ToString("MMMM dd, yyyy")
     };
 
-    private async Task SendAsync(string email, string subject, string html, string template, Guid orderId)
+    private async Task SendAsync(string email, string subject, string html, string template, Guid orderId, CancellationToken cancellationToken)
     {
         try
         {
-            await _emailSender.SendAsync(email, subject, html);
-            _logger.LogInformation("[Notification] Sent '{Template}' email to {Email} for order {OrderId}.", template, email, orderId);
+            await _emailSender.SendAsync(email, subject, html, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            _logger.LogError(ex, "[Notification] Failed to send '{Template}' email to {Email} for order {OrderId}.", template, email, orderId);
+            NotificationMetrics.RecordFailure("email", exception is HttpRequestException ? "provider" : "unexpected");
+            NotificationMetrics.RecordConsumerRetry(nameof(OrderNotificationConsumer), "provider");
+            throw;
         }
+        _logger.LogInformation("Sent notification template {Template} for order {OrderId}.", template, orderId);
     }
 }

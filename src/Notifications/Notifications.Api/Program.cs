@@ -1,16 +1,38 @@
 using Notifications.Api.Data;
 using ServiceDefaults;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults()
        .WithSwagger();
 
-builder.Services.AddSingleton(
-    new NotificationDbContext(builder.Configuration.GetConnectionString("notifications")!, "notifications"));
+builder.Services.AddProblemDetails();
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
+
+var connectionString = builder.Configuration.GetConnectionString("notifications");
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("The notifications MongoDB connection string is not configured.");
+
+var notificationDatabase = new NotificationDbContext(connectionString, "notifications");
+builder.Services.AddSingleton(notificationDatabase);
+builder.Services.AddHealthChecks().AddAsyncCheck(
+    "notifications-database",
+    async cancellationToken =>
+    {
+        await notificationDatabase.PingAsync(cancellationToken);
+        return HealthCheckResult.Healthy();
+    },
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 var app = builder.Build();
+app.UseExceptionHandler();
+app.UseCors();
 
 app.MapGet("/notifications", async (string email, INotificationRepository repo, CancellationToken ct) =>
 {

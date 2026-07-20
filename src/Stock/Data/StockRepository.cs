@@ -24,7 +24,7 @@ public class StockRepository : IStockRepository
             Builders<Stock>.Filter.Eq(s => s.ProductID, productGuid),
             Builders<Stock>.Filter.Ne(s => s.Quantity, 0)
         );
-        return await _stocks.Find(filter).ToListAsync();
+        return await _stocks.Find(filter).ToListAsync(ct);
     }
 
     // TODO: Filter by warehouse
@@ -34,7 +34,7 @@ public class StockRepository : IStockRepository
             Builders<Stock>.Filter.Eq(s => s.ProductID, productGuid),
             Builders<Stock>.Filter.Ne(s => s.Quantity, 0)
         );
-        return await _stocks.Find(filter).FirstOrDefaultAsync();
+        return await _stocks.Find(filter).FirstOrDefaultAsync(ct);
     }
 
     public async Task<Stock> AddOrUpdateAsync(Stock stock, CancellationToken ct = default)

@@ -2,6 +2,7 @@ using Domain.Operations.Contracts;
 using Operations.Application.Repositories;
 using Operations.Application.Services;
 using ServiceDefaults;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +10,57 @@ builder.AddServiceDefaults()
        .WithMassTransit()
        .WithSwagger();
 
-builder.Services.AddSingleton<IPackageRepository, PackageRepository>();
+builder.Services.AddProblemDetails();
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
+var packageRepository = new PackageRepository(builder.Configuration);
+builder.Services.AddSingleton<IPackageRepository>(packageRepository);
+builder.Services.AddSingleton<OperationsRequestStore>();
+builder.Services.AddHealthChecks().AddAsyncCheck(
+    "operations-database",
+    async cancellationToken =>
+    {
+        await packageRepository.PingAsync(cancellationToken);
+        return HealthCheckResult.Healthy();
+    },
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
 builder.Services.AddScoped<IPackageWorkflowService, PackageWorkflowService>();
 
 var app = builder.Build();
+app.UseExceptionHandler();
+app.UseCors();
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method)
+        && context.Request.Path.StartsWithSegments("/api/operations"))
+    {
+        var key = context.Request.Headers["Idempotency-Key"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(key) || key.Length > 128)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(
+                new { error = "A valid Idempotency-Key header is required." },
+                context.RequestAborted);
+            return;
+        }
+
+        var store = context.RequestServices.GetRequiredService<OperationsRequestStore>();
+        var requestId = $"{context.Request.Path.Value?.ToLowerInvariant()}:{key}";
+        if (!await store.TryBeginAsync(requestId, context.RequestAborted))
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(
+                new { error = "This operations request has already been accepted." },
+                context.RequestAborted);
+            return;
+        }
+    }
+
+    await next(context);
+});
 
 app.MapGet("/api/operations/pending-packages", async (
     IPackageWorkflowService workflowService,

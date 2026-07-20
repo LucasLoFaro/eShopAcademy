@@ -49,7 +49,6 @@ public sealed class OrderDeliveredEventConsumer : IConsumer<OrderDeliveredEvent>
 
         await _publishEndpoint.Publish(enrichedEvent, context.CancellationToken);
 
-        _logger.LogInformation("[Shipping] Published enriched delivered event for Order {OrderId} to {Email}.",
-            incoming.OrderId, shippingInfo.CustomerEmail);
+        _logger.LogInformation("Published enriched delivered event for order {OrderId}.", incoming.OrderId);
     }
 }

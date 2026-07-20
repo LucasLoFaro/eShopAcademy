@@ -108,6 +108,30 @@ public class NotificationApiTests : IClassFixture<WebApplicationFactory<ApiProgr
         body!.MarkedRead.Should().Be(5);
     }
 
+    [Fact]
+    public async Task Alive_DoesNotDependOnMongoDatabase()
+    {
+        using var factory = new WebApplicationFactory<ApiProgram>();
+        var client = CreateClient(factory);
+
+        var response = await client.GetAsync("/alive");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Health_ReportsUnavailableMongoDatabase()
+    {
+        using var factory = new WebApplicationFactory<ApiProgram>();
+        var client = factory.WithWebHostBuilder(builder =>
+            builder.UseSetting("ConnectionStrings:notifications", "mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=100"))
+            .CreateClient();
+
+        var response = await client.GetAsync("/health");
+
+        response.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
+    }
+
     private static NotificationMessage CreateNotification(string email, string subject, string type) =>
         new()
         {

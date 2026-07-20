@@ -15,29 +15,41 @@ public sealed class ShipmentStore
         _db = connection.GetDatabase(database);
     }
 
-    public async Task SaveAsync(SimulatedShipment shipment)
+    public async Task SaveAsync(SimulatedShipment shipment, CancellationToken cancellationToken = default)
     {
         var json = JsonSerializer.Serialize(shipment);
-        await _db.StringSetAsync(ShipmentPrefix + shipment.ShipmentId, json);
-        await _db.SetAddAsync(ShipmentIndexKey, shipment.ShipmentId.ToString());
+        await _db.StringSetAsync(ShipmentPrefix + shipment.ShipmentId, json).WaitAsync(cancellationToken);
+        await _db.SetAddAsync(ShipmentIndexKey, shipment.ShipmentId.ToString()).WaitAsync(cancellationToken);
     }
 
-    public async Task<SimulatedShipment?> GetByIdAsync(string id)
+    public async Task<bool> TryCreateAsync(SimulatedShipment shipment, CancellationToken cancellationToken = default)
     {
-        var json = await _db.StringGetAsync(ShipmentPrefix + id);
+        var json = JsonSerializer.Serialize(shipment);
+        var created = await _db.StringSetAsync(
+            ShipmentPrefix + shipment.ShipmentId,
+            json,
+            when: When.NotExists).WaitAsync(cancellationToken);
+        if (created)
+            await _db.SetAddAsync(ShipmentIndexKey, shipment.ShipmentId.ToString()).WaitAsync(cancellationToken);
+        return created;
+    }
+
+    public async Task<SimulatedShipment?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var json = await _db.StringGetAsync(ShipmentPrefix + id).WaitAsync(cancellationToken);
         return json.IsNullOrEmpty ? null : JsonSerializer.Deserialize<SimulatedShipment>((string)json!);
     }
 
-    public async Task<IReadOnlyList<SimulatedShipment>> GetAllAsync()
+    public async Task<IReadOnlyList<SimulatedShipment>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var ids = await _db.SetMembersAsync(ShipmentIndexKey);
+        var ids = await _db.SetMembersAsync(ShipmentIndexKey).WaitAsync(cancellationToken);
         if (ids.Length == 0)
         {
             return Array.Empty<SimulatedShipment>();
         }
 
         var keys = ids.Select(id => (RedisKey)(ShipmentPrefix + id)).ToArray();
-        var values = await _db.StringGetAsync(keys);
+        var values = await _db.StringGetAsync(keys).WaitAsync(cancellationToken);
 
         var shipments = new List<SimulatedShipment>(values.Length);
         foreach (var value in values)
@@ -55,11 +67,11 @@ public sealed class ShipmentStore
         return shipments;
     }
 
-    public async Task<SimulatedShipment?> FindByShipmentIdAsync(Guid shipmentId)
-        => (await GetAllAsync()).FirstOrDefault(s => s.ShipmentId == shipmentId);
+    public async Task<SimulatedShipment?> FindByShipmentIdAsync(Guid shipmentId, CancellationToken cancellationToken = default)
+        => await GetByIdAsync(shipmentId.ToString(), cancellationToken);
 
-    public async Task<SimulatedShipment?> FindByOrderIdAsync(Guid orderId)
-        => (await GetAllAsync()).FirstOrDefault(s => s.OrderId == orderId);
+    public async Task<SimulatedShipment?> FindByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default)
+        => (await GetAllAsync(cancellationToken)).FirstOrDefault(s => s.OrderId == orderId);
 }
 
 public class StatusHistoryEntry

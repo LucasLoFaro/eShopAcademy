@@ -44,7 +44,8 @@ public class ReleaseStockReservationConsumerTests
         await repository.CreateAsync(reservation, CancellationToken.None);
         await stockRepository.AddOrUpdateAsync(existingStock, CancellationToken.None);
 
-        // Act
+        // Act: broker redelivery must not restore stock or publish twice.
+        await consumer.Consume(context.Object);
         await consumer.Consume(context.Object);
 
         // Assert
@@ -55,6 +56,7 @@ public class ReleaseStockReservationConsumerTests
         var updatedReservation = await repository.GetByIdAsync(commandWithReason.ReservationId, CancellationToken.None);
         updatedReservation.Should().NotBeNull();
         updatedReservation!.IsCommitted.Should().BeFalse();
+        updatedReservation.CommittedAt.Should().NotBeNull();
 
         publishEndpoint.Verify(endpoint => endpoint.Publish(
                 It.Is<StockReleasedEvent>(evt =>

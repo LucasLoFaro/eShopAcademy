@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shipping.Application\Shipping.Application.csproj" />
     <ProjectReference Include="..\Shipping.Service\Shipping.Service.csproj" />
+    <ProjectReference Include="..\Shipping.Simulator\Shipping.Simulator.csproj" />
   </ItemGroup>
 
 </Project>

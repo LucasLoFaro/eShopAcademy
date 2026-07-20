@@ -4,6 +4,7 @@ using Domain.Notifications.Entities;
 using FluentAssertions;
 using MassTransit;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
 using NotificationService;
@@ -273,5 +274,85 @@ public class OrderNotificationConsumerTests
                 d["Amount"] == 99.99m.ToString("N2") &&
                 d["Currency"] == "EUR")),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task Consume_WhenProviderHasTransientFailure_PropagatesForBrokerRetry()
+    {
+        var evt = new OrderSubmittedEvent
+        {
+            OrderId = Guid.NewGuid(),
+            CustomerEmail = "private@example.com",
+            CustomerName = "Customer"
+        };
+        _renderer.Setup(renderer => renderer.Render("OrderSubmitted", It.IsAny<Dictionary<string, string>>()))
+            .Returns("<html/>");
+        _emailSender.Setup(sender => sender.SendAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("temporary provider outage"));
+        var context = new Mock<ConsumeContext<OrderSubmittedEvent>>();
+        context.SetupGet(c => c.Message).Returns(evt);
+        context.SetupGet(c => c.CancellationToken).Returns(CancellationToken.None);
+
+        var action = () => CreateSut().Consume(context.Object);
+
+        await action.Should().ThrowAsync<HttpRequestException>();
+    }
+
+    [Fact]
+    public async Task Consume_WhenTemplateIsInvalid_PropagatesPermanentFailure()
+    {
+        var evt = new OrderSubmittedEvent
+        {
+            OrderId = Guid.NewGuid(),
+            CustomerEmail = "private@example.com",
+            CustomerName = "Customer"
+        };
+        _renderer.Setup(renderer => renderer.Render("OrderSubmitted", It.IsAny<Dictionary<string, string>>()))
+            .Throws(new InvalidOperationException("template is invalid"));
+        var context = new Mock<ConsumeContext<OrderSubmittedEvent>>();
+        context.SetupGet(c => c.Message).Returns(evt);
+        context.SetupGet(c => c.CancellationToken).Returns(CancellationToken.None);
+
+        var action = () => CreateSut().Consume(context.Object);
+
+        await action.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
+    public async Task Consume_DoesNotWriteRecipientEmailToLogs()
+    {
+        const string recipient = "private@example.com";
+        var logger = new CapturingLogger<OrderNotificationConsumer>();
+        var evt = new OrderSubmittedEvent
+        {
+            OrderId = Guid.NewGuid(),
+            CustomerEmail = recipient,
+            CustomerName = "Customer"
+        };
+        _renderer.Setup(renderer => renderer.Render("OrderSubmitted", It.IsAny<Dictionary<string, string>>()))
+            .Returns("<html/>");
+        _emailSender.Setup(sender => sender.SendAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        var context = new Mock<ConsumeContext<OrderSubmittedEvent>>();
+        context.SetupGet(c => c.Message).Returns(evt);
+        context.SetupGet(c => c.CancellationToken).Returns(CancellationToken.None);
+        var consumer = new OrderNotificationConsumer(
+            _emailSender.Object, _renderer.Object, _dbContextMock.Object, logger);
+
+        await consumer.Consume(context.Object);
+
+        logger.Messages.Should().NotContain(message => message.Contains(recipient, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public List<string> Messages { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter) => Messages.Add(formatter(state, exception));
     }
 }

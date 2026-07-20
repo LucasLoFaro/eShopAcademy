@@ -151,10 +151,9 @@ public class PackageWorkflowService : IPackageWorkflowService
         }, cancellationToken);
 
         _logger.LogWarning(
-            "[Operations] Problem reported for order {OrderId}: {Issue} - {Details}",
+            "Problem reported for order {OrderId} with category {Issue}.",
             orderId,
-            updated.IssueType,
-            updated.IssueDetails);
+            updated.IssueType);
 
         return updated;
     }

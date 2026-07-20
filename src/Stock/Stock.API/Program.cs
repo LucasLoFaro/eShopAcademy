@@ -1,6 +1,8 @@
 using Infrastructure.Services;
 using Infrastructure.Data;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ServiceDefaults;
+using OpenTelemetry.Metrics;
 
 
 namespace API;
@@ -17,9 +19,30 @@ public class Program
 
         builder.Services.AddControllers()
             .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
+        builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(StockMetrics.MeterName));
+        builder.Services.AddProblemDetails();
+        builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+            policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+                .AllowAnyHeader()
+                .AllowAnyMethod()));
 
-        builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock"), "stock"));
+        var connectionString = builder.Configuration.GetConnectionString("stock");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("The stock MongoDB connection string is not configured.");
+
+        var stockDatabase = new StockDbContext(connectionString, "stock");
+        builder.Services.AddSingleton(stockDatabase);
+        builder.Services.AddHealthChecks().AddAsyncCheck(
+            "stock-database",
+            async cancellationToken =>
+            {
+                await stockDatabase.PingAsync(cancellationToken);
+                return HealthCheckResult.Healthy();
+            },
+            tags: ["ready"],
+            timeout: TimeSpan.FromSeconds(3));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
+        builder.Services.AddScoped<IStockOperationStore, StockOperationStore>();
 
         builder.Services.AddTransient<StockMessagingClient>();
 
@@ -27,6 +50,8 @@ public class Program
         if (app.Environment.IsDevelopment())
             await SeedTestData(app);
 
+        app.UseExceptionHandler();
+        app.UseCors();
         app.MapControllers();
         app.UseDefaultEndpoints();
         app.Run();

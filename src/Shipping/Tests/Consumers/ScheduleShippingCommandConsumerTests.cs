@@ -18,9 +18,14 @@ public class ScheduleShippingCommandConsumerTests
 {
     private readonly Mock<IShippingInfoRepository> _infoRepo = new();
     private readonly Mock<IShippingProviderClient> _providerClient = new();
+    private readonly Mock<IShippingOperationStore> _operationStore = new();
 
-    private ScheduleShippingCommandConsumer CreateSut() =>
-        new(NullLogger<ScheduleShippingCommandConsumer>.Instance, _infoRepo.Object, _providerClient.Object);
+    private ScheduleShippingCommandConsumer CreateSut()
+    {
+        _operationStore.Setup(store => store.TryBeginAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        return new(NullLogger<ScheduleShippingCommandConsumer>.Instance, _infoRepo.Object, _providerClient.Object, _operationStore.Object);
+    }
 
     [Theory]
     [AutoData]
@@ -82,5 +87,30 @@ public class ScheduleShippingCommandConsumerTests
 
         // Assert: event is still published
         context.Verify(c => c.Publish(It.IsAny<ShippingScheduledEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task Consume_WhenOrderWasAlreadyScheduled_DoesNotCallProviderOrPublish(
+        ScheduleShippingCommand command)
+    {
+        _operationStore.Setup(store => store.TryBeginAsync(command.OrderId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var context = new Mock<ConsumeContext<ScheduleShippingCommand>>();
+        context.SetupGet(c => c.Message).Returns(command);
+        context.SetupGet(c => c.CancellationToken).Returns(CancellationToken.None);
+
+        var consumer = new ScheduleShippingCommandConsumer(
+            NullLogger<ScheduleShippingCommandConsumer>.Instance,
+            _infoRepo.Object,
+            _providerClient.Object,
+            _operationStore.Object);
+
+        await consumer.Consume(context.Object);
+
+        _providerClient.Verify(client => client.ScheduleShippingAsync(
+            It.IsAny<Domain.Shipping.Entities.Shipping>(), It.IsAny<CancellationToken>()), Times.Never);
+        context.Verify(c => c.Publish(It.IsAny<ShippingScheduledEvent>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

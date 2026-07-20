@@ -22,7 +22,12 @@ public sealed class ShippingProviderClient : IShippingProviderClient
     {
         EnsureBasePathConfigured();
 
-        var response = await _client.PostAsJsonAsync(ShippingProviderConstants.SchedulePath, shipping, cancellationToken);
+        using var request = new HttpRequestMessage(HttpMethod.Post, ShippingProviderConstants.SchedulePath)
+        {
+            Content = JsonContent.Create(shipping)
+        };
+        request.Headers.TryAddWithoutValidation("Idempotency-Key", $"shipping:{shipping.OrderId:N}");
+        var response = await _client.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<ScheduleShippingResponse>(cancellationToken: cancellationToken);

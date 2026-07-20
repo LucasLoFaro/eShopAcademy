@@ -1,50 +1,64 @@
-using Microsoft.Extensions.Configuration;
+using MassTransit;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using ServiceDefaults;
 using Shipping.Application.Clients;
 using Shipping.Application.Data;
 using Shipping.Application.Options;
 using Shipping.Service.Consumers;
+using Shipping.Application;
+using OpenTelemetry.Metrics;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(ShippingMetrics.MeterName));
 
-builder.Services.AddSingleton(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var connectionString = configuration.GetConnectionString("shipping");
+var connectionString = builder.Configuration.GetConnectionString("shipping");
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("The shipping MongoDB connection string is not configured.");
 
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("The shipping MongoDB connection string is not configured.");
-    }
-
-    var databaseName = configuration["Shipping:Database"] ?? "shipping";
-
-    return new ShippingDbContext(connectionString, databaseName);
-});
-
+var shippingDatabase = new ShippingDbContext(
+    connectionString,
+    builder.Configuration["Shipping:Database"] ?? "shipping");
+builder.Services.AddSingleton(shippingDatabase);
+builder.Services.AddSingleton<IMongoClient>(shippingDatabase.Client);
+builder.Services.AddSingleton(shippingDatabase.Database);
 builder.Services.AddScoped<IShippingInfoRepository, ShippingInfoRepository>();
-builder.Services.Configure<ShippingProviderOptions>(builder.Configuration.GetSection("Shipping:Provider"));
+builder.Services.AddScoped<IShippingOperationStore, ShippingOperationStore>();
+
+builder.Services.AddOptions<ShippingProviderOptions>()
+    .Bind(builder.Configuration.GetSection("Shipping:Provider"))
+    .Validate(ShippingProviderOptions.IsValid, "Shipping provider BaseUrl must be an absolute HTTP(S) URI.")
+    .ValidateOnStart();
 builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>((sp, client) =>
 {
-    var options = sp.GetRequiredService<IOptions<ShippingProviderOptions>>().Value;
-
-    if (string.IsNullOrWhiteSpace(options.BaseUrl))
-    {
-        throw new InvalidOperationException("The shipping provider base URL is not configured.");
-    }
-
-    client.BaseAddress = new Uri(options.BaseUrl);
+    client.BaseAddress = new Uri(sp.GetRequiredService<IOptions<ShippingProviderOptions>>().Value.BaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
 
 builder.AddServiceDefaults()
     .WithMassTransit(messaging =>
     {
-        messaging.ReceiveEndpoint<ScheduleShippingCommandConsumer>("schedule-shipping");
-        messaging.ReceiveEndpoint<CancelShippingCommandConsumer>("cancel-shipping");
-        messaging.ReceiveEndpoint<OrderDeliveredEventConsumer>("order-delivered");
-        messaging.ReceiveEndpoint<ConfirmPickupCommandConsumer>("confirm-shipping");
+        messaging.Registration(registration => registration.AddMongoDbOutbox(options =>
+        {
+            options.ClientFactory(provider => provider.GetRequiredService<IMongoClient>());
+            options.DatabaseFactory(provider => provider.GetRequiredService<IMongoDatabase>());
+            options.QueryDelay = TimeSpan.FromSeconds(1);
+            options.DuplicateDetectionWindow = TimeSpan.FromHours(1);
+        }));
     }, typeof(ScheduleShippingCommandConsumer).Assembly);
 
-var host = builder.Build();
-host.Run();
+builder.Services.AddHealthChecks().AddAsyncCheck(
+    "shipping-database",
+    async cancellationToken =>
+    {
+        await shippingDatabase.PingAsync(cancellationToken);
+        return HealthCheckResult.Healthy();
+    },
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
+
+var app = builder.Build();
+app.UseDefaultEndpoints();
+app.Run();

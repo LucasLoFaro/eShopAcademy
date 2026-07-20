@@ -11,7 +11,7 @@ public class ShippingService : ShippingGrpc.ShippingGrpcBase
 
     public override Task<ShippingResponse> ProcessShipping(ShippingRequest request, ServerCallContext context)
     {
-        _logger.LogInformation($"Processing shipping for Order {request.OrderId} to {request.Address}");
+        _logger.LogInformation("Processing shipping for order {OrderId}.", request.OrderId);
 
         return Task.FromResult(new ShippingResponse
         {

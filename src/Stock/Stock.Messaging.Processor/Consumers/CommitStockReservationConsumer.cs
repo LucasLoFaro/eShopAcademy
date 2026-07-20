@@ -5,6 +5,8 @@ using Domain.Stock.Contracts;
 using Infrastructure.Services;
 using Infrastructure.Data;
 using MassTransit;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 
 namespace Stock.Messaging.Processor.Consumers;
@@ -13,34 +15,58 @@ public sealed class CommitStockReservationConsumer : IConsumer<CommitStockReserv
 {
     private readonly IStockReservationRepository _reservationRepository;
     private readonly StockMessagingClient _messagingClient;
+    private readonly ILogger<CommitStockReservationConsumer> _logger;
 
     public CommitStockReservationConsumer(
         IStockReservationRepository reservationRepository,
         StockMessagingClient messagingClient)
+        : this(reservationRepository, messagingClient, NullLogger<CommitStockReservationConsumer>.Instance)
+    {
+    }
+
+    public CommitStockReservationConsumer(
+        IStockReservationRepository reservationRepository,
+        StockMessagingClient messagingClient,
+        ILogger<CommitStockReservationConsumer> logger)
     {
         _reservationRepository = reservationRepository;
         _messagingClient = messagingClient;
+        _logger = logger;
     }
 
     public async Task Consume(ConsumeContext<CommitStockReservationCommand> context)
     {
         var command = context.Message;
+        using var scope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["OrderId"] = command.OrderId,
+            ["ReservationId"] = command.ReservationId
+        });
         var reservation = await _reservationRepository.GetByIdAsync(command.ReservationId, context.CancellationToken);
 
         if (reservation == null)
         {
+            StockMetrics.RecordFailure("commit", "not_found");
             await PublishCommitFailed(context, command, "Reservation not found.");
             return;
         }
 
         if (reservation.IsCommitted)
         {
-            await PublishCommitFailed(context, command, "Reservation already committed.");
+            _logger.LogDebug("Ignoring duplicate stock reservation commit.");
+            return;
+        }
+
+        if (reservation.CommittedAt.HasValue)
+        {
+            StockMetrics.RecordFailure("commit", "released");
+            await PublishCommitFailed(context, command, "Reservation already released.");
             return;
         }
 
         if (reservation.ValidUntil < DateTime.UtcNow)
         {
+            StockMetrics.RecordFailure("commit", "expired");
             await PublishCommitFailed(context, command, "Reservation expired.");
             return;
         }

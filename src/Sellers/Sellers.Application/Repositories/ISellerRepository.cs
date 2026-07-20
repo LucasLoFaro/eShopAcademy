@@ -9,4 +9,8 @@ public interface ISellerRepository
     Task<Seller?> GetByIdentityAsync(string identityObjectId, CancellationToken cancellationToken);
     Task<IReadOnlyList<Seller>> GetAllAsync(CancellationToken cancellationToken);
     Task<Seller> UpdateAsync(Seller seller, CancellationToken cancellationToken);
+    Task<(Seller? Seller, bool Created)> TryRegisterSaleAsync(
+        Guid sellerId,
+        SellerLedgerEntry entry,
+        CancellationToken cancellationToken);
 }

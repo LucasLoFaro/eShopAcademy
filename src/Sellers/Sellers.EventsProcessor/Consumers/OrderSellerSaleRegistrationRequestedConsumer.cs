@@ -22,6 +22,11 @@ public class OrderSellerSaleRegistrationRequestedConsumer : IConsumer<OrderSelle
     {
         var message = context.Message;
 
+        if (message.SellerId == Guid.Empty || message.OrderId == Guid.Empty || message.OrderItemId == Guid.Empty)
+        {
+            throw new ArgumentException("Seller, order, and order item identifiers are required.");
+        }
+
         var seller = await _sellerService.RegisterSaleAsync(
             message.SellerId,
             message.OrderId,

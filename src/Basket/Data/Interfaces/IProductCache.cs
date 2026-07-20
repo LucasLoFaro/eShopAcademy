@@ -4,6 +4,6 @@ namespace Data.Interfaces;
 
 public interface IProductCache
 {
-    public Task<bool> AddOrUpdateProduct(ProductDTO product);
-    public Task<bool> UpdateProductStock(AlterStockDTO stock);
+    Task<bool> AddOrUpdateProduct(ProductDTO product, CancellationToken cancellationToken = default);
+    Task<bool> UpdateProductStock(AlterStockDTO stock, CancellationToken cancellationToken = default);
 }

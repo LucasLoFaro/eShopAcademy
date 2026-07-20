@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System.Text.Json;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +21,21 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+builder.Services.AddProblemDetails();
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? builder.Configuration["SellersSpaOrigin"]?
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
     });
 });
 
@@ -48,10 +57,15 @@ builder.Services.AddAuthorizationBuilder()
              ctx.User.HasClaim("permissions", "sellers:admin"))))
     .AddPolicy("sellers-authenticated", policy => policy.RequireAuthenticatedUser());
 
-builder.Services.AddSingleton<ISellerRepository, SellerRepository>();
+builder.Services.AddSellerStorage(builder.Configuration);
 builder.Services.AddScoped<ISellerService, SellerService>();
 
-builder.AddAzureBlobClient("productimages");
+builder.AddAzureBlobServiceClient("productimages", settings => settings.DisableHealthChecks = true);
+builder.Services.AddHealthChecks().AddCheck<BlobReadinessHealthCheck>(
+    "product-images-blob",
+    failureStatus: HealthStatus.Unhealthy,
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
 
 builder.Services.AddHttpClient("products-api", client =>
 {
@@ -75,6 +89,7 @@ builder.Services.AddHttpClient("stock-api", client =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseDefaultEndpoints();
 app.UseCors();
 app.UseAuthentication();
@@ -607,3 +622,27 @@ static async Task<bool> CanAccessSellerAsync(ClaimsPrincipal user, Guid sellerId
 }
 
 record StockUpdateRequest(int Quantity, string? Warehouse);
+
+public partial class Program;
+
+sealed class BlobReadinessHealthCheck : IHealthCheck
+{
+    private readonly BlobServiceClient _client;
+
+    public BlobReadinessHealthCheck(BlobServiceClient client) => _client = client;
+
+    public async Task<HealthCheckResult> CheckHealthAsync(
+        HealthCheckContext context,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _client.GetPropertiesAsync(cancellationToken);
+            return HealthCheckResult.Healthy();
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            return HealthCheckResult.Unhealthy("Product image storage is unavailable.");
+        }
+    }
+}

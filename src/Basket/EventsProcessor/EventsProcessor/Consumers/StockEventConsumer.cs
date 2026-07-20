@@ -20,6 +20,6 @@ public class StockEventConsumer : IConsumer<StockUpdatedEvent>
 
     public async Task Consume(ConsumeContext<StockUpdatedEvent> context)
     {
-        await _productCache.UpdateProductStock(_mapper.Map<AlterStockDTO>(context.Message));
+        await _productCache.UpdateProductStock(_mapper.Map<AlterStockDTO>(context.Message), context.CancellationToken);
     }
 }

@@ -12,6 +12,11 @@ public interface ICustomerRepository
     
     // Address management
     Task<SavedAddress> AddAddressAsync(Guid customerId, SavedAddress address, CancellationToken ct = default);
+    Task<bool> AddAddressIfMissingAsync(
+        Guid customerId,
+        string operationId,
+        SavedAddress address,
+        CancellationToken ct = default);
     Task<SavedAddress?> UpdateAddressAsync(Guid customerId, Guid addressId, SavedAddress address, CancellationToken ct = default);
     Task<bool> DeleteAddressAsync(Guid customerId, Guid addressId, CancellationToken ct = default);
     Task<bool> SetDefaultAddressAsync(Guid customerId, Guid addressId, CancellationToken ct = default);

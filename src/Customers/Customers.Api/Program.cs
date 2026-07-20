@@ -6,11 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults()
        .WithSwagger();
 
-builder.Services.AddSingleton(sp =>
-    new CustomerDbContext(builder.Configuration.GetConnectionString("customers"), "customers"));
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddProblemDetails();
+builder.Services.AddCustomerStorage(builder.Configuration);
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
@@ -90,3 +90,5 @@ app.MapPost("/customers/{customerId}/addresses/{addressId}/set-default", async (
 app.UseDefaultEndpoints();
 
 app.Run();
+
+public partial class Program;

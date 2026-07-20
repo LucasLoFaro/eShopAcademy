@@ -23,14 +23,25 @@ public class SellerTaxBillingVerificationConsumer : IConsumer<SellerTaxVerificat
     {
         var message = context.Message;
 
+        if (message.SellerId == Guid.Empty || string.IsNullOrWhiteSpace(message.TaxId))
+        {
+            throw new ArgumentException("Seller identifier and tax identifier are required.");
+        }
+
         _logger.LogInformation(
-            "[Sellers] Tax billing verification requested for seller {SellerId} with TaxId {TaxId}",
-            message.SellerId, message.TaxId);
+            "[Sellers] Tax billing verification requested for seller {SellerId}",
+            message.SellerId);
 
         var seller = await _repository.GetByIdAsync(message.SellerId, context.CancellationToken);
         if (seller is null)
         {
             _logger.LogWarning("[Sellers] Seller {SellerId} not found, skipping tax billing verification", message.SellerId);
+            return;
+        }
+
+        if (seller.VerificationNotes?.StartsWith("Tax billing verification", StringComparison.Ordinal) == true)
+        {
+            _logger.LogInformation("[Sellers] Tax billing verification already completed for seller {SellerId}", message.SellerId);
             return;
         }
 
@@ -73,8 +84,7 @@ public class SellerTaxBillingVerificationConsumer : IConsumer<SellerTaxVerificat
         // TODO: Integrate with real tax authority billing API
         // For now, hardcoded to always succeed with a simulated transaction
         _logger.LogInformation(
-            "[Sellers] Generating small verification bill for TaxId {TaxId} against local tax authority (hardcoded)",
-            message.TaxId);
+            "[Sellers] Generating a seller tax verification bill (development stub)");
 
         var result = new TaxBillingResult
         {

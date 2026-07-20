@@ -3,7 +3,9 @@ using Azure.Identity;
 using Core.Application.Interfaces.Services;
 using Domain.Products.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services;
 
@@ -12,28 +14,25 @@ public class ContentModerationService : IContentModerationService
     private readonly ContentSafetyClient _client;
     private readonly ILogger<ContentModerationService> _logger;
 
-    public ContentModerationService(IConfiguration configuration, ILogger<ContentModerationService> logger)
+    public ContentModerationService(IOptions<ContentSafetyOptions> options, ILogger<ContentModerationService> logger)
     {
         _logger = logger;
-        var endpoint = configuration["ContentSafety:Endpoint"]
-            ?? throw new InvalidOperationException("ContentSafety:Endpoint configuration is missing.");
-
-        _client = new ContentSafetyClient(new Uri(endpoint), new DefaultAzureCredential());
+        _client = new ContentSafetyClient(new Uri(options.Value.Endpoint), new DefaultAzureCredential());
     }
 
-    public async Task<ContentModerationResult> ModerateProductAsync(Product product)
+    public async Task<ContentModerationResult> ModerateProductAsync(Product product, CancellationToken cancellationToken = default)
     {
         var textToAnalyze = $"{product.Name} {product.Description}";
 
         // Analyze text content
-        var textResult = await AnalyzeTextAsync(textToAnalyze);
+        var textResult = await AnalyzeTextAsync(textToAnalyze, cancellationToken);
         if (!textResult.IsApproved)
             return textResult;
 
         // Analyze image content if URL is provided
         if (!string.IsNullOrWhiteSpace(product.ImageUrl))
         {
-            var imageResult = await AnalyzeImageAsync(product.ImageUrl);
+            var imageResult = await AnalyzeImageAsync(product.ImageUrl, cancellationToken);
             if (!imageResult.IsApproved)
                 return imageResult;
         }
@@ -41,12 +40,12 @@ public class ContentModerationService : IContentModerationService
         return new ContentModerationResult(true);
     }
 
-    private async Task<ContentModerationResult> AnalyzeTextAsync(string text)
+    private async Task<ContentModerationResult> AnalyzeTextAsync(string text, CancellationToken cancellationToken)
     {
         try
         {
             var options = new AnalyzeTextOptions(text);
-            var response = await _client.AnalyzeTextAsync(options);
+            var response = await _client.AnalyzeTextAsync(options, cancellationToken);
 
             foreach (var category in response.Value.CategoriesAnalysis)
             {
@@ -68,13 +67,13 @@ public class ContentModerationService : IContentModerationService
         }
     }
 
-    private async Task<ContentModerationResult> AnalyzeImageAsync(string imageUrl)
+    private async Task<ContentModerationResult> AnalyzeImageAsync(string imageUrl, CancellationToken cancellationToken)
     {
         try
         {
             var imageData = new ContentSafetyImageData(new Uri(imageUrl));
             var options = new AnalyzeImageOptions(imageData);
-            var response = await _client.AnalyzeImageAsync(options);
+            var response = await _client.AnalyzeImageAsync(options, cancellationToken);
 
             foreach (var category in response.Value.CategoriesAnalysis)
             {
@@ -91,8 +90,30 @@ public class ContentModerationService : IContentModerationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Content Safety image analysis failed for URL: {ImageUrl}", imageUrl);
+            _logger.LogError(ex, "Content Safety image analysis failed");
             throw;
         }
+    }
+}
+
+public sealed class ContentSafetyOptions
+{
+    public string Endpoint { get; set; } = string.Empty;
+}
+
+public static class ContentModerationRegistration
+{
+    public static IServiceCollection AddProductContentModeration(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddOptions<ContentSafetyOptions>()
+            .Bind(configuration.GetSection("ContentSafety"))
+            .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out var endpoint) &&
+                                 endpoint.Scheme == Uri.UriSchemeHttps,
+                "ContentSafety:Endpoint must be an absolute HTTPS URI.")
+            .ValidateOnStart();
+        services.AddSingleton<IContentModerationService, ContentModerationService>();
+        return services;
     }
 }

@@ -21,7 +21,7 @@ public class ProductGrpcService : ProductService.ProductServiceBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid GUID format"));
         }
 
-        var product = await _productService.GetByIdAsync(productId);
+        var product = await _productService.GetByIdAsync(productId, context.CancellationToken);
         if (product is null)
             throw new RpcException(new Status(StatusCode.NotFound, "Product not found"));
         

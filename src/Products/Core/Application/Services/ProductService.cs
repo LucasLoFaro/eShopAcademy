@@ -20,39 +20,39 @@ public class ProductService : IProductService
         _moderation = moderation;
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
-        => await _productsRepository.GetAllAsync();
+    public async Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _productsRepository.GetAllAsync(cancellationToken);
 
-    public async Task<Product?> GetByIdAsync(Guid id)
-        => await _productsRepository.GetByIdAsync(id);
+    public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        => await _productsRepository.GetByIdAsync(id, cancellationToken);
 
-    public async Task<Product?> GetMostExpensive()
-        => await _productsRepository.GetMostExpensive();
+    public async Task<Product?> GetMostExpensive(CancellationToken cancellationToken = default)
+        => await _productsRepository.GetMostExpensive(cancellationToken);
 
     // These two should send the stock integration events as well
-    public async Task AddOrUpdateAsync(Product product)
+    public async Task AddOrUpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
-        var moderationResult = await _moderation.ModerateProductAsync(product);
+        var moderationResult = await _moderation.ModerateProductAsync(product, cancellationToken);
         if (!moderationResult.IsApproved)
             throw new InvalidOperationException($"Product content moderation failed: {moderationResult.RejectionReason}");
 
-        var isNew = await _productsRepository.GetByIdAsync(product.Id) is null;
+        var isNew = await _productsRepository.GetByIdAsync(product.Id, cancellationToken) is null;
 
-        await _productsRepository.AddOrUpdateAsync(product);
-        await _messaging.SendProductUpdate(product);
+        await _productsRepository.AddOrUpdateAsync(product, cancellationToken);
+        await _messaging.SendProductUpdate(product, cancellationToken);
 
         if (isNew)
         {
-            await _messaging.SendProductPublished(product);
+            await _messaging.SendProductPublished(product, cancellationToken);
         }
     }
 
-    public async Task DeleteAsync(Product product)
+    public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
     {
-        await _productsRepository.DeleteAsync(product);
-        await _messaging.SendProductDelete(product);
+        await _productsRepository.DeleteAsync(product, cancellationToken);
+        await _messaging.SendProductDelete(product, cancellationToken);
     }
 
-    public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter)
-        => await _productsRepository.SearchAsync(filter);
+    public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter, CancellationToken cancellationToken = default)
+        => await _productsRepository.SearchAsync(filter, cancellationToken);
 }

@@ -22,17 +22,21 @@ public class CustomerAddressUpdatedEventConsumer : IConsumer<CustomerAddressUpda
     public async Task Consume(ConsumeContext<CustomerAddressUpdatedEvent> context)
     {
         var evt = context.Message;
+
+        if (evt.CustomerId == Guid.Empty || evt.OrderId == Guid.Empty)
+        {
+            throw new ArgumentException("Customer and order identifiers are required.");
+        }
         
         _logger.LogInformation(
-            "[CustomerAddressUpdate] Processing address update for customer {CustomerId} from order {OrderId}",
-            evt.CustomerId, evt.OrderId);
+            "[CustomerAddressUpdate] Processing address update from order {OrderId}",
+            evt.OrderId);
 
-        var customer = await _customerRepository.GetByIdAsync(evt.CustomerId);
+        var customer = await _customerRepository.GetByIdAsync(evt.CustomerId, context.CancellationToken);
         if (customer == null)
         {
             _logger.LogWarning(
-                "[CustomerAddressUpdate] Customer {CustomerId} not found",
-                evt.CustomerId);
+                "[CustomerAddressUpdate] Customer record was not found");
             return;
         }
 
@@ -55,36 +59,46 @@ public class CustomerAddressUpdatedEventConsumer : IConsumer<CustomerAddressUpda
         if (existingAddress != null)
         {
             _logger.LogInformation(
-                "[CustomerAddressUpdate] Address already exists for customer {CustomerId}, skipping",
-                evt.CustomerId);
+                "[CustomerAddressUpdate] Address already exists; skipping duplicate insert");
             
             // Update the legacy Address field for backward compatibility
             customer.Address = newAddress;
-            await _customerRepository.UpdateAsync(evt.CustomerId, customer);
+            await _customerRepository.UpdateAsync(evt.CustomerId, customer, context.CancellationToken);
             return;
         }
 
         // Address doesn't exist, add it as a new saved address
+        var operationId = $"Order {evt.OrderId:D}";
         var savedAddress = new SavedAddress
         {
-            Description = $"Order {evt.OrderId.ToString()[..8]}", // Use first 8 chars of order ID as description
+            Description = operationId,
             Address = newAddress,
             IsDefault = customer.SavedAddresses.Count == 0 // Set as default if it's the first address
         };
 
         try
         {
-            await _customerRepository.AddAddressAsync(evt.CustomerId, savedAddress);
-            
-            _logger.LogInformation(
-                "[CustomerAddressUpdate] Added new address '{Description}' for customer {CustomerId}. Total addresses: {Count}",
-                savedAddress.Description, evt.CustomerId, customer.SavedAddresses.Count + 1);
+            var added = await _customerRepository.AddAddressIfMissingAsync(
+                evt.CustomerId,
+                operationId,
+                savedAddress,
+                context.CancellationToken);
+
+            if (added)
+            {
+                _logger.LogInformation(
+                    "[CustomerAddressUpdate] Added an address. Address count: {Count}",
+                    customer.SavedAddresses.Count + 1);
+            }
+            else
+            {
+                _logger.LogInformation("[CustomerAddressUpdate] Duplicate delivery skipped");
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "[CustomerAddressUpdate] Failed to add address for customer {CustomerId}",
-                evt.CustomerId);
+                "[CustomerAddressUpdate] Failed to add an address");
             throw;
         }
     }

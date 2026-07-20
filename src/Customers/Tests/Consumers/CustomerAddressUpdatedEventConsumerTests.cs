@@ -39,6 +39,7 @@ public class CustomerAddressUpdatedEventConsumerTests
         // Assert: no writes made
         _repository.Verify(r => r.UpdateAsync(It.IsAny<Guid>(), It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
         _repository.Verify(r => r.AddAddressAsync(It.IsAny<Guid>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(r => r.AddAddressIfMissingAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
@@ -77,6 +78,7 @@ public class CustomerAddressUpdatedEventConsumerTests
         // Assert: legacy field updated, no new address added
         _repository.Verify(r => r.UpdateAsync(evt.CustomerId, customer, It.IsAny<CancellationToken>()), Times.Once);
         _repository.Verify(r => r.AddAddressAsync(It.IsAny<Guid>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(r => r.AddAddressIfMissingAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
@@ -95,19 +97,111 @@ public class CustomerAddressUpdatedEventConsumerTests
 
         _repository.Setup(r => r.GetByIdAsync(evt.CustomerId, It.IsAny<CancellationToken>()))
                    .ReturnsAsync(customer);
-        _repository.Setup(r => r.AddAddressAsync(evt.CustomerId, It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()))
-                   .ReturnsAsync(new SavedAddress());
+        _repository.Setup(r => r.AddAddressIfMissingAsync(
+                evt.CustomerId,
+                $"Order {evt.OrderId:D}",
+                It.IsAny<SavedAddress>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         // Act
         await CreateSut().Consume(BuildContext(evt));
 
         // Assert: new address saved with the event values
-        _repository.Verify(r => r.AddAddressAsync(
+        _repository.Verify(r => r.AddAddressIfMissingAsync(
             evt.CustomerId,
+            $"Order {evt.OrderId:D}",
             It.Is<SavedAddress>(a =>
                 a.Address.Street == evt.Street &&
                 a.Address.ZipCode == evt.ZipCode &&
                 a.Address.City == evt.City),
             It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task Consume_WhenDuplicateIsDelivered_DoesNotAddAnotherAddress(CustomerAddressUpdatedEvent evt)
+    {
+        var customer = new Customer
+        {
+            Name = "Existing",
+            Mail = "existing@example.invalid",
+            Phone = "unused",
+            Address = new Address(),
+            SavedAddresses =
+            [
+                new SavedAddress
+                {
+                    Address = new Address
+                    {
+                        Street = evt.Street,
+                        Number = evt.Number,
+                        ZipCode = evt.ZipCode,
+                        City = evt.City
+                    }
+                }
+            ]
+        };
+        _repository.Setup(r => r.GetByIdAsync(evt.CustomerId, It.IsAny<CancellationToken>())).ReturnsAsync(customer);
+        _repository.Setup(r => r.UpdateAsync(evt.CustomerId, customer, It.IsAny<CancellationToken>())).ReturnsAsync(customer);
+        var consumer = CreateSut();
+
+        await consumer.Consume(BuildContext(evt));
+        await consumer.Consume(BuildContext(evt));
+
+        _repository.Verify(r => r.AddAddressAsync(It.IsAny<Guid>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repository.Verify(r => r.AddAddressIfMissingAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<SavedAddress>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task Consume_WhenConcurrentDuplicateIsDelivered_UsesStableOrderDeduplicationKey(
+        CustomerAddressUpdatedEvent evt)
+    {
+        var customer = new Customer
+        {
+            Name = "Existing",
+            Mail = "existing@example.invalid",
+            Phone = "unused",
+            Address = new Address(),
+            SavedAddresses = []
+        };
+        var operationId = $"Order {evt.OrderId:D}";
+        _repository.Setup(r => r.GetByIdAsync(evt.CustomerId, It.IsAny<CancellationToken>())).ReturnsAsync(customer);
+        _repository.SetupSequence(r => r.AddAddressIfMissingAsync(
+                evt.CustomerId,
+                operationId,
+                It.IsAny<SavedAddress>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true)
+            .ReturnsAsync(false);
+        var consumer = CreateSut();
+
+        await consumer.Consume(BuildContext(evt));
+        await consumer.Consume(BuildContext(evt));
+
+        _repository.Verify(r => r.AddAddressIfMissingAsync(
+            evt.CustomerId,
+            operationId,
+            It.IsAny<SavedAddress>(),
+            It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task Consume_WhenIdentifiersAreMissing_ThrowsPermanentFailure()
+    {
+        var evt = new CustomerAddressUpdatedEvent { CustomerId = Guid.Empty, OrderId = Guid.Empty };
+        var act = () => CreateSut().Consume(BuildContext(evt));
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
+
+    [Theory]
+    [AutoData]
+    public async Task Consume_WhenRepositoryTimesOut_PropagatesTransientFailure(CustomerAddressUpdatedEvent evt)
+    {
+        _repository.Setup(r => r.GetByIdAsync(evt.CustomerId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TimeoutException("Mongo timeout"));
+        var act = () => CreateSut().Consume(BuildContext(evt));
+        await act.Should().ThrowAsync<TimeoutException>();
     }
 }

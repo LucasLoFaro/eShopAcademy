@@ -15,35 +15,35 @@ public class ProductsRepository : IProductsRepository
         _products = context.Products;
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync()
-        => await _products.Find(Builders<Product>.Filter.Empty).ToListAsync();
+    public async Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await _products.Find(Builders<Product>.Filter.Empty).ToListAsync(cancellationToken);
 
-    public async Task<Product?> GetByIdAsync(Guid id)
-        => await _products.Find(Builders<Product>.Filter.Eq(p => p.Id, id)).FirstOrDefaultAsync();
+    public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        => await _products.Find(Builders<Product>.Filter.Eq(p => p.Id, id)).FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<Product?> GetMostExpensive()
+    public async Task<Product?> GetMostExpensive(CancellationToken cancellationToken = default)
         => await _products
                 .Find(Builders<Product>.Filter.Empty)
                 .SortByDescending(p => p.Price)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task AddOrUpdateAsync(Product product)
+    public async Task AddOrUpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
-        await _products.ReplaceOneAsync(filter, product, new ReplaceOptions { IsUpsert = true });
+        await _products.ReplaceOneAsync(filter, product, new ReplaceOptions { IsUpsert = true }, cancellationToken);
     }
 
 
-    public async Task DeleteAsync(Product product)
+    public async Task DeleteAsync(Product product, CancellationToken cancellationToken = default)
     {
-        await _products.DeleteOneAsync(Builders<Product>.Filter.Eq(p => p.Id, product.Id));
+        await _products.DeleteOneAsync(Builders<Product>.Filter.Eq(p => p.Id, product.Id), cancellationToken);
     }
 
-    public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter)
+    public async Task<PagedResult<Product>> SearchAsync(ProductSearchFilter filter, CancellationToken cancellationToken = default)
     {
         // MongoDB supports server-side querying, but the current filtering logic
         // is kept in memory to preserve the existing behavior.
-        var products = await _products.Find(Builders<Product>.Filter.Empty).ToListAsync();
+        var products = await _products.Find(Builders<Product>.Filter.Empty).ToListAsync(cancellationToken);
         var results = products.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(filter.SearchText))

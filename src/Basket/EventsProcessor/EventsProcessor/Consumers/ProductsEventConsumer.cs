@@ -20,6 +20,6 @@ public class ProductsEventConsumer : IConsumer<ProductUpdatedEvent>
 
     public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
     {
-        await _productCache.AddOrUpdateProduct(_mapper.Map<ProductDTO>(context.Message));
+        await _productCache.AddOrUpdateProduct(_mapper.Map<ProductDTO>(context.Message), context.CancellationToken);
     }
 }

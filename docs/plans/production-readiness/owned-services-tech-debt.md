@@ -164,3 +164,87 @@ Scope: `src/Stock`, `src/Shipping`, `src/Operations`, `src/Notifications`, and `
 
 Close an item only with links to the implementation and its automated or runtime evidence. Record the broker and database topology, failure injected, expected result, actual result, and any sanitized telemetry used to confirm recovery. A passing unit test alone is insufficient for items that explicitly require representative infrastructure or a process-crash boundary.
 
+## Basket, Customers, Products, and Sellers follow-up
+
+The following items remain after rebasing the Basket, Customers, Products, and Sellers hardening work onto the shared observability and resilience foundation. The upstream Azure Monitor exporter and safe-method HTTP retry policy close the previously recorded telemetry-export and unsafe-default-retry gaps, so those are not repeated as open debt.
+
+### TD-BCPS-001 — Adopt durable MongoDB inbox/outbox semantics (P0)
+
+**Risk:** Customers Messaging, Sellers Service, and Sellers EventsProcessor currently use process-local outbox protection. Products API and Sellers API also have database-write-plus-publish flows without a durable atomic handoff. A crash can lose or duplicate an event even though ordinary duplicate delivery is handled.
+
+**Work:** Use the shared context-aware endpoint registration to adopt the approved durable MongoDB inbox/outbox convention. Define atomic or recoverable database-to-message handoffs for API publication paths.
+
+**Acceptance criteria:** Duplicate delivery is suppressed across restarts and concurrent replicas; crashes at each persistence/publish boundary recover to one logical business result; inbox and outbox backlog are observable without payload logging.
+
+**Owner:** Customers, Products, and Sellers with the shared messaging/platform owner for the MongoDB persistence convention.
+
+### TD-BCPS-002 — Introduce an explicit product-deletion event (P0)
+
+**Risk:** `ProductMessagingService.SendProductDelete` publishes `ProductUpdatedEvent` because the shared domain has no deletion event. Basket cannot distinguish deletion from update, so stale product cache entries can survive.
+
+**Work:** Add a shared `ProductDeletedEvent` carrying a stable product identifier, publish it after product deletion, and make Basket evict the corresponding cache entry idempotently. Document the contract as an event/fact rather than a command.
+
+**Acceptance criteria:** Product deletion publishes one logical deletion fact; update and deletion are distinguishable; duplicate deletion delivery is harmless; Basket cache eviction is covered by contract and integration tests.
+
+**Owner:** Shared domain-contract owner with Products and Basket.
+
+### TD-BCPS-003 — Define authoritative seller attribution for submitted orders (P1)
+
+**Risk:** The Sellers `OrderSubmitted` consumer cannot complete a deterministic seller transition when seller attribution is absent or ambiguous. Seller workflow state can remain incomplete while the message is acknowledged.
+
+**Work:** Define authoritative seller attribution fields and a stable business identifier in the shared order contract, then implement the seller-side transition and failure classification.
+
+**Acceptance criteria:** Every eligible order item maps to one seller; replay cannot duplicate work; missing or invalid attribution follows a documented permanent or business-error path.
+
+**Owner:** Shared order-contract owner with Sellers.
+
+### TD-BCPS-004 — Make seller verification concurrency-safe (P1)
+
+**Risk:** Document and tax/billing verification consumers avoid ordinary sequential duplicates, but concurrent replicas can race without a durable inbox and atomic compare-and-set transition. External verification can be repeated and terminal state overwritten.
+
+**Work:** Key durable inbox records by seller plus verification type/version, make state transitions atomic, and pass a stable idempotency key to providers that support one.
+
+**Acceptance criteria:** Concurrent duplicates result in one external operation and one terminal transition; restart and redelivery do not repeat completed verification; unknown provider outcomes enter a reconcilable state.
+
+**Owner:** Sellers with the integration-provider owner.
+
+### TD-BCPS-005 — Publish and probe owned worker health endpoints from AppHost (P1)
+
+**Risk:** Basket EventsProcessor, Customers Messaging, Sellers Service, and Sellers EventsProcessor expose `/health`, but their AppHost resources do not publish or probe those endpoints. AppHost can treat a running process as available while its critical storage or broker dependency is unavailable.
+
+**Work:** Give each worker a unique AppHost HTTP endpoint and attach `WithHttpHealthCheck("/health")` without routing probes through an API or Gateway.
+
+**Acceptance criteria:** Every worker has a unique reachable health URL; critical dependency loss changes `/health` while `/alive` remains successful; AppHost gates dependents on readiness and recovers without restarting healthy resources.
+
+**Owner:** Shared platform/AppHost with Basket, Customers, and Sellers for runtime assertions.
+
+### TD-BCPS-006 — Certify production third-party adapters (P1)
+
+**Risk:** Sellers document-intelligence and tax-authority integrations and Products content-safety integration do not yet prove production authentication, timeout, rate-limit, data-residency, and failure-classification behavior. These optional providers must not accidentally become readiness dependencies.
+
+**Work:** Complete provider-specific production adapters with bounded timeouts, redacted telemetry, circuit breaking, explicit transient/permanent mapping, secret-store integration, and operational runbooks.
+
+**Acceptance criteria:** Provider sandbox contract tests pass; secrets never enter source, logs, traces, or health output; outages follow a documented degraded business path; optional-provider failure does not make the process unready unless product requirements explicitly reclassify it as critical.
+
+**Owner:** Products and Sellers with platform security and provider-integration owners.
+
+### TD-BCPS-007 — Complete full-topology readiness and recovery validation (P1)
+
+**Risk:** Unit and in-process tests cover endpoint contracts, but the previous Aspire run did not reach ready because container-backed dependencies remained in `Starting`. Real Redis, MongoDB, blob, and broker failure/recovery behavior remains unproven for all nine executables.
+
+**Work:** Run the complete topology in a healthy container environment and interrupt each critical dependency independently. Measure probe and recovery timing and verify correlation across retry/redelivery.
+
+**Acceptance criteria:** All nine executables reach healthy; each critical dependency failure returns `/health` 503 while `/alive` stays 200; health recovers without process restart within the documented objective; responses and telemetry remain non-sensitive.
+
+**Owner:** Shared AppHost/platform for the environment; Basket, Customers, Products, and Sellers for assertions.
+
+### TD-BCPS-008 — Normalize .NET SDK provisioning (P2)
+
+**Risk:** The machine-wide .NET 10 SDK used during hardening was incomplete, requiring an isolated official SDK. Developers and CI can fail before compilation or silently build with inconsistent tooling.
+
+**Work:** Repair managed SDK provisioning and pin the supported version through the repository's approved shared tooling process.
+
+**Acceptance criteria:** Clean developer and CI environments restore, build every owned project, and pass all owned tests with the same supported SDK version.
+
+**Owner:** Developer-experience/CI platform owner.
+

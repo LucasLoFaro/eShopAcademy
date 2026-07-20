@@ -26,6 +26,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+    <PackageReference Include="Quartz.Serialization.SystemTextJson" Version="3.18.1" />
   </ItemGroup>
 
   <ItemGroup>

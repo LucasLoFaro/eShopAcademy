@@ -241,7 +241,14 @@ public class MessagingArchitectureTests
             .ToArray();
 
         Assert.NotEmpty(messagingHosts);
-        Assert.All(messagingHosts, path => Assert.Contains("AddServiceDefaults", File.ReadAllText(path)));
+        Assert.All(messagingHosts, path =>
+        {
+            var program = File.ReadAllText(path);
+            Assert.True(
+                program.Contains("AddServiceDefaults", StringComparison.Ordinal) ||
+                program.Contains("AddWebServiceDefaults", StringComparison.Ordinal),
+                $"{path} must register shared service defaults.");
+        });
     }
 
     private static JsonDocument LoadTopology() => JsonDocument.Parse(File.ReadAllText(Path.Combine(

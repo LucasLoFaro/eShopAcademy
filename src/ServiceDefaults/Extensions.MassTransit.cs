@@ -21,9 +21,14 @@ public static partial class Extentions
         var messagingOptions = MessagingOptionsResolver.Resolve(
             builder.Configuration,
             builder.Environment);
+        var reliabilityOptions = MessagingReliabilityOptions.Resolve(builder.Configuration);
+        hostConfiguration.ReliabilityOptions = reliabilityOptions;
 
         builder.Services.AddSingleton(messagingOptions);
         builder.Services.AddSingleton<IOptions<MessagingOptions>>(Options.Create(messagingOptions));
+        builder.Services.AddSingleton(reliabilityOptions);
+        builder.Services.AddSingleton<IOptions<MessagingReliabilityOptions>>(Options.Create(reliabilityOptions));
+        MessagingReliabilityPolicy.ConfigureHost(builder.Services, reliabilityOptions);
         builder.Services.AddSingleton(new MessagingRegistrationMetadata(
             messagingOptions.Transport,
             hostConfiguration.SchedulingEnabled
@@ -36,6 +41,18 @@ public static partial class Extentions
         builder.Services.AddMassTransit(registration =>
         {
             registration.SetKebabCaseEndpointNameFormatter();
+            registration.ConfigureHealthCheckOptions(health =>
+            {
+                health.Name = "masstransit-bus";
+                health.MinimalFailureStatus = Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy;
+                health.Tags.Add(HealthCheckTags.Ready);
+            });
+
+            if (hostConfiguration.ReliabilityEnabled)
+            {
+                registration.AddConfigureEndpointsCallback((_, endpoint) =>
+                    MessagingReliabilityPolicy.Apply(endpoint, reliabilityOptions));
+            }
 
             foreach (var assembly in hostConfiguration.ConsumerAssemblies)
             {

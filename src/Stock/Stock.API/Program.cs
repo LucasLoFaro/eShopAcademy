@@ -1,6 +1,7 @@
 using Infrastructure.Services;
 using Infrastructure.Data;
 using ServiceDefaults;
+using Microsoft.Extensions.Options;
 
 
 namespace API;
@@ -11,15 +12,23 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.AddServiceDefaults()
+        builder.AddWebServiceDefaults()
+               .AddRequiredConnectionString("stock")
                .WithSwagger()
                .WithMassTransit();
 
         builder.Services.AddControllers()
             .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
 
-        builder.Services.AddSingleton(sp => new StockDbContext(builder.Configuration.GetConnectionString("stock"), "stock"));
+        builder.Services.AddSingleton(sp => new StockDbContext(
+            sp.GetRequiredService<IOptionsMonitor<RequiredConnectionString>>().Get("stock").Value,
+            "stock"));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
+
+        builder.Services.AddHealthChecks().AddCriticalDependency(
+            "stock-mongodb",
+            async (sp, cancellationToken) =>
+                await sp.GetRequiredService<StockDbContext>().PingAsync(cancellationToken));
 
         builder.Services.AddTransient<StockMessagingClient>();
 
@@ -27,6 +36,7 @@ public class Program
         if (app.Environment.IsDevelopment())
             await SeedTestData(app);
 
+        app.UseWebServiceDefaults();
         app.MapControllers();
         app.UseDefaultEndpoints();
         app.Run();

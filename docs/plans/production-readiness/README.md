@@ -9,6 +9,7 @@ These documents combine validated current-state evidence with target contracts. 
 - [Health endpoints](health-endpoints.md) — current endpoint inventory and future readiness contract.
 - [Observability](observability.md) — current OpenTelemetry inventory and intended Application Insights architecture.
 - [Security and configuration](security-and-configuration.md) — current risks and future production controls.
+- [Shared platform foundation migration guide](shared-platform-foundation.md) — reusable APIs, pilot adoption, at-least-once delivery contract, and service-agent decisions.
 
 The consolidated issue-ready summary is [documentation-validation-gaps.md](../documentation-validation-gaps.md).
 

@@ -13,6 +13,8 @@ public sealed class MessagingHostConfigurator
     internal IReadOnlyList<EndpointDefinition> Endpoints => _endpoints;
     internal Action<IBusRegistrationConfigurator>? ConfigureRegistration { get; private set; }
     internal bool SchedulingEnabled { get; private set; }
+    internal bool ReliabilityEnabled { get; private set; }
+    internal MessagingReliabilityOptions? ReliabilityOptions { get; set; }
 
     public MessagingHostConfigurator AddConsumersFrom(params Assembly[] assemblies)
     {
@@ -39,6 +41,20 @@ public sealed class MessagingHostConfigurator
         return this;
     }
 
+    public MessagingHostConfigurator UseReliabilityConventions()
+    {
+        ReliabilityEnabled = true;
+        return this;
+    }
+
+    public MessagingHostConfigurator UseCorrelationId<TMessage>(Func<TMessage, Guid> provider)
+        where TMessage : class
+    {
+        ArgumentNullException.ThrowIfNull(provider);
+        GlobalTopology.Send.UseCorrelationId(provider);
+        return this;
+    }
+
     public MessagingHostConfigurator ReceiveEndpoint<TConsumer>(
         string endpointName,
         Action<IReceiveEndpointConfigurator>? configureEndpoint = null)
@@ -50,10 +66,30 @@ public sealed class MessagingHostConfigurator
             {
                 endpoint.ConfigureConsumeTopology = createTopology;
                 configureEndpoint?.Invoke(endpoint);
+                ApplyReliability(endpoint);
                 endpoint.ConfigureConsumer<TConsumer>(context);
             });
         });
 
+        return this;
+    }
+
+    public MessagingHostConfigurator ReceiveEndpoint<TConsumer>(
+        string endpointName,
+        Action<IBusRegistrationContext, IReceiveEndpointConfigurator> configureEndpoint)
+        where TConsumer : class, IConsumer
+    {
+        ArgumentNullException.ThrowIfNull(configureEndpoint);
+        AddEndpoint(endpointName, (context, bus, name, createTopology) =>
+        {
+            bus.ReceiveEndpoint(name, endpoint =>
+            {
+                endpoint.ConfigureConsumeTopology = createTopology;
+                configureEndpoint(context, endpoint);
+                ApplyReliability(endpoint);
+                endpoint.ConfigureConsumer<TConsumer>(context);
+            });
+        });
         return this;
     }
 
@@ -71,11 +107,22 @@ public sealed class MessagingHostConfigurator
             {
                 endpoint.ConfigureConsumeTopology = createTopology;
                 configureEndpoint?.Invoke(endpoint);
+                ApplyReliability(endpoint);
                 endpoint.ConfigureSaga<TSaga>(context);
             });
         });
 
         return this;
+    }
+
+    private void ApplyReliability(IReceiveEndpointConfigurator endpoint)
+    {
+        if (ReliabilityEnabled)
+        {
+            MessagingReliabilityPolicy.Apply(
+                endpoint,
+                ReliabilityOptions ?? throw new InvalidOperationException("Messaging reliability options were not initialized."));
+        }
     }
 
     private void AddEndpoint(string endpointName, EndpointConfiguration configure)

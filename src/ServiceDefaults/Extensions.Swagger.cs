@@ -41,7 +41,7 @@ public static partial class Extensions
     {
         var hasSwagger = app.Services.GetService<Swashbuckle.AspNetCore.Swagger.ISwaggerProvider>() != null;
 
-        if (hasSwagger)
+        if (hasSwagger && app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();

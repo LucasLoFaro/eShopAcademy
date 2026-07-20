@@ -1,4 +1,4 @@
-import { Q as QueryClient, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-DUkXVRYF.js';
+import { Q as QueryClient, j as jsxDevRuntimeExports, a as QueryClientProvider, A as App } from './App-uy147gjc.js';
 import { r as requireReact } from './index-B1280Vi5.js';
 import { r as requireReactDom } from './index-Cauge8MD.js';
 
@@ -20216,11 +20216,11 @@ const queryClient = new QueryClient({
 });
 clientExports.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(App, {}, void 0, false, {
-    fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/main.tsx",
+    fileName: "C:/Users/lulo02/.codex/worktrees/f732/eShopAcademy/src/Frontend/eshop-sellers/src/main.tsx",
     lineNumber: 15,
     columnNumber: 5
   }, undefined) }, void 0, false, {
-    fileName: "C:/github/lucas/eShopAcademy/src/Frontend/eshop-sellers/src/main.tsx",
+    fileName: "C:/Users/lulo02/.codex/worktrees/f732/eShopAcademy/src/Frontend/eshop-sellers/src/main.tsx",
     lineNumber: 14,
     columnNumber: 3
   }, undefined)

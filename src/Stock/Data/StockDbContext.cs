@@ -1,5 +1,6 @@
 ﻿using Domain.Stock.Entities;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 
 namespace Infrastructure.Data;
@@ -19,8 +20,10 @@ public class StockDbContext
     public IMongoCollection<Stock> Stocks => _database.GetCollection<Stock>("Stocks");
     public IMongoCollection<StockReservation> Reservations => _database.GetCollection<StockReservation>("Reservations");
 
-    public async Task PingAsync(CancellationToken cancellationToken)
-        => await _database.RunCommandAsync<MongoDB.Bson.BsonDocument>(
-            new MongoDB.Bson.BsonDocument("ping", 1),
+    public async Task PingAsync(CancellationToken cancellationToken = default)
+    {
+        await _database.RunCommandAsync<BsonDocument>(
+            new BsonDocument("ping", 1),
             cancellationToken: cancellationToken);
+    }
 }

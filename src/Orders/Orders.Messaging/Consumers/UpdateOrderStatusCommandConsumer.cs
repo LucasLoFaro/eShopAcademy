@@ -46,7 +46,11 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
             return;
         }
 
-        order.Status = newStatus;
+        var statusChanged = ShouldApplyStatus(order.Status, newStatus);
+        if (statusChanged)
+        {
+            order.Status = newStatus;
+        }
 
         // Payment
         order.Payment ??= new OrderPaymentInfo();
@@ -116,16 +120,19 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
 
         await _orders.UpdateAsync(order, context.CancellationToken);
 
-        await context.Publish(new OrderStatusUpdatedEvent
+        if (statusChanged)
         {
-            OrderId = order.Id,
-            CustomerName = command.CustomerName,
-            CustomerEmail = command.CustomerEmail,
-            Status = command.Status,
-            Amount = command.Amount,
-            TrackingNumber = command.TrackingNumber,
-            Carrier = command.Carrier
-        }, context.CancellationToken);
+            await context.Publish(new OrderStatusUpdatedEvent
+            {
+                OrderId = order.Id,
+                CustomerName = command.CustomerName,
+                CustomerEmail = command.CustomerEmail,
+                Status = command.Status,
+                Amount = command.Amount,
+                TrackingNumber = command.TrackingNumber,
+                Carrier = command.Carrier
+            }, context.CancellationToken);
+        }
 
         if (newStatus == OrderStatus.Paid && order.SellerSalesRegisteredAt is null)
         {
@@ -163,6 +170,21 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
             await _orders.UpdateAsync(order, context.CancellationToken);
         }
 
-        _logger.LogInformation("[UpdateOrderStatus] Order {OrderId} updated to {Status}.", order.Id, newStatus);
+        _logger.LogInformation(
+            statusChanged
+                ? "[UpdateOrderStatus] Order {OrderId} updated to {Status}."
+                : "[UpdateOrderStatus] Merged order {OrderId} details without changing status from {Status}.",
+            order.Id,
+            order.Status);
+    }
+
+    private static bool ShouldApplyStatus(OrderStatus current, OrderStatus requested)
+    {
+        if (requested is OrderStatus.Cancelled or OrderStatus.Error)
+        {
+            return current != requested;
+        }
+
+        return requested > current;
     }
 }

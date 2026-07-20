@@ -60,7 +60,7 @@ public sealed class ShippingStatusService : IShippingStatusService
 
         var normalizedStatus = ProviderShippingStatus.Normalize(update.Status);
 
-        if (normalizedStatus == ProviderShippingStatus.Shipped)
+        if (normalizedStatus is ProviderShippingStatus.Shipped or ProviderShippingStatus.OutForDelivery)
         {
             await PublishEventAsync(new OrderShippedEvent
             {

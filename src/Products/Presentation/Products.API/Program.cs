@@ -4,8 +4,6 @@ using Infrastructure.Data.Repositories;
 using Core.Application.Services;
 using Infrastructure.Services;
 using Infrastructure.Data;
-using Domain.Products.Entities;
-using MongoDB.Driver;
 using ServiceDefaults;
 using Data;
 
@@ -40,10 +38,6 @@ static async Task SeedTestData(WebApplication app)
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
-
-        if (await db.Products.Find(Builders<Product>.Filter.Empty).AnyAsync())
-            return;
-
         var messagingService = scope.ServiceProvider.GetRequiredService<IProductMessagingService>();
         await ProductSeedData.InitializeAsync(db, messagingService);
     }

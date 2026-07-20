@@ -83,7 +83,7 @@ See [safety-guardrails.md](references/safety-guardrails.md) for detailed rules a
 | Stop app | `aspire stop` |
 | Wait for resource | `aspire wait <resource>` |
 | Check status | `aspire ps` or `aspire describe` |
-| Show hidden resources (proxies, helpers, migrations) | `aspire ps --include-hidden` / `aspire describe --include-hidden` |
+| Show hidden resources (proxies, helpers, migrations) | `aspire describe --include-hidden` |
 | Resource operation | `aspire resource <resource-name> <command>` such as `stop`, `start`, or `rebuild` when exposed |
 | Create new project | `aspire new aspire-starter` |
 | Add Aspire to existing | `aspire init` (then hand off to `aspireify` skill for wiring) |
@@ -146,7 +146,7 @@ The same rule applies to any "file in use", "cannot access the file", or
 
 | Scenario | Route To |
 |----------|----------|
-| AppHost wiring after `aspire init` (scan repo, add resources, ServiceDefaults/OTel) | → `aspireify` skill ([`../aspireify/SKILL.md`](../aspireify/SKILL.md)) or project-local `.agents/skills/aspireify/SKILL.md` |
+| AppHost wiring after `aspire init` (scan repo, add resources, ServiceDefaults/OTel) | → installed `aspireify` skill (in-plugin or project-local) |
 | Browser logs (`Aspire.Hosting.Browsers` / `WithBrowserLogs()`) and dashboard authoring | → `aspireify` skill (code edits) and `aspire-monitoring` (discovery) |
 | Custom resource commands (`WithCommand`, `ExecuteCommandResult`, `HttpCommandResultMode`) | → `aspireify` skill |
 | Lifecycle hooks (`SubscribeBeforeStart`, `SubscribeAfterResourcesCreated`, BeforeStart pipeline phase) | → `aspireify` skill |
@@ -179,7 +179,7 @@ Current rules to apply when handing off:
 
 After `aspire init` drops a skeleton AppHost + `aspire.config.json`, route AppHost wiring
 (scan repo → propose resource graph → edit AppHost → wire `Aspire.ServiceDefaults` / OTel →
-validate via `aspire start`) to the in-plugin **aspireify** skill: [`../aspireify/SKILL.md`](../aspireify/SKILL.md).
+validate via `aspire start`) to the **aspireify** skill when it is installed.
 For first-run flows that only need the skeleton drop, see the in-plugin **aspire-init** skill:
 [`../aspire-init/SKILL.md`](../aspire-init/SKILL.md). This orchestration skill stays focused
 on lifecycle (start/stop/wait/restart) and never edits AppHost code itself.

@@ -1,5 +1,7 @@
 # Customers.Messaging Project Setup
 
+> Historical implementation note. The worker split remains, but this is not a current runbook. The shared transport now defaults to RabbitMQ in Development and Azure Service Bus outside Development. There is no supported Docker Compose workflow in this repository.
+
 ## Overview
 Successfully moved the messaging consumers from `Customers.Api` to a dedicated `Customers.Messaging` Worker Service project for better separation of concerns.
 
@@ -186,19 +188,9 @@ Potential additional consumers for Customers.Messaging:
 - `CustomerDeletedEventConsumer` - GDPR compliance
 - `CustomerPreferencesUpdatedEventConsumer` - Marketing preferences
 
-## Deployment
+## Deployment status
 
-**Docker Compose / Kubernetes:**
-```yaml
-customers-messaging:
-  image: customers-messaging:latest
-  environment:
-    - ConnectionStrings__customers=mongodb://...
-    - ConnectionStrings__rabbit=amqp://...
-  depends_on:
-    - mongodb
-    - rabbitmq
-```
+The original standalone container sketch was removed because it did not match repository reality. Local deployment is owned by Aspire. Production infrastructure and worker deployment are not checked in; see [`../documentation-validation-gaps.md`](../documentation-validation-gaps.md).
 
 ## Monitoring
 

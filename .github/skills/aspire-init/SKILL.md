@@ -22,7 +22,7 @@ metadata:
 
 > **First-run only.** This skill owns the skeleton drop and template choice for repositories
 > that do not yet have an Aspire AppHost. Once the skeleton is in place, hand off to
-> [`aspireify`](../aspireify/SKILL.md) for the actual resource wiring.
+> to the `aspireify` skill, when installed, for the actual resource wiring.
 
 ## Prerequisites
 
@@ -50,7 +50,7 @@ of the following before running `aspire init`:
 | User intent | Explicit "add Aspire", "scaffold Aspire", "aspire init" | OK to init |
 
 If **any** AppHost signal is already present, **do not run `aspire init`**. Route to
-[`aspireify`](../aspireify/SKILL.md) (re-wire) or
+`aspireify` when installed (re-wire) or
 [`aspire-orchestration`](../aspire-orchestration/SKILL.md) (lifecycle).
 
 ## Decision: `aspire new` vs `aspire init`

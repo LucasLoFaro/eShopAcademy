@@ -47,7 +47,7 @@ the bootstrap skills (`aspire-init` / `aspireify`) or to a runtime sub-skill:
 
 0. **Bootstrap branch** — if **no AppHost exists** in the repo, route to
    [`aspire-init`](../aspire-init/SKILL.md) for the skeleton drop. If an AppHost stub exists
-   but is **unwired** (no resources declared), route to [`aspireify`](../aspireify/SKILL.md).
+   but is **unwired** (no resources declared), route to the `aspireify` skill when it is installed.
    Only continue with the steps below once a wired AppHost is present.
 1. Confirm workspace is Aspire — identify the AppHost
 2. `aspire start` (or `aspire start --isolated` in worktrees or whenever shared local state is risky)
@@ -78,7 +78,7 @@ the bootstrap skills (`aspire-init` / `aspireify`) or to a runtime sub-skill:
 | Start, stop, wait, restart, rebuild | → [aspire-orchestration](../aspire-orchestration/SKILL.md) |
 | Create a new Aspire project from a template (`aspire new`) | → [aspire-init](../aspire-init/SKILL.md) (in-plugin) |
 | Add Aspire to an existing repo (`aspire init`, drop skeleton) | → [aspire-init](../aspire-init/SKILL.md) (in-plugin) |
-| Wire AppHost / scaffold resource graph / add integrations after `aspire init` | → [aspireify](../aspireify/SKILL.md) (in-plugin) |
+| Wire AppHost / scaffold resource graph / add integrations after `aspire init` | → `aspireify` when installed (in-plugin or project-local) |
 | Deploy, publish, destroy, pipeline steps | → [aspire-deployment](../aspire-deployment/SKILL.md) |
 | Logs, traces, metrics, dashboard, browser logs | → [aspire-monitoring](../aspire-monitoring/SKILL.md) |
 | Deployed app monitoring (Azure) | → `azure-diagnostics` skill (azure-skills plugin) |
@@ -156,4 +156,4 @@ Either install method works. The `dotnet tool install` path produces a NativeAOT
 - [../aspire-monitoring/references/monitoring.md](../aspire-monitoring/references/monitoring.md) — App state, logs, traces, search filtering, dashboard links, and export workflows.
 - [../aspire-monitoring/references/playwright-handoff.md](../aspire-monitoring/references/playwright-handoff.md) — Playwright handoff after Aspire endpoint discovery.
 - [../aspire-deployment/SKILL.md](../aspire-deployment/SKILL.md) — Deployment and pipeline-step workflows.
-- [../aspireify/references/apphost-wiring.md](../aspireify/references/apphost-wiring.md) — C# and TypeScript AppHost API lookup and wiring patterns.
+- The optional `aspireify` skill supplies C# and TypeScript AppHost wiring references when that skill is installed.

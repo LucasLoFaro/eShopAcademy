@@ -13,7 +13,6 @@ Status: application contract for the later infrastructure-as-code milestone. The
 | Operations.Service | shared | `prepare-package`, `operations-seller-stamp` |
 | Orders.API | shared, assembly discovery | `order-status-updated-sse` plus producers |
 | Orders.Messaging | shared | `cancel-order-command`, `update-order-status-command` |
-| Orders.EventsProcessor | shared legacy saga | `submit-order`; saga repository must be explicit |
 | Orchestration | special registration migrated to shared transport selection | `order-state`; EF saga repository; scheduled `OrderExpiredEvent` |
 | Payments.API | shared, producer only | payment events |
 | Payments.gRPC | shared, producer only | payment events |
@@ -32,7 +31,7 @@ Status: application contract for the later infrastructure-as-code milestone. The
 
 ## Consumers and sagas
 
-The inventory contains 24 consumers and two saga registrations:
+The inventory contains 24 consumers and one saga registration:
 
 - Basket: `ProductsEventConsumer`, `StockEventConsumer`, `EmptyBasketCommandConsumer`, `ReinstateBasketCommandConsumer`.
 - Customers: `CustomerAddressUpdatedEventConsumer`.
@@ -43,9 +42,9 @@ The inventory contains 24 consumers and two saga registrations:
 - Sellers: `OrderSubmittedForSellerConsumer`, `SellerDocumentVerificationConsumer`, `SellerTaxBillingVerificationConsumer`, `OrderSellerSaleRegistrationRequestedConsumer`.
 - Shipping: `ScheduleShippingCommandConsumer`, `CancelShippingCommandConsumer`, `OrderDeliveredEventConsumer`, `ConfirmPickupCommandConsumer`.
 - Stock: `CommitStockReservationConsumer`, `ReleaseStockReservationConsumer`, `ProductPublishedConsumer`.
-- Sagas: the production `OrderStateMachine` with Entity Framework persistence, and the legacy `EventsProcessor.StateMachines.OrderState` saga on `submit-order` with an explicitly selected in-memory repository.
+- Saga: the production `OrderStateMachine` with Entity Framework persistence on the `order-state` endpoint.
 
-The legacy `Orders.EventsProcessor` project is outside `eShopAcademy.sln` and references two project files that no longer exist (`Orders/Core/Domain/Order.Domain.csproj` and `Orders/Infrastructure/Messaging/Order.Messaging.csproj`). Its registration is included in the contract, but the host cannot be built until that pre-existing project damage is repaired.
+An earlier manifest described an `Orders.EventsProcessor`/`submit-order` saga, but no such project or source exists in the repository. It has been removed from the current topology contract rather than represented as an active or repairable component.
 
 ## Commands
 

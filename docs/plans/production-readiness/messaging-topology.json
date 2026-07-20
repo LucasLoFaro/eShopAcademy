@@ -87,8 +87,7 @@
     { "type": "Stock.Messaging.Processor.Consumers.ProductPublishedConsumer", "endpoint": "product-published-stock" }
   ],
   "sagas": [
-    { "type": "Application.Saga.OrderStateMachine", "endpoint": "order-state", "persistence": "EntityFrameworkCore" },
-    { "type": "EventsProcessor.StateMachines.OrderState", "endpoint": "submit-order", "persistence": "InMemory", "status": "legacy-unbuildable" }
+    { "type": "Application.Saga.OrderStateMachine", "endpoint": "order-state", "persistence": "EntityFrameworkCore" }
   ],
   "endpoints": [
     { "name": "products-updated", "owner": "Basket.EventsProcessor", "durable": true, "subscriptions": ["Domain.Common.Events.Products.ProductUpdatedEvent"] },
@@ -103,7 +102,6 @@
     { "name": "order-status-updated-sse", "owner": "Orders.API", "durable": true, "subscriptions": ["Domain.Common.Events.Orders.OrderStatusUpdatedEvent"] },
     { "name": "cancel-order-command", "owner": "Orders.Messaging", "durable": true, "commands": ["Domain.Common.Commands.Orders.CancelOrderCommand"] },
     { "name": "update-order-status-command", "owner": "Orders.Messaging", "durable": true, "commands": ["Domain.Common.Commands.Orders.UpdateOrderStatusCommand"] },
-    { "name": "submit-order", "owner": "Orders.EventsProcessor", "durable": true, "subscriptions": ["Core.Domain.Events.OrderSubmittedEvent"] },
     { "name": "order-state", "owner": "Orchestration", "durable": true, "saga": "Application.Saga.OrderStateMachine", "subscriptions": ["Domain.Common.Events.Orders.OrderSubmittedEvent", "Domain.Common.Events.Orders.OrderCompletedEvent", "Domain.Common.Events.Payments.PaymentCompletedEvent", "Domain.Common.Events.Payments.PaymentFailedEvent", "Domain.Common.Events.Stock.StockReservationCommittedEvent", "Domain.Common.Events.Stock.StockReservationCommitFailedEvent", "Domain.Common.Events.Orders.OrderReadyForPickupEvent", "Domain.Common.Events.Operations.PackageIssueReportedEvent", "Domain.Common.Events.Shipping.ShippingFailedEvent", "Domain.Common.Events.Shipping.ShippingScheduledEvent", "Domain.Common.Events.Orders.OrderShippedEvent", "Domain.Common.Events.Orders.OrderDeliveredEvent", "Domain.Common.Events.Orders.OrderExpiredEvent"] },
     { "name": "refund-payment", "owner": "Payments.Messaging", "durable": true, "commands": ["Domain.Common.Commands.Payments.RefundPaymentCommand"] },
     { "name": "seller-orders-submitted", "owner": "Sellers.Service", "durable": true, "subscriptions": ["Domain.Common.Events.Orders.OrderSubmittedEvent"] },

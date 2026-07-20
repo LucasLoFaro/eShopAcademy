@@ -1,5 +1,7 @@
 # Multiple Address Handling in CustomerAddressUpdatedEventConsumer
 
+> Historical implementation note. Saved-address handling remains implemented, but this document is not the current behavioral contract. In particular, the shared MassTransit setup has no configured retry/redelivery policy, and the repository's read-then-update operations do not guarantee cross-instance deduplication under concurrent deliveries.
+
 ## Overview
 The consumer has been enhanced to properly support multiple saved addresses per customer, with smart deduplication and automatic address management.
 
@@ -217,7 +219,7 @@ if (customer == null)
 catch (Exception ex)
 {
     _logger.LogError(ex, ...);
-    throw; // Message requeued for retry
+    throw; // The delivery faults; no shared retry/redelivery policy is configured today
 }
 ```
 
@@ -228,9 +230,9 @@ IsDefault = customer.SavedAddresses.Count == 0
 ```
 
 ### 4. Concurrent Orders
-- MongoDB handles concurrent updates
-- Each `AddAddressAsync` call is atomic
-- Repository ensures consistency
+- The current check and update are not one cross-document uniqueness transaction.
+- Concurrent deliveries can race and add duplicates.
+- A normalized unique key or conditional atomic update is required before claiming concurrency-safe deduplication.
 
 ## Future Enhancements
 

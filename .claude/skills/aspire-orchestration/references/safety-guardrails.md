@@ -226,7 +226,7 @@ Use `--include-hidden` when:
 | Debugging a proxy or sidecar | Proxies are hidden by default; you need their state to diagnose connectivity |
 | Investigating helper containers | Helper containers (e.g. wait-for-it shims, init containers) are hidden |
 | Tracking down migration jobs | Migration / seed jobs are typically hidden once they finish |
-| Expected resources are missing from `aspire ps` | The resource may exist but be marked hidden — confirm with `--include-hidden` before assuming the AppHost is wrong |
+| Expected resources are missing from `aspire ps` | The resource may exist but be marked hidden — confirm with `aspire describe --include-hidden` before assuming the AppHost is wrong |
 | Parsing for completeness in agent automation | A full-graph view requires explicit opt-in |
 
 ```bash
@@ -234,7 +234,7 @@ Use `--include-hidden` when:
 aspire ps --format Json
 
 # ✅ Debugging / completeness — include hidden resources
-aspire ps --include-hidden --format Json
+aspire describe --include-hidden --format Json
 aspire describe --include-hidden --format Json
 ```
 

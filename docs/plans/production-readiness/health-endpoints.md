@@ -1,5 +1,7 @@
 # Health endpoints
 
+Status: proposed production-readiness contract plus a current-state inventory. Dependency-aware readiness and worker management endpoints are not implemented.
+
 ## Contract
 
 - `GET /alive` is process-only liveness. It must not query a database, cache, broker, downstream service, DNS, identity provider, telemetry exporter, or external provider. It returns success once the process has started and failure only for an unrecoverable in-process condition.
@@ -8,7 +10,7 @@
 - Responses are unauthenticated only on a private management listener. The body is a fixed `Healthy`, `Degraded`, or `Unhealthy` shape with check names and durations; it never includes connection strings, hosts, database names, exception messages, stack traces, provider bodies, or credentials.
 - Telemetry enablement must not control endpoint existence. Disabling `Aspire:Monitoring:Enabled` may disable exporters, but not health registration or mapping.
 
-Current `AddDefaultHealthChecks` registers only `self` tagged `live`. Consequently, every web process that calls `UseDefaultEndpoints()` currently exposes `/alive` and `/health` when monitoring is enabled, but both are effectively process-only. `Host.CreateApplicationBuilder` workers have no HTTP server. “Yes (self)” below means a route exists but readiness is incomplete.
+Current `AddDefaultHealthChecks` registers only `self` tagged `live`, independently of telemetry enablement. Consequently, every web process that calls `UseDefaultEndpoints()` exposes `/alive` and `/health`, but both are effectively process-only. `Host.CreateApplicationBuilder` workers have no HTTP server. “Yes (self)” below means a route exists but readiness is incomplete.
 
 ## Dependency matrix
 
@@ -68,7 +70,7 @@ Required workers are Basket.EventsProcessor, Customers.Messaging, Notifications.
 
 | ID | Severity | Affected files | Finding and proposed standard | Acceptance criteria | Recommended automated test |
 |---|---|---|---|---|---|
-| HLT-01 | High | `src/ServiceDefaults/Extensions.cs`; every `Program.cs` marked “Yes (self)” | `/health` is only the self check and is coupled to monitoring. Register health independently and add only matrix-critical checks. | `/alive` remains healthy during broker/DB outage; `/health` becomes unhealthy within 2 seconds; disabling exporters does not remove routes. | `WebApplicationFactory` contract tests plus container dependency-stop tests. |
+| HLT-01 | High | `src/ServiceDefaults/Extensions.cs`; every `Program.cs` marked “Yes (self)” | `/health` is only the self check. Add only matrix-critical checks while retaining the now-independent registration. | `/alive` remains healthy during broker/DB outage; `/health` becomes unhealthy within 2 seconds; disabling exporters does not remove routes. | `WebApplicationFactory` contract tests plus container dependency-stop tests. |
 | HLT-02 | High | The eleven worker `Program.cs` files listed above | Workers expose no probe endpoint. Add the platform-owned private management listener and shutdown-aware readiness. | Every worker has reachable private `/alive` and `/health`; bus/store failures and shutdown change readiness as specified. | Architecture test enumerating `AddServiceDefaults` worker projects and runtime probe tests per dependency type. |
 | HLT-03 | High | `Products.gRPC/Program.cs`, `Shipping.gRPC/Program.cs`, `Stock.gRPC/Program.cs`, `PSP.Simulator/Program.cs` | These web processes call defaults but never map default endpoints; Products.gRPC also has an unresolved service dependency graph. Map endpoints and validate required service graphs/config at startup. | Both routes exist on the management endpoint and core service dependencies resolve before ready. | Startup smoke test that resolves every mapped gRPC service and calls both probes. |
 | HLT-04 | Medium | `Gateway/Program.cs`, `Gateway/appsettings.json` | Gateway readiness must not query all destinations. Limit it to local route/auth option validation and process health. | All downstreams may be stopped while Gateway `/health` stays healthy; malformed route configuration prevents startup/readiness. | Test host with unreachable destinations and a separate invalid-config test. |

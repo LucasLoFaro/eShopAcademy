@@ -75,13 +75,12 @@ When something is wrong, investigate before editing code:
 | `aspire describe` | Resource state, endpoints, health | `aspire describe --format Json` |
 | `aspire describe --include-hidden` | Include proxies, helper containers, migrations | `aspire describe --include-hidden --format Json` |
 | `aspire ps --format Json` | Resource list with state (filtered) | `aspire ps --format Json` |
-| `aspire ps --include-hidden --format Json` | Resource list with hidden resources | `aspire ps --include-hidden --format Json` |
 | `aspire export` | Portable telemetry bundle | `aspire export` |
 | `aspire dashboard run` | Standalone dashboard (foreground/blocking) | `aspire dashboard run` |
 
 ### Hidden resources are filtered by default
 
-`aspire ps`, `aspire describe`, and other CLI commands filter out resources marked hidden in the AppHost (proxies, helper containers, migrations). The default output is correct for normal app inspection. Add `--include-hidden` when:
+`aspire describe` filters out resources marked hidden in the AppHost (proxies, helper containers, migrations). The default output is correct for normal app inspection. Add `--include-hidden` to `aspire describe` when:
 
 - Debugging proxies, sidecar/helper containers, or migration jobs.
 - An expected resource is "missing" from `aspire ps` / `aspire describe`.
@@ -94,7 +93,7 @@ When something is wrong, investigate before editing code:
 aspire describe --format Json
 
 # ✅ When a resource you expect is missing, retry with --include-hidden
-aspire ps --include-hidden --format Json | jq '.[] | {name, displayName, state, hidden}'
+aspire describe --include-hidden --format Json | jq '.[] | {name, displayName, state, hidden}'
 
 # ✅ Get endpoints from describe, not guessing ports
 ENDPOINT=$(aspire describe apiservice --format Json | jq -r '.endpoints[0].url')
@@ -109,7 +108,7 @@ aspire describe --apphost ./src/MyApp.AppHost/
 |-------|---------|-----------|
 | TS AppHost DNS failure ([#15782](https://github.com/microsoft/aspire/issues/15782)) | `aspire otel` "No such host" for `*.dev.localhost` | Use `--dashboard-url localhost:PORT` |
 | `--isolated` mode telemetry ([#16107](https://github.com/microsoft/aspire/issues/16107)) | OTEL port not randomized in isolated mode | Avoid `--isolated` if telemetry is needed |
-| Resource missing from `aspire ps` / `aspire describe` | Hidden-by-default resources such as proxies, helpers, or migrations | Re-run with `--include-hidden` |
+| Resource missing from `aspire ps` / `aspire describe` | Hidden-by-default resources such as proxies, helpers, or migrations | Re-run `aspire describe` with `--include-hidden` |
 
 > **Resolved in 13.3**: The standalone-dashboard workaround for [#16236](https://github.com/microsoft/aspire/issues/16236) is obsolete — use `aspire dashboard run` (see below).
 

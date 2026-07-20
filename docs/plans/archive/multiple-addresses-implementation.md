@@ -1,5 +1,7 @@
 # Multiple Addresses Feature - Implementation Summary
 
+> Historical implementation note. The frontend address hooks and checkout integration that were TODOs below now exist. This file preserves the rollout sequence and is not the authoritative current frontend guide.
+
 ## Overview
 Enhanced the checkout flow to support multiple saved addresses per customer with descriptions (e.g., "Home", "Work").
 

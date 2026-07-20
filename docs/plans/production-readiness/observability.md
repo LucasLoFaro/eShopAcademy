@@ -1,5 +1,7 @@
 # Observability
 
+Status: current-state inventory and proposed production standard. Application Insights export, redaction, dashboards, and alerts are not implemented by this repository today.
+
 ## Current inventory
 
 All 28 executable `Program.cs` files identified in `health-endpoints.md` call `AddServiceDefaults`. Unless `Aspire:Monitoring:Enabled` is false, `src/ServiceDefaults/Extensions.OpenTelemetry.cs` registers:

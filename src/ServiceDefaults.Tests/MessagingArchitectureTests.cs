@@ -247,7 +247,7 @@ public class MessagingArchitectureTests
     private static JsonDocument LoadTopology() => JsonDocument.Parse(File.ReadAllText(Path.Combine(
         RepositoryRoot(),
         "docs",
-        "specs",
+        "plans",
         "production-readiness",
         "messaging-topology.json")));
 

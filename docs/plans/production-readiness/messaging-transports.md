@@ -46,7 +46,7 @@ RabbitMQ creates local topology automatically. Azure Service Bus may create topo
 
 ## Package decision
 
-All packages whose ID is `MassTransit` or starts with `MassTransit.` use `MassTransitVersion` from the repository `Directory.Packages.props`. Version `8.5.10` is the latest stable Apache-2.0 release in the 8.x line and is used for the shared RabbitMQ, Azure Service Bus, Entity Framework, Quartz, and test surfaces. Its APIs were verified to support the required namespace/credential host overload, native Service Bus scheduler, Quartz scheduler, deterministic naming, and topology controls. The previous direct versions (8.5.4, 9.0.1, and 9.1.2) are removed without upgrading unrelated packages or introducing the MassTransit 9 commercial runtime license requirement.
+All packages whose ID is `MassTransit` or starts with `MassTransit.` use `MassTransitVersion` from the repository `Directory.Packages.props`. The repository is pinned to version `8.5.10` for the shared RabbitMQ, Azure Service Bus, Entity Framework, Quartz, and test surfaces. The checked-in registration tests cover the namespace/credential host overload, both scheduler strategies, deterministic naming, and topology controls; this document intentionally makes no time-sensitive claim that the pinned version is the newest available release.
 
 ## Guardrails
 

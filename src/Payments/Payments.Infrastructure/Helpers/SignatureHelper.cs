@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
-using Domain.Payments.Contracts;
-using System.Text.Json;
 using System.Text;
-
+using System.Text.Json;
+using Domain.Payments.Contracts;
+using Infrastructure.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Helpers;
 
@@ -11,23 +11,30 @@ public class SignatureHelper : ISignatureHelper
 {
     private readonly string _signatureSecret;
 
-    public SignatureHelper (IConfiguration config)
+    public SignatureHelper(IOptions<PaymentSecurityOptions> options)
     {
-        _signatureSecret = config["Payment:SignatureSecret"]!;
+        _signatureSecret = options.Value.SignatureSecret;
     }
 
     public bool VerifyWebhookSignature(PaymentNotification payload, string headerSignature)
-    {
-        return headerSignature.Equals("Signature"); // For testing purposes only
+        => Verify(JsonSerializer.Serialize(payload), headerSignature);
 
+    public bool VerifyPaymentRequest(PaymentRequest payload, string headerSignature)
+        => Verify(JsonSerializer.Serialize(payload), headerSignature);
+
+    private bool Verify(string payload, string headerSignature)
+    {
         if (string.IsNullOrWhiteSpace(headerSignature))
             return false;
 
-        var computed = ComputeHmacHex(JsonSerializer.Serialize(payload));
-        return string.Equals(computed, headerSignature.Trim(), StringComparison.OrdinalIgnoreCase);
+        var computed = ComputeHmacHex(payload);
+        var suppliedBytes = Encoding.ASCII.GetBytes(headerSignature.Trim().ToLowerInvariant());
+        var computedBytes = Encoding.ASCII.GetBytes(computed);
+        return suppliedBytes.Length == computedBytes.Length &&
+            CryptographicOperations.FixedTimeEquals(computedBytes, suppliedBytes);
     }
 
-    public string SignNotificationRequest(PaymentNotification request) // For testing purposes only
+    public string SignNotificationRequest(PaymentNotification request)
     {
         var json = JsonSerializer.Serialize(request);
         return ComputeHmacHex(json);
@@ -49,7 +56,8 @@ public class SignatureHelper : ISignatureHelper
 
 public interface ISignatureHelper
 {
-    string SignNotificationRequest(PaymentNotification request); // For testing purposes only
+    string SignNotificationRequest(PaymentNotification request);
     bool VerifyWebhookSignature(PaymentNotification payload, string headerSignature);
+    bool VerifyPaymentRequest(PaymentRequest payload, string headerSignature);
     string SignPaymentRequest(PaymentRequest request);
 }

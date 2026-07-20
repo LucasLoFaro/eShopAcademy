@@ -1,14 +1,22 @@
-using Payments.Messaging;
+using Infrastructure.Idempotency;
+using Infrastructure.Observability;
+using OpenTelemetry.Metrics;
 using Payments.Messaging.Consumers;
 using ServiceDefaults;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults()
-       .WithMassTransit(messaging =>
-        {
-            messaging.ReceiveEndpoint<RefundPaymentCommandConsumer>("refund-payment");
-        }, typeof(RefundPaymentCommandConsumer).Assembly);
+    .WithMassTransit(messaging =>
+    {
+        messaging.ReceiveEndpoint<RefundPaymentCommandConsumer>("refund-payment");
+    }, typeof(RefundPaymentCommandConsumer).Assembly);
 
-var host = builder.Build();
-host.Run();
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(PaymentTelemetry.MeterName));
+builder.Services.AddSingleton<IPaymentOperationRegistry, PaymentOperationRegistry>();
+
+var app = builder.Build();
+app.UseDefaultEndpoints();
+app.Run();
+
+public partial class Program { }

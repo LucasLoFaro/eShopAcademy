@@ -19,7 +19,10 @@ public class PaymentMessagingClientTests
         Guid orderId, string providerTransactionId)
     {
         // Arrange
-        _publishEndpoint.Setup(p => p.Publish(It.IsAny<PaymentInitiatedEvent>(), It.IsAny<CancellationToken>()))
+        _publishEndpoint.Setup(p => p.Publish(
+                            It.IsAny<PaymentInitiatedEvent>(),
+                            It.IsAny<IPipe<PublishContext<PaymentInitiatedEvent>>>(),
+                            It.IsAny<CancellationToken>()))
                         .Returns(Task.CompletedTask);
 
         // Act
@@ -30,6 +33,7 @@ public class PaymentMessagingClientTests
             It.Is<PaymentInitiatedEvent>(e =>
                 e.OrderId == orderId &&
                 e.ProviderTransactionId == providerTransactionId),
+            It.IsAny<IPipe<PublishContext<PaymentInitiatedEvent>>>(),
             It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -40,7 +44,10 @@ public class PaymentMessagingClientTests
         Guid orderId, string providerTransactionId)
     {
         // Arrange
-        _publishEndpoint.Setup(p => p.Publish(It.IsAny<PaymentCompletedEvent>(), It.IsAny<CancellationToken>()))
+        _publishEndpoint.Setup(p => p.Publish(
+                            It.IsAny<PaymentCompletedEvent>(),
+                            It.IsAny<IPipe<PublishContext<PaymentCompletedEvent>>>(),
+                            It.IsAny<CancellationToken>()))
                         .Returns(Task.CompletedTask);
 
         // Act
@@ -51,6 +58,7 @@ public class PaymentMessagingClientTests
             It.Is<PaymentCompletedEvent>(e =>
                 e.OrderId == orderId &&
                 e.ProviderTransactionId == providerTransactionId),
+            It.IsAny<IPipe<PublishContext<PaymentCompletedEvent>>>(),
             It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -61,7 +69,10 @@ public class PaymentMessagingClientTests
         Guid orderId, string providerTransactionId, string reason)
     {
         // Arrange
-        _publishEndpoint.Setup(p => p.Publish(It.IsAny<PaymentFailedEvent>(), It.IsAny<CancellationToken>()))
+        _publishEndpoint.Setup(p => p.Publish(
+                            It.IsAny<PaymentFailedEvent>(),
+                            It.IsAny<IPipe<PublishContext<PaymentFailedEvent>>>(),
+                            It.IsAny<CancellationToken>()))
                         .Returns(Task.CompletedTask);
 
         // Act
@@ -73,6 +84,7 @@ public class PaymentMessagingClientTests
                 e.OrderId == orderId &&
                 e.ProviderTransactionId == providerTransactionId &&
                 e.Reason == reason),
+            It.IsAny<IPipe<PublishContext<PaymentFailedEvent>>>(),
             It.IsAny<CancellationToken>()),
             Times.Once);
     }

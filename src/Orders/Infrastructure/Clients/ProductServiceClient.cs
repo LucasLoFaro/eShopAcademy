@@ -14,9 +14,11 @@ public class ProductServiceClient : IProductServiceClient
         _httpClient = httpClient;
     }
 
-    public async Task<Product> GetProductByIdAsync(Guid productId)
+    public async Task<Product> GetProductByIdAsync(Guid productId, CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetFromJsonAsync<Product>($"/api/product/{productId}");
+        var response = await _httpClient.GetFromJsonAsync<Product>(
+            $"/api/product/{productId}",
+            cancellationToken);
 
         if (response == null)
             throw new InvalidOperationException("Product service returned no data.");

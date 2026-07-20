@@ -21,26 +21,26 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Order>> GetAllOrders()
-        => await _orderService.GetAllOrders();
+    public async Task<List<Order>> GetAllOrders(CancellationToken cancellationToken)
+        => await _orderService.GetAllOrders(cancellationToken);
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrder(Guid id)
-        => await _orderService.GetOrderById(id) is Order order ? 
+    public async Task<IActionResult> GetOrder(Guid id, CancellationToken cancellationToken)
+        => await _orderService.GetOrderById(id, cancellationToken) is Order order ?
             Ok(order) : NotFound();
 
     [HttpPost]
-    public async Task<IActionResult> PlaceOrder([FromBody] OrderRequest request)
+    public async Task<IActionResult> PlaceOrder([FromBody] OrderRequest request, CancellationToken cancellationToken)
     {
         // TODO: Handle all possible outcomes.
-        var order = await _orderService.PlaceOrderAsync(request);
+        var order = await _orderService.PlaceOrderAsync(request, cancellationToken);
         return Accepted(order);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> RemoveOrder(Guid id)
+    public async Task<IActionResult> RemoveOrder(Guid id, CancellationToken cancellationToken)
     {
-        await _orderService.RemoveOrder(id);
+        await _orderService.RemoveOrder(id, cancellationToken);
         return NoContent();
     }
 

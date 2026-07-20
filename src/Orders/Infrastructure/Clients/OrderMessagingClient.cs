@@ -3,6 +3,7 @@ using Domain.Common.Events.Customers;
 using Domain.Common.Events.Orders;
 using Domain.Orders.Entities;
 using MassTransit;
+using Application.Observability;
 
 namespace Infrastructure.Clients;
 
@@ -16,8 +17,12 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
     }
 
     public Task PublishOrderSubmitted(Order order, Guid basketClientId, CancellationToken ct = default)
-        => _publishEndpoint.Publish(new OrderSubmittedEvent
+    {
+        var messageId = OrderMessageIdentity.Create(order.Id, Guid.Empty, "order-submitted");
+        return _publishEndpoint.Publish(new OrderSubmittedEvent
         {
+            EventId = messageId,
+            CorrelationId = order.Id,
             OrderId = order.Id,
             CustomerName = order.Customer?.Name ?? string.Empty,
             CustomerEmail = order.Customer?.Email ?? string.Empty,
@@ -27,7 +32,12 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             PaymentId = order.Payment?.Id ?? Guid.Empty,
             ReservationId = order.Stock?.ReservationId ?? Guid.Empty,
             DestinationAddress = FormatAddress(order.Customer?.Address)
+        }, context =>
+        {
+            context.MessageId = messageId;
+            context.CorrelationId = order.Id;
         }, ct);
+    }
 
     private static string FormatAddress(OrderAddressInfo? address)
     {
@@ -46,16 +56,29 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
     }
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken ct = default)
-        => _publishEndpoint.Publish(new OrderCancelledEvent
+    {
+        var messageId = OrderMessageIdentity.Create(orderId, Guid.Empty, "order-cancelled");
+        return _publishEndpoint.Publish(new OrderCancelledEvent
         {
+            EventId = messageId,
+            CorrelationId = orderId,
             OrderId = orderId,
             CustomerEmail = customerEmail,
             Reason = reason
+        }, context =>
+        {
+            context.MessageId = messageId;
+            context.CorrelationId = orderId;
         }, ct);
+    }
 
     public Task PublishCustomerAddressUpdated(Guid customerId, OrderAddressInfo address, Guid orderId, CancellationToken ct = default)
-        => _publishEndpoint.Publish(new CustomerAddressUpdatedEvent
+    {
+        var messageId = OrderMessageIdentity.Create(orderId, Guid.Empty, "customer-address-updated");
+        return _publishEndpoint.Publish(new CustomerAddressUpdatedEvent
         {
+            EventId = messageId,
+            CorrelationId = orderId,
             CustomerId = customerId,
             OrderId = orderId,
             Street = address.Street,
@@ -63,5 +86,10 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             AdditionalInformation = address.AdditionalInformation,
             ZipCode = address.ZipCode,
             City = address.City
+        }, context =>
+        {
+            context.MessageId = messageId;
+            context.CorrelationId = orderId;
         }, ct);
+    }
 }

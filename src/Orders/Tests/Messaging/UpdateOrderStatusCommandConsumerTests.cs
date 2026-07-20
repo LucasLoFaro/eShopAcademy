@@ -1,5 +1,6 @@
 using AutoFixture.Xunit2;
 using Domain.Common.Commands.Orders;
+using Domain.Common.Events.Orders;
 using Domain.Orders.Entities;
 using Domain.Orders.Enums;
 using FluentAssertions;
@@ -190,6 +191,35 @@ public class UpdateOrderStatusCommandConsumerTests
             order.Shipping.Status.Should().Be(ShippingStatus.Scheduled);
             order.Shipping.TrackingNumber.Should().Be("SIM-REGRESSION");
             order.Shipping.Carrier.Should().Be("Simulator");
+            order.Status.Should().Be(OrderStatus.Processing);
         }
+    }
+
+    [Fact]
+    public async Task Consume_RepeatedOrRegressivePaidUpdate_MergesDetailsWithoutPublishingDuplicateStatusEvent()
+    {
+        var orderId = Guid.NewGuid();
+        var order = new Order { Id = orderId, Status = OrderStatus.Processing };
+        var command = new UpdateOrderStatusCommand
+        {
+            OrderId = orderId,
+            Status = "Paid",
+            ShippingStatus = "Scheduled",
+            TrackingNumber = "SIM-123",
+            Carrier = "Simulator"
+        };
+
+        _orders.Setup(r => r.GetByIdAsync(orderId, It.IsAny<CancellationToken>())).ReturnsAsync(order);
+        _orders.Setup(r => r.UpdateAsync(order, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var context = new Mock<ConsumeContext<UpdateOrderStatusCommand>>();
+        context.Setup(c => c.Message).Returns(command);
+        context.Setup(c => c.CancellationToken).Returns(CancellationToken.None);
+
+        await CreateSut().Consume(context.Object);
+
+        order.Status.Should().Be(OrderStatus.Processing);
+        order.Shipping.Status.Should().Be(ShippingStatus.Scheduled);
+        order.Shipping.TrackingNumber.Should().Be("SIM-123");
+        context.Verify(c => c.Publish(It.IsAny<OrderStatusUpdatedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

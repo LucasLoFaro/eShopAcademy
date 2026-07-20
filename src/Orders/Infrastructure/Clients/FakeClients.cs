@@ -7,7 +7,7 @@ namespace Infrastructure.Clients;
 
 public class FakeProductServiceClient : IProductServiceClient
 {
-    public async Task<Product> GetProductByIdAsync(Guid productId)
+    public async Task<Product> GetProductByIdAsync(Guid productId, CancellationToken cancellationToken = default)
         => new Product()
         {
             ID = new Guid("8b6e2e1d-6f1d-4b0d-9f6c-1a4c7b9d2e8f"),
@@ -22,7 +22,7 @@ public class FakeProductServiceClient : IProductServiceClient
 
 public class FakeCustomerServiceClient : ICustomerServiceClient
 {
-    public async Task<OrderCustomerInfo> GetCustomerByIdAsync(Guid customerId)
+    public async Task<OrderCustomerInfo> GetCustomerByIdAsync(Guid customerId, CancellationToken cancellationToken = default)
         => new OrderCustomerInfo()
         {
             Name = "Lucas Lo Faro",

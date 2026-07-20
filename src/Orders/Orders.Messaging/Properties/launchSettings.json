@@ -4,6 +4,7 @@
     "Orders.Messaging": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:8004",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

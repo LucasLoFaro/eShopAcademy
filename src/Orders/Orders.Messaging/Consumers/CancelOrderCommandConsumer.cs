@@ -5,6 +5,7 @@ using Domain.Common.Events.Orders;
 using Infrastructure.Data;
 using Domain.Orders.Enums;
 using MassTransit;
+using Application.Observability;
 
 namespace Orders.Messaging.Consumers;
 
@@ -48,16 +49,22 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
             ? order.Customer.Name
             : command.CustomerName;
 
+        var cancelledEventId = OrderMessageIdentity.Create(order.Id, command.EventId, "order-cancelled");
         await context.Publish(new OrderCancelledEvent
         {
+            EventId = cancelledEventId,
+            CorrelationId = order.Id,
             OrderId = order.Id,
             CustomerName = customerName,
             CustomerEmail = customerEmail,
             Reason = reason
         }, context.CancellationToken);
 
+        var statusEventId = OrderMessageIdentity.Create(order.Id, command.EventId, "status-cancelled");
         await context.Publish(new OrderStatusUpdatedEvent
         {
+            EventId = statusEventId,
+            CorrelationId = order.Id,
             OrderId = order.Id,
             CustomerName = customerName,
             CustomerEmail = customerEmail,
@@ -70,6 +77,8 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
             var releaseStock = await context.GetSendEndpoint(new Uri("queue:release-stock-reservation"));
             await releaseStock.Send(new ReleaseStockReservationCommand
             {
+                EventId = OrderMessageIdentity.Create(order.Id, command.EventId, "release-stock"),
+                CorrelationId = order.Id,
                 OrderId = order.Id,
                 ReservationId = reservationId,
                 Reason = reason
@@ -81,6 +90,8 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
             var refundPayment = await context.GetSendEndpoint(new Uri("queue:refund-payment"));
             await refundPayment.Send(new RefundPaymentCommand
             {
+                EventId = OrderMessageIdentity.Create(order.Id, command.EventId, "refund-payment"),
+                CorrelationId = order.Id,
                 OrderId = order.Id,
                 PaymentId = paymentId,
                 Reason = reason
@@ -88,5 +99,6 @@ public sealed class CancelOrderCommandConsumer : IConsumer<CancelOrderCommand>
         }
 
         _logger.LogInformation("[CancelOrder] Order {OrderId} cancelled and compensating commands dispatched.", order.Id);
+        OrdersTelemetry.RecordResult("cancel-order", "cancelled");
     }
 }

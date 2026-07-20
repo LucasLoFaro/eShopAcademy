@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Orders.Entities;
 using Domain.Orders.Enums;
+using MassTransit;
 
 
 namespace Infrastructure.Data;
@@ -103,6 +104,7 @@ public class OrderDbContext : DbContext
         });
 
         base.OnModelCreating(builder);
+        builder.AddTransactionalOutboxEntities();
     }
 
 

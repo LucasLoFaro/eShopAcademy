@@ -3,14 +3,16 @@ using Domain.Common.States;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
 using Orchestration.Data;
+using Orchestration.Health;
+using Orchestration.Observability;
 using Quartz;
 using ServiceDefaults;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Logging.AddConsole();
 LogContext.ConfigureCurrentLogContext();
 
 var orchestrationConnectionString = builder.Configuration.GetConnectionString("orchestration")
@@ -21,6 +23,7 @@ var orchestrationConnectionString = builder.Configuration.GetConnectionString("o
 var enableSensitiveDataLogging = builder.Environment.IsDevelopment() &&
     builder.Configuration.GetValue<bool>("Persistence:EnableSensitiveDataLogging");
 
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(OrderSagaTelemetry.MeterName));
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddOptions<OrderSagaOptions>()
     .Bind(builder.Configuration.GetSection(OrderSagaOptions.SectionName))
@@ -29,11 +32,9 @@ builder.Services.AddOptions<OrderSagaOptions>()
 
 builder.Services.AddDbContext<OrderSagaDbContext>(options =>
 {
-    options.UseNpgsql(orchestrationConnectionString);
+    options.UseNpgsql(orchestrationConnectionString, npgsql => npgsql.CommandTimeout(5));
     if (enableSensitiveDataLogging)
-    {
         options.EnableSensitiveDataLogging();
-    }
 });
 
 builder.WithMassTransit(messaging =>
@@ -52,14 +53,11 @@ builder.WithMassTransit(messaging =>
             {
                 repository.ConcurrencyMode = ConcurrencyMode.Optimistic;
                 repository.AddDbContext<DbContext, OrderSagaDbContext>((_, options) =>
-                    options.UseNpgsql(orchestrationConnectionString));
+                    options.UseNpgsql(orchestrationConnectionString, npgsql => npgsql.CommandTimeout(5)));
             });
     });
 });
 
-// ServiceDefaults adds Quartz only for RabbitMQ scheduling. Applying this after
-// transport registration replaces Quartz's RAM store with a durable, clustered
-// PostgreSQL job store. Azure Service Bus continues to use its native scheduler.
 builder.Services.AddQuartz(quartz =>
 {
     quartz.SchedulerName = "order-saga-scheduler";
@@ -78,12 +76,20 @@ builder.Services.AddQuartz(quartz =>
     });
 });
 
-var host = builder.Build();
+builder.Services.AddHealthChecks().AddCheck<OrderSagaDatabaseHealthCheck>(
+    "saga-postgres",
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
 
-using (var scope = host.Services.CreateScope())
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<OrderSagaDbContext>();
-    db.Database.Migrate();
+    var database = scope.ServiceProvider.GetRequiredService<OrderSagaDbContext>();
+    database.Database.Migrate();
 }
 
-host.Run();
+app.UseDefaultEndpoints();
+app.Run();
+
+public partial class Program { }

@@ -2,6 +2,8 @@ using Domain.Payments.Contracts;
 using FluentAssertions;
 using Infrastructure.Helpers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Infrastructure.Configuration;
 using Xunit;
 
 namespace Payments.Tests.Helpers;
@@ -12,10 +14,10 @@ public class SignatureHelperTests
 
     private static SignatureHelper CreateSut(string secret = Secret)
     {
-        var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["Payment:SignatureSecret"] = secret })
-            .Build();
-        return new SignatureHelper(config);
+        return new SignatureHelper(Options.Create(new PaymentSecurityOptions
+        {
+            SignatureSecret = secret
+        }));
     }
 
     private static PaymentNotification BuildNotification() => new()
@@ -75,12 +77,13 @@ public class SignatureHelperTests
     [Fact]
     public void VerifyWebhookSignature_WithMatchingSignatureHeader_ReturnsTrue()
     {
-        // Arrange - production code currently returns true when header equals "Signature"
+        // Arrange
         var sut = CreateSut();
         var notification = BuildNotification();
+        var signature = sut.SignNotificationRequest(notification);
 
         // Act
-        var result = sut.VerifyWebhookSignature(notification, "Signature");
+        var result = sut.VerifyWebhookSignature(notification, signature);
 
         // Assert
         result.Should().BeTrue();

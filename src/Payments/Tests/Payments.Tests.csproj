@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Payments.Infrastructure\Payments.Infrastructure.csproj" />
     <ProjectReference Include="..\Payments.Messaging\Payments.Messaging.csproj" />
+    <ProjectReference Include="..\..\PSP\PSP.Simulator\PSP.Simulator.csproj" />
   </ItemGroup>
 
 </Project>

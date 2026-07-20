@@ -4,6 +4,7 @@ using Domain.Orders.Entities;
 using Domain.Orders.Enums;
 using Infrastructure.Data;
 using MassTransit;
+using Application.Observability;
 
 namespace Orders.Messaging.Consumers;
 
@@ -43,6 +44,16 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
         if (order.Status is OrderStatus.Cancelled or OrderStatus.Delivered)
         {
             _logger.LogInformation("[UpdateOrderStatus] Order {OrderId} already in terminal state {Status}.", order.Id, order.Status);
+            return;
+        }
+
+        if (IsAlreadyApplied(order, command, newStatus))
+        {
+            _logger.LogInformation(
+                "[UpdateOrderStatus] Duplicate update ignored for order {OrderId} and status {Status}.",
+                order.Id,
+                newStatus);
+            OrdersTelemetry.RecordResult("update-order-status", "duplicate");
             return;
         }
 
@@ -118,6 +129,8 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
 
         await context.Publish(new OrderStatusUpdatedEvent
         {
+            EventId = OrderMessageIdentity.Create(order.Id, command.EventId, "status-updated"),
+            CorrelationId = order.Id,
             OrderId = order.Id,
             CustomerName = command.CustomerName,
             CustomerEmail = command.CustomerEmail,
@@ -145,6 +158,8 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
 
                 await context.Publish(new OrderSellerSaleRegistrationRequestedEvent
                 {
+                    EventId = OrderMessageIdentity.Create(order.Id, command.EventId, $"seller-sale:{item.Id:N}"),
+                    CorrelationId = order.Id,
                     OrderId = order.Id,
                     CustomerName = command.CustomerName,
                     CustomerEmail = command.CustomerEmail,
@@ -164,5 +179,19 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
         }
 
         _logger.LogInformation("[UpdateOrderStatus] Order {OrderId} updated to {Status}.", order.Id, newStatus);
+        OrdersTelemetry.RecordResult("update-order-status", "updated");
     }
+
+    private static bool IsAlreadyApplied(
+        Order order,
+        UpdateOrderStatusCommand command,
+        OrderStatus newStatus) =>
+        order.Status == newStatus &&
+        (!command.PaymentId.HasValue || order.Payment?.Id == command.PaymentId.Value) &&
+        (string.IsNullOrEmpty(command.ProviderTransactionId) || order.Payment?.ProviderTransactionId == command.ProviderTransactionId) &&
+        (!command.Amount.HasValue || order.Payment?.Amount == command.Amount.Value) &&
+        (string.IsNullOrEmpty(command.TrackingNumber) || order.Shipping?.TrackingNumber == command.TrackingNumber) &&
+        (string.IsNullOrEmpty(command.Carrier) || order.Shipping?.Carrier == command.Carrier) &&
+        (!command.ReservationId.HasValue || order.Stock?.ReservationId == command.ReservationId.Value) &&
+        (newStatus != OrderStatus.Paid || order.SellerSalesRegisteredAt is not null);
 }

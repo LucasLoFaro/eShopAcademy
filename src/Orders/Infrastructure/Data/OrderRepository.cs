@@ -13,7 +13,7 @@ public class OrderRepository : IOrderRepository
     public async Task AddAsync(Order order, CancellationToken ct = default)
     {
         await _db.Orders.AddAsync(order, ct);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
     }
 
     public async Task<List<Order>> GetAllAsync(CancellationToken ct = default)

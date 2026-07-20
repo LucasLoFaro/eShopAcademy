@@ -1,49 +1,86 @@
 using Domain.Payments.Contracts;
-using System.Collections.Concurrent;
-using System.Text;
-using System.Text.Json;
+using Infrastructure.Configuration;
+using Infrastructure.Helpers;
+using Infrastructure.Idempotency;
+using Infrastructure.Observability;
+using Microsoft.AspNetCore.HttpOverrides;
+using OpenTelemetry.Metrics;
+using ServiceDefaults;
+using Psp.Simulator;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-builder.Services.AddHttpClient("webhook");
+builder.AddServiceDefaults().WithSwagger();
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(PaymentTelemetry.MeterName));
+builder.Services.AddOptions<PaymentSecurityOptions>()
+    .Bind(builder.Configuration.GetSection(PaymentSecurityOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddProblemDetails();
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+{
+    var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+    if (origins.Length > 0)
+        policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+}));
+builder.Services.AddSingleton<ISignatureHelper, SignatureHelper>();
+builder.Services.AddSingleton<IPaymentOperationRegistry, PaymentOperationRegistry>();
+builder.Services.AddSingleton<PspPaymentRegistry>();
+#pragma warning disable EXTEXP0001
+builder.Services.AddHttpClient("webhook", client => client.Timeout = TimeSpan.FromSeconds(5))
+    .RemoveAllResilienceHandlers();
+#pragma warning restore EXTEXP0001
 
 var app = builder.Build();
 
-var payments = new ConcurrentDictionary<string, PendingPayment>();
+app.UseForwardedHeaders();
+app.UseExceptionHandler();
+app.UseCors();
+app.UseDefaultEndpoints();
 
-app.MapPost("/psp/make-payment", (PaymentRequest request, HttpRequest httpRequest) =>
+app.MapPost("/psp/make-payment", (
+    PaymentRequest request,
+    HttpRequest httpRequest,
+    ISignatureHelper signatureHelper,
+    PspPaymentRegistry registry) =>
 {
-    var id = Guid.NewGuid().ToString();
+    if (!httpRequest.Headers.TryGetValue("X-Signature", out var signature) ||
+        !signatureHelper.VerifyPaymentRequest(request, signature.ToString()))
+        return Results.Unauthorized();
 
-    payments[id] = new PendingPayment
-    {
-        Id = id,
-        ExternalId = request.ExternalId,
-        Amount = request.Amount,
-        Currency = request.Currency,
-        NotificationUrl = request.NotificationUrl,
-        Signature = httpRequest.Headers["X-Signature"].ToString()
-    };
+    if (!httpRequest.Headers.TryGetValue("Idempotency-Key", out var idempotencyKey) ||
+        idempotencyKey.ToString() != request.ExternalId ||
+        !Guid.TryParse(request.ExternalId, out _) ||
+        request.Amount <= 0 ||
+        string.IsNullOrWhiteSpace(request.Currency) ||
+        !Uri.TryCreate(request.NotificationUrl, UriKind.Absolute, out var notificationUri) ||
+        notificationUri.Scheme is not ("http" or "https"))
+        return Results.BadRequest();
+
+    var registration = registry.Register(request, notificationUri);
+    if (registration.Conflict)
+        return Results.Conflict();
+
+    var payment = registration.Payment;
 
     var baseUrl = $"{httpRequest.Scheme}://{httpRequest.Host}";
 
     var response = new PaymentResponse
     {
-        Id = id,
+        Id = payment.Id,
         ExternalId = request.ExternalId,
         Amount = request.Amount,
         Currency = request.Currency,
-        Status = "Pending",
-        Url = $"{baseUrl}/psp/payment/{id}"
+        Status = payment.Status,
+        Url = $"{baseUrl}/psp/payment/{payment.Id}"
     };
 
     return Results.Ok(response);
 });
 
-app.MapGet("/psp/payment/{id}", (string id) =>
+app.MapGet("/psp/payment/{id}", (string id, PspPaymentRegistry registry) =>
 {
-    if (!payments.TryGetValue(id, out var payment))
+    if (!registry.TryGet(id, out var payment))
         return Results.NotFound("Payment not found.");
 
     var html = $$"""
@@ -116,66 +153,104 @@ app.MapGet("/psp/payment/{id}", (string id) =>
     return Results.Content(html, "text/html");
 });
 
-app.MapPost("/psp/payment/{id}/confirm", async (string id, IHttpClientFactory httpClientFactory) =>
-{
-    if (!payments.TryGetValue(id, out var payment))
-        return Results.NotFound("Payment not found.");
+app.MapPost("/psp/payment/{id}/confirm", (
+    string id,
+    IHttpClientFactory httpClientFactory,
+    ISignatureHelper signatureHelper,
+    IPaymentOperationRegistry operations,
+    PspPaymentRegistry registry,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+    ResolvePayment(
+        id,
+        "success",
+        null,
+        registry,
+        httpClientFactory,
+        signatureHelper,
+        operations,
+        logger,
+        cancellationToken));
 
-    var notification = new PaymentNotification
-    {
-        Id = payment.Id,
-        ExternalId = payment.ExternalId,
-        Amount = payment.Amount,
-        Currency = payment.Currency,
-        Status = "success"
-    };
-
-    await SendWebhookNotification(httpClientFactory, payment, notification);
-
-    return Results.Json(new { status = "success" });
-});
-
-app.MapPost("/psp/payment/{id}/reject", async (string id, IHttpClientFactory httpClientFactory) =>
-{
-    if (!payments.TryGetValue(id, out var payment))
-        return Results.NotFound("Payment not found.");
-
-    var notification = new PaymentNotification
-    {
-        Id = payment.Id,
-        ExternalId = payment.ExternalId,
-        Amount = payment.Amount,
-        Currency = payment.Currency,
-        Status = "cancelled",
-        FailureReason = "Payment rejected by user"
-    };
-
-    await SendWebhookNotification(httpClientFactory, payment, notification);
-
-    return Results.Json(new { status = "cancelled" });
-});
+app.MapPost("/psp/payment/{id}/reject", (
+    string id,
+    IHttpClientFactory httpClientFactory,
+    ISignatureHelper signatureHelper,
+    IPaymentOperationRegistry operations,
+    PspPaymentRegistry registry,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+    ResolvePayment(
+        id,
+        "cancelled",
+        "Payment rejected by user",
+        registry,
+        httpClientFactory,
+        signatureHelper,
+        operations,
+        logger,
+        cancellationToken));
 
 app.Run();
 
-static async Task SendWebhookNotification(IHttpClientFactory httpClientFactory, PendingPayment payment, PaymentNotification notification)
+static async Task<IResult> ResolvePayment(
+    string id,
+    string status,
+    string? failureReason,
+    PspPaymentRegistry registry,
+    IHttpClientFactory httpClientFactory,
+    ISignatureHelper signatureHelper,
+    IPaymentOperationRegistry operations,
+    ILogger logger,
+    CancellationToken cancellationToken)
 {
-    var client = httpClientFactory.CreateClient("webhook");
-    var json = JsonSerializer.Serialize(notification);
-    using var request = new HttpRequestMessage(HttpMethod.Post, payment.NotificationUrl)
+    if (!registry.TryGet(id, out var payment))
+        return Results.NotFound();
+
+    if (payment.Status != "Pending")
+        return Results.Json(new { status = payment.Status });
+
+    var operationKey = $"resolve:{payment.Id}";
+    if (!operations.TryBegin(operationKey))
+        return Results.Conflict(new { status = "processing" });
+
+    var notification = new PaymentNotification
     {
-        Content = new StringContent(json, Encoding.UTF8, "application/json")
+        Id = payment.Id,
+        ExternalId = payment.ExternalId,
+        Amount = payment.Amount,
+        Currency = payment.Currency,
+        Status = status,
+        FailureReason = failureReason
     };
-    request.Headers.Add("X-Signature", "Signature");
 
-    await client.SendAsync(request);
+    try
+    {
+        var client = httpClientFactory.CreateClient("webhook");
+        using var request = new HttpRequestMessage(HttpMethod.Post, payment.NotificationUrl)
+        {
+            Content = JsonContent.Create(notification)
+        };
+        request.Headers.Add("X-Signature", signatureHelper.SignNotificationRequest(notification));
+        request.Headers.Add("Idempotency-Key", $"{payment.Id}:{status}");
+
+        using var response = await client.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        payment.Status = status;
+        PaymentTelemetry.RecordResult("psp_simulator", status);
+        logger.LogInformation(
+            "Resolved simulated payment {ProviderTransactionId} for order {OrderId} with status {PaymentStatus}",
+            payment.Id,
+            payment.ExternalId,
+            status);
+        return Results.Json(new { status });
+    }
+    catch
+    {
+        operations.Abandon(operationKey);
+        PaymentTelemetry.RecordFault("psp-webhook", "delivery");
+        throw;
+    }
 }
 
-record PendingPayment
-{
-    public string Id { get; init; } = default!;
-    public string ExternalId { get; init; } = default!;
-    public double Amount { get; init; }
-    public string Currency { get; init; } = default!;
-    public string NotificationUrl { get; init; } = default!;
-    public string Signature { get; init; } = default!;
-}
+public partial class Program { }

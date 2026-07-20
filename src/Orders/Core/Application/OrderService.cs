@@ -47,7 +47,7 @@ public class OrderService : IOrderService
             Status = OrderStatus.Created
         };
 
-        var customer = await _customerClient.GetCustomerByIdAsync(request.CustomerId);
+        var customer = await _customerClient.GetCustomerByIdAsync(request.CustomerId, ct);
         if (customer == null)
             throw new InvalidOperationException($"Customer not found");
         
@@ -57,7 +57,7 @@ public class OrderService : IOrderService
 
         foreach (var item in request.Items)
         {
-            var updatedProduct = await _productClient.GetProductByIdAsync(item.ProductID);
+            var updatedProduct = await _productClient.GetProductByIdAsync(item.ProductID, ct);
             updatedProduct.Image ??= string.Empty;
             if (updatedProduct.Price != item.Price)
                 throw new InvalidOperationException($"Price changed for product {updatedProduct.Name}");
@@ -94,9 +94,9 @@ public class OrderService : IOrderService
             ReservationId = (Guid) reserve.ReservationId!
         };
         
-        await _db.AddAsync(order);
+        await _db.AddAsync(order, ct);
 
-        await _orderMessagingClient.PublishOrderSubmitted(order, request.BasketClientId);
+        await _orderMessagingClient.PublishOrderSubmitted(order, request.BasketClientId, ct);
 
         // Notify customer service to persist the updated address
         await _orderMessagingClient.PublishCustomerAddressUpdated(

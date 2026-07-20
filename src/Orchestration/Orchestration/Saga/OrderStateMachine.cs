@@ -14,6 +14,7 @@ using Domain.Common.Events.Stock;
 using Domain.Common.States;
 using MassTransit;
 using Microsoft.Extensions.Options;
+using Orchestration.Observability;
 
 namespace Application.Saga;
 
@@ -149,7 +150,11 @@ public sealed class OrderStateMachine : MassTransitStateMachine<OrderState>
                 })
                 .TransitionTo(Processing),
             When(PaymentTimeout.Received)
-                .Then(ctx => _logger.LogWarning("Payment timed out for order saga {OrderId}", ctx.Saga.CorrelationId))
+                .Then(ctx =>
+                {
+                    OrderSagaTelemetry.RecordFailure("payment_timeout");
+                    _logger.LogWarning("Payment timed out for order saga {OrderId}", ctx.Saga.CorrelationId);
+                })
                 .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     EventId = EffectId(ctx.Saga.CorrelationId, ctx.Message.EventId, "release-stock-reservation"),
@@ -161,7 +166,11 @@ public sealed class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Send(new Uri("queue:cancel-order-command"), ctx => CancelOrder(ctx, "timeout-cancel", $"Order expired: {TimeoutReason()}"))
                 .TransitionTo(Failed),
             When(PaymentFailed)
-                .Then(ctx => _logger.LogWarning("Payment failed for order saga {OrderId}", ctx.Saga.CorrelationId))
+                .Then(ctx =>
+                {
+                    OrderSagaTelemetry.RecordFailure("payment_failed");
+                    _logger.LogWarning("Payment failed for order saga {OrderId}", ctx.Saga.CorrelationId);
+                })
                 .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
                 {
                     EventId = EffectId(ctx.Saga.CorrelationId, ctx.Message.EventId, "release-stock-reservation"),
@@ -355,7 +364,11 @@ public sealed class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     private EventActivityBinder<OrderState, ShippingFailedEvent> ShippingFailureActivity() =>
         When(ShippingFailed)
-            .Then(ctx => _logger.LogWarning("Shipping failed for order saga {OrderId}", ctx.Saga.CorrelationId))
+            .Then(ctx =>
+            {
+                OrderSagaTelemetry.RecordFailure("shipping_failed");
+                _logger.LogWarning("Shipping failed for order saga {OrderId}", ctx.Saga.CorrelationId);
+            })
             .Send(new Uri("queue:refund-payment"), ctx => Refund(ctx, "shipping-failed-refund", $"Shipping failed: {ctx.Message.Reason}"))
             .Send(new Uri("queue:release-stock-reservation"), ctx => new ReleaseStockReservationCommand
             {
@@ -370,7 +383,11 @@ public sealed class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     private EventActivityBinder<OrderState, StockReservationCommitFailedEvent> StockCommitFailureActivity() =>
         When(StockReservationCommitFailed)
-            .Then(ctx => _logger.LogWarning("Stock commit failed for order saga {OrderId}", ctx.Saga.CorrelationId))
+            .Then(ctx =>
+            {
+                OrderSagaTelemetry.RecordFailure("stock_commit_failed");
+                _logger.LogWarning("Stock commit failed for order saga {OrderId}", ctx.Saga.CorrelationId);
+            })
             .Send(new Uri("queue:refund-payment"), ctx => Refund(ctx, "stock-failed-refund", ctx.Message.Reason))
             .If(ctx => ctx.Saga.ShipmentId != Guid.Empty, activity => activity
                 .Send(new Uri("queue:cancel-shipping"), ctx => CancelShipping(ctx, "stock-failed-cancel-shipping")))
@@ -382,6 +399,7 @@ public sealed class OrderStateMachine : MassTransitStateMachine<OrderState>
         When(PackageIssueReported)
             .Then(ctx =>
             {
+                OrderSagaTelemetry.RecordFailure("package_issue");
                 ctx.Saga.IssueType = ctx.Message.IssueType;
                 ctx.Saga.IssueDetails = ctx.Message.Details;
                 ctx.Saga.IssueReportedAt = ctx.Message.ReportedAt;

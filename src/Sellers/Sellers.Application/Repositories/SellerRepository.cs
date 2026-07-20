@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 namespace Sellers.Application.Repositories;
 
@@ -16,20 +17,11 @@ public class SellerRepository : ISellerRepository
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
     }
 
-    public SellerRepository(IConfiguration configuration)
+    public SellerRepository(IOptions<SellerStorageOptions> options)
     {
-        var connectionString = configuration.GetConnectionString("sellers");
-
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            throw new InvalidOperationException("Missing connection string for the sellers Mongo database.");
-        }
-
-        var databaseName = configuration["Sellers:Database"] ?? "sellers";
-        var collectionName = configuration["Sellers:SellersCollection"] ?? "sellers";
-
-        var client = new MongoClient(connectionString);
-        _collection = client.GetDatabase(databaseName).GetCollection<Seller>(collectionName);
+        var value = options.Value;
+        var client = new MongoClient(value.ConnectionString);
+        _collection = client.GetDatabase(value.DatabaseName).GetCollection<Seller>(value.CollectionName);
     }
 
     public async Task<Seller> CreateAsync(Seller seller, CancellationToken cancellationToken)
@@ -66,5 +58,38 @@ public class SellerRepository : ISellerRepository
             cancellationToken);
 
         return seller;
+    }
+
+    public async Task<(Seller? Seller, bool Created)> TryRegisterSaleAsync(
+        Guid sellerId,
+        SellerLedgerEntry entry,
+        CancellationToken cancellationToken)
+    {
+        var filter = Builders<Seller>.Filter.And(
+            Builders<Seller>.Filter.Eq(seller => seller.Id, sellerId),
+            Builders<Seller>.Filter.Not(Builders<Seller>.Filter.ElemMatch(
+                seller => seller.Ledger,
+                existing => existing.OrderId == entry.OrderId &&
+                            existing.OrderItemId == entry.OrderItemId &&
+                            existing.Type == Domain.Sellers.Enums.SellerLedgerEntryType.Sale)));
+
+        var update = Builders<Seller>.Update
+            .Inc(seller => seller.AccumulatedSalesAmount, entry.GrossAmount)
+            .Inc(seller => seller.AccumulatedCommissionsAmount, entry.CommissionAmount)
+            .Push(seller => seller.Ledger, entry)
+            .Set(seller => seller.ModifiedAt, DateTime.UtcNow);
+
+        var updated = await _collection.FindOneAndUpdateAsync(
+            filter,
+            update,
+            new FindOneAndUpdateOptions<Seller> { ReturnDocument = ReturnDocument.After },
+            cancellationToken);
+
+        if (updated is not null)
+        {
+            return (updated, true);
+        }
+
+        return (await GetByIdAsync(sellerId, cancellationToken), false);
     }
 }

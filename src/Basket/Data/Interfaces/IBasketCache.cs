@@ -1,13 +1,12 @@
-﻿using Domain.Basket.Entities;
-using System.Collections.Generic;
+using Domain.Basket.Entities;
 
 namespace Data.Interfaces;
 
 public interface IBasketCache
 {
-    public Task<BasketWithDetails> GetBasketLoadedByClientId(Guid userId);
-    public Task<bool> AddProductToBasket(Guid userId, Item item);
-    public Task<bool> RemoveProductFromBasket(Guid userId, Item item);
-    public Task<bool> EmptyBasket(Guid userId);
-    public Task<bool> ReinstateBasket(Guid userId, IReadOnlyCollection<Item> items);
+    Task<BasketWithDetails> GetBasketLoadedByClientId(Guid clientId, CancellationToken cancellationToken = default);
+    Task<bool> AddProductToBasket(Guid clientId, Item item, CancellationToken cancellationToken = default);
+    Task<bool> RemoveProductFromBasket(Guid clientId, Item item, CancellationToken cancellationToken = default);
+    Task<bool> EmptyBasket(Guid clientId, CancellationToken cancellationToken = default);
+    Task<bool> ReinstateBasket(Guid clientId, IReadOnlyCollection<Item> items, CancellationToken cancellationToken = default);
 }

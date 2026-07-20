@@ -3,31 +3,34 @@ using Domain.Basket.Entities;
 using DomainEntities = Domain.Basket.Entities;
 using StackExchange.Redis;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Data;
 
 public class BasketCache : IBasketCache
 {
-    private IDatabase _cache;
+    private readonly IDatabase _cache;
+    private readonly ILogger<BasketCache> _logger;
     private const String BASKET_PREFIX = "basket:";
     private const String PRODUCT_PREFIX = "product:";
 
-    public BasketCache(IDatabaseClient database)
+    public BasketCache(IDatabaseClient database, ILogger<BasketCache> logger)
     {
         _cache = database.GetDatabase();
+        _logger = logger;
     }
 
-    public async Task<BasketWithDetails> GetBasketLoadedByClientId(Guid clientId)
+    public async Task<BasketWithDetails> GetBasketLoadedByClientId(Guid clientId, CancellationToken cancellationToken = default)
     {
         DomainEntities.Basket? basket;
         try
         {
-            var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
+            var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString()).WaitAsync(cancellationToken);
             basket = JsonSerializer.Deserialize<DomainEntities.Basket>(json.ToString())!;
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine($"There was an issue while retrieving basket {clientId} from cache.", clientId);
+            _logger.LogWarning("Unable to retrieve a basket from Redis");
             return null!;
         }
 
@@ -57,7 +60,7 @@ public class BasketCache : IBasketCache
 
         // Run all queries at once and wait for all of them to finish.
         batch.Execute();
-        await Task.WhenAll(productTasks.Values);
+        await Task.WhenAll(productTasks.Values).WaitAsync(cancellationToken);
 
         // Load the actual name and price values in each item
         foreach (var item in basketWithDetails.Items)
@@ -77,24 +80,24 @@ public class BasketCache : IBasketCache
         return basketWithDetails;
     }
 
-    public async Task<DomainEntities.Basket> GetBasketByClientId(Guid clientId)
+    private async Task<DomainEntities.Basket> GetBasketByClientId(Guid clientId, CancellationToken cancellationToken)
     {
         try
         {
-            var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString());
+            var json = await _cache.StringGetAsync(BASKET_PREFIX + clientId.ToString()).WaitAsync(cancellationToken);
             return JsonSerializer.Deserialize<DomainEntities.Basket>(json.ToString())!;
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine($"There was an issue while retrieving basket {clientId} from cache.", clientId);
+            _logger.LogWarning("Unable to retrieve a basket from Redis");
             return null!;
         }
     }
 
     //TODO: Check stock before adding to basket
-    public async Task<bool> AddProductToBasket(Guid clientId, Item item)
+    public async Task<bool> AddProductToBasket(Guid clientId, Item item, CancellationToken cancellationToken = default)
     {
-        var basket = await GetBasketByClientId(clientId);
+        var basket = await GetBasketByClientId(clientId, cancellationToken);
         if (basket == null)
         {
             basket = new DomainEntities.Basket()
@@ -114,19 +117,19 @@ public class BasketCache : IBasketCache
 
         try
         {
-            _cache.StringSet(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket));
+            await _cache.StringSetAsync(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket)).WaitAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine("There was an issue while storing the basket");
+            _logger.LogWarning("Unable to store a basket in Redis");
             return false;
         }
 
         return true;
     }
-    public async Task<bool> RemoveProductFromBasket(Guid clientId, Item item)
+    public async Task<bool> RemoveProductFromBasket(Guid clientId, Item item, CancellationToken cancellationToken = default)
     {
-        var basket = await GetBasketByClientId(clientId);
+        var basket = await GetBasketByClientId(clientId, cancellationToken);
         if (basket == null)
             return false;
 
@@ -141,18 +144,18 @@ public class BasketCache : IBasketCache
 
         try
         {
-            _cache.StringSet(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket));
+            await _cache.StringSetAsync(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket)).WaitAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine("There was an issue while caching the basket");
+            _logger.LogWarning("Unable to update a basket in Redis");
             return false;
         }
 
         return true;
     }
 
-    public async Task<bool> ReinstateBasket(Guid clientId, IReadOnlyCollection<Item> items)
+    public async Task<bool> ReinstateBasket(Guid clientId, IReadOnlyCollection<Item> items, CancellationToken cancellationToken = default)
     {
         var basket = new DomainEntities.Basket
         {
@@ -162,27 +165,27 @@ public class BasketCache : IBasketCache
 
         try
         {
-            await _cache.StringSetAsync(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket));
+            await _cache.StringSetAsync(BASKET_PREFIX + clientId.ToString(), JsonSerializer.Serialize(basket)).WaitAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine("There was an issue while storing the basket");
-            return false;
+            _logger.LogWarning("Unable to reinstate a basket in Redis");
+            throw;
         }
 
         return true;
     }
 
-    public async Task<bool> EmptyBasket(Guid clientId)
+    public async Task<bool> EmptyBasket(Guid clientId, CancellationToken cancellationToken = default)
     {
         try
         {
-            return await _cache.KeyDeleteAsync(BASKET_PREFIX + clientId.ToString());
+            return await _cache.KeyDeleteAsync(BASKET_PREFIX + clientId.ToString()).WaitAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
-            Console.WriteLine("There was an issue while removing the basket");
-            return false;
+            _logger.LogWarning("Unable to remove a basket from Redis");
+            throw;
         }
     }
 }

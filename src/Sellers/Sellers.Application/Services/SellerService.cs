@@ -115,33 +115,21 @@ public class SellerService : ISellerService
         string notes,
         CancellationToken cancellationToken)
     {
-        var seller = await _repository.GetByIdAsync(sellerId, cancellationToken);
-
-        if (seller is null)
-        {
-            return null;
-        }
-
-        if (seller.Ledger.Any(entry =>
-                entry.OrderId == orderId &&
-                entry.OrderItemId == orderItemId &&
-                entry.Type == SellerLedgerEntryType.Sale))
-        {
-            return seller;
-        }
-
-        seller.AccumulatedSalesAmount += grossAmount;
-        seller.AccumulatedCommissionsAmount += commissionAmount;
-        seller.Ledger.Add(new SellerLedgerEntry
+        var (updatedSeller, created) = await _repository.TryRegisterSaleAsync(
+            sellerId,
+            new SellerLedgerEntry
         {
             OrderId = orderId,
             OrderItemId = orderItemId,
             GrossAmount = grossAmount,
             CommissionAmount = commissionAmount,
             Notes = notes
-        });
+        }, cancellationToken);
 
-        var updatedSeller = await _repository.UpdateAsync(seller, cancellationToken);
+        if (updatedSeller is null || !created)
+        {
+            return updatedSeller;
+        }
 
         await _publishEndpoint.Publish<SellerSaleRegisteredEvent>(new
         {

@@ -87,6 +87,32 @@ public class CustomerRepository : ICustomerRepository
         return address;
     }
 
+    public async Task<bool> AddAddressIfMissingAsync(
+        Guid customerId,
+        string operationId,
+        SavedAddress address,
+        CancellationToken ct = default)
+    {
+        address.Id = Guid.NewGuid();
+        address.CustomerId = customerId;
+        address.Description = operationId;
+        address.CreatedAt = DateTime.UtcNow;
+        address.ModifiedAt = address.CreatedAt;
+
+        var filter = Builders<Customer>.Filter.And(
+            Builders<Customer>.Filter.Eq(customer => customer.Id, customerId),
+            Builders<Customer>.Filter.Not(Builders<Customer>.Filter.ElemMatch(
+                customer => customer.SavedAddresses,
+                existing => existing.Description == operationId)));
+        var update = Builders<Customer>.Update
+            .Push(customer => customer.SavedAddresses, address)
+            .Set(customer => customer.Address, address.Address)
+            .Set(customer => customer.ModifiedAt, DateTime.UtcNow);
+
+        var result = await _customers.UpdateOneAsync(filter, update, cancellationToken: ct);
+        return result.ModifiedCount == 1;
+    }
+
     public async Task<SavedAddress?> UpdateAddressAsync(Guid customerId, Guid addressId, SavedAddress updatedAddress, CancellationToken ct = default)
     {
         var filter = Builders<Customer>.Filter.And(

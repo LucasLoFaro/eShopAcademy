@@ -13,17 +13,18 @@ builder.AddServiceDefaults()
        .WithMassTransit()
        .WithSwagger();
 
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers()
     .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
 
 //Inject services
-builder.Services.AddSingleton(sp => new ProductDbContext(builder.Configuration.GetConnectionString("products"), "products"));
+builder.Services.AddProductStorage(builder.Configuration);
 builder.Services.AddTransient<IProductMessagingService, ProductMessagingService>();
-builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddTransient<IProductService, ProductService>();
-builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
+builder.Services.AddProductContentModeration(builder.Configuration);
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
     await SeedTestData(app);
@@ -42,3 +43,4 @@ static async Task SeedTestData(WebApplication app)
         await ProductSeedData.InitializeAsync(db, messagingService);
     }
 }
+public partial class Program;

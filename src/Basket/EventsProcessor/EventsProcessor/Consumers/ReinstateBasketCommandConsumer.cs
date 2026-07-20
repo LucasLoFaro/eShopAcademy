@@ -24,6 +24,6 @@ public class ReinstateBasketCommandConsumer : IConsumer<ReinstateBasketCommand>
             Quantity = item.Quantity
         }).ToList();
 
-        await _basketCache.ReinstateBasket(command.ClientId, items);
+        await _basketCache.ReinstateBasket(command.ClientId, items, context.CancellationToken);
     }
 }

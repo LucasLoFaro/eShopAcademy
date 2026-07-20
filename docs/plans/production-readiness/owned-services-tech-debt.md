@@ -248,3 +248,13 @@ The following items remain after rebasing the Basket, Customers, Products, and S
 
 **Owner:** Developer-experience/CI platform owner.
 
+### TD-BCPS-009 — Remove shared domain-package build warnings (P2)
+
+**Risk:** Rebased owned-service builds still emit nullable-initialization warnings from Basket, Customers, and Products domain models and member-hiding warnings from shared product and seller events. Persistent baseline warnings can conceal new regressions and make a warnings-as-errors quality gate impractical.
+
+**Work:** Correct nullability contracts in the affected domain entities and DTOs, and make inherited event-member behavior explicit with the appropriate override, rename, or intentional `new` declaration. Treat public package-contract changes as versioned shared-domain work.
+
+**Acceptance criteria:** Basket, Customers, Products, and Sellers dependency graphs build without nullable or member-hiding compiler warnings; serialized contracts remain compatible or are intentionally versioned; domain contract tests cover required versus optional fields and inherited event metadata.
+
+**Owner:** Basket, Customers, Products, and shared domain-contract owners. The bounded-service hardening branch must not change `src/Domain` to close this item.
+

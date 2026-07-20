@@ -14,9 +14,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
+    <PackageReference Include="MassTransit.Quartz" Version="$(MassTransitVersion)" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="$(MassTransitVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.13.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">

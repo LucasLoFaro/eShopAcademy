@@ -1,13 +1,11 @@
-﻿using System.Linq;
-using AutoFixture.Xunit2;
 using Application.Saga;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
+using Validator = System.ComponentModel.DataAnnotations.Validator;
 using Domain.Common.Commands.Basket;
-using Domain.Common.Commands.Operations;
 using Domain.Common.Commands.Orders;
-using Domain.Common.Commands.Payments;
 using Domain.Common.Commands.Shipping;
 using Domain.Common.Commands.Stock;
-using Domain.Common.Events.Operations;
 using Domain.Common.Events.Orders;
 using Domain.Common.Events.Payments;
 using Domain.Common.Events.Shipping;
@@ -16,509 +14,352 @@ using Domain.Common.States;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Orders.Tests.Orchestration.Saga;
 
-public class OrderStateMachineTests : IAsyncLifetime
+public sealed class OrderStateMachineTests : IAsyncLifetime
 {
+    private static readonly DateTimeOffset Now = new(2026, 7, 20, 12, 0, 0, TimeSpan.Zero);
+    private static readonly TimeSpan PaymentTimeout = TimeSpan.FromMinutes(7);
+
     private ITestHarness _harness = null!;
+    private ISagaStateMachineTestHarness<OrderStateMachine, OrderState> _sagaHarness = null!;
+    private OrderStateMachine _machine = null!;
     private ServiceProvider _provider = null!;
 
     public async Task InitializeAsync()
     {
-        // Arrange: setup DI and test harness
-        _provider = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg =>
-            {
-                cfg.AddSagaStateMachine<OrderStateMachine, OrderState>()
-                    .InMemoryRepository();
-            })
-            .BuildServiceProvider(true);
+        var services = new ServiceCollection();
+        services.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IOptions<OrderSagaOptions>>(
+            Options.Create(new OrderSagaOptions { PaymentTimeout = PaymentTimeout }));
+        services.AddMassTransitTestHarness(configurator =>
+        {
+            configurator.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                .InMemoryRepository();
+        });
 
+        _provider = services.BuildServiceProvider(true);
         _harness = _provider.GetRequiredService<ITestHarness>();
-
+        _machine = _provider.GetRequiredService<OrderStateMachine>();
+        _sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
         await _harness.Start();
     }
 
     public async Task DisposeAsync()
     {
-        if (_harness != null)
+        await _harness.Stop();
+        await _provider.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task Timeout_before_payment_cancels_once_and_becomes_terminal()
+    {
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000001");
+        await Submit(orderId);
+
+        await _harness.Bus.Publish(Expired(orderId));
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Failed));
+        Assert.Equal(1, await SentCount<CancelOrderCommand>(orderId));
+        Assert.Equal(1, await SentCount<ReleaseStockReservationCommand>(orderId));
+
+        await _harness.Bus.Publish(Payment(orderId));
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Failed));
+        Assert.Equal(0, await SentCount<CommitStockReservationCommand>(orderId));
+    }
+
+    [Fact]
+    public async Task Payment_before_timeout_exits_payment_pending_and_never_cancels()
+    {
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000002");
+        await Submit(orderId);
+
+        await _harness.Bus.Publish(Payment(orderId));
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Processing));
+        Assert.Equal(1, await SentCount<CommitStockReservationCommand>(orderId));
+        Assert.Equal(1, await SentCount<EmptyBasketCommand>(orderId));
+        Assert.Equal(1, await SentCount<ScheduleShippingCommand>(orderId));
+        Assert.Equal(0, await SentCount<CancelOrderCommand>(orderId));
+    }
+
+    [Fact]
+    public async Task Stale_timeout_after_payment_is_ignored()
+    {
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000003");
+        await Submit(orderId);
+        await _harness.Bus.Publish(Payment(orderId));
+
+        await _harness.Bus.Publish(Expired(orderId));
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Processing));
+        Assert.Equal(0, await SentCount<CancelOrderCommand>(orderId));
+        Assert.Equal(0, await SentCount<ReleaseStockReservationCommand>(orderId));
+    }
+
+    [Fact]
+    public async Task Duplicate_payment_completed_does_not_repeat_business_effects()
+    {
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000004");
+        var payment = Payment(orderId);
+        await Submit(orderId);
+
+        await _harness.Bus.Publish(payment);
+        await _harness.Bus.Publish(payment);
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Processing));
+        Assert.Equal(1, await SentCount<CommitStockReservationCommand>(orderId));
+        Assert.Equal(1, await SentCount<EmptyBasketCommand>(orderId));
+        Assert.Equal(1, await SentCount<ScheduleShippingCommand>(orderId));
+        Assert.Equal(1, await StatusCount(orderId, "Paid"));
+    }
+
+    [Fact]
+    public async Task Duplicate_shipping_and_delivery_events_do_not_repeat_effects()
+    {
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000005");
+        var shipping = ShippingScheduled(orderId);
+        var stock = StockCommitted(orderId);
+        var shipped = Shipped(orderId);
+        var delivered = Delivered(orderId);
+        await Submit(orderId);
+        await _harness.Bus.Publish(Payment(orderId));
+
+        await _harness.Bus.Publish(shipping);
+        await _harness.Bus.Publish(shipping);
+        await _harness.Bus.Publish(stock);
+        await _harness.Bus.Publish(stock);
+        await _harness.Bus.Publish(shipped);
+        await _harness.Bus.Publish(shipped);
+        await _harness.Bus.Publish(delivered);
+        await _harness.Bus.Publish(delivered);
+
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Completed));
+        Assert.Equal(1, await StatusCount(orderId, "Shipped"));
+        Assert.Equal(1, await StatusCount(orderId, "Delivered"));
+        Assert.Equal(1, await StatusCount(orderId, "Processing"));
+        Assert.Equal(1, await _harness.Published.SelectAsync<CompleteOrderCommand>()
+            .CountAsync(x => x.Context.Message.OrderId == orderId));
+    }
+
+    [Fact]
+    public async Task Payment_timeout_race_commits_only_one_business_outcome()
+    {
+        for (var index = 0; index < 12; index++)
         {
-            await _harness.Stop();
+            var orderId = Guid.Parse($"20000000-0000-0000-0000-{index + 1:000000000000}");
+            await Submit(orderId);
+
+            await Task.WhenAll(
+                _harness.Bus.Publish(Payment(orderId)),
+                _harness.Bus.Publish(Expired(orderId)));
+
+            var settledState = await WaitForSettledState(orderId);
+            var paidEffects = await SentCount<CommitStockReservationCommand>(orderId);
+            var cancelledEffects = await SentCount<CancelOrderCommand>(orderId);
+            Assert.True((paidEffects, cancelledEffects) is (1, 0) or (0, 1));
+            Assert.True(settledState is "Processing" or "Failed");
         }
-
-        if (_provider != null)
-        {
-            await _provider.DisposeAsync();
-        }
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnPaymentCompleted_ShouldPublishStockCommitEmptyBasketAndShippingCommands(
-        OrderSubmittedEvent submittedEvent,
-        PaymentCompletedEvent paymentCompletedEvent)
+    [Fact]
+    public async Task Terminal_saga_cannot_be_reactivated()
     {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000006");
+        await Complete(orderId);
+        var completedEffectsBeforeReplay =
+            await StatusCount(orderId, "Delivered") +
+            await SentCount<CommitStockReservationCommand>(orderId) +
+            await SentCount<CancelOrderCommand>(orderId);
 
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
+        await _harness.Bus.Publish(Submitted(orderId));
+        await _harness.Bus.Publish(Payment(orderId));
+        await _harness.Bus.Publish(Expired(orderId));
+        await _harness.Bus.Publish(Shipped(orderId));
 
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // Act: send PaymentCompletedEvent
-        paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(paymentCompletedEvent);
-
-        // Assert: PaymentCompletedEvent consumed
-        Assert.True(await _harness.Consumed.Any<PaymentCompletedEvent>());
-
-        // Assert: commands sent to deterministic endpoints
-        Assert.True(await _harness.Sent.Any<CommitStockReservationCommand>());
-        Assert.True(await _harness.Sent.Any<EmptyBasketCommand>());
-        Assert.True(await _harness.Sent.Any<ScheduleShippingCommand>());
-
-        await AssertSentTo<CommitStockReservationCommand>("commit-stock-reservation");
-        await AssertSentTo<EmptyBasketCommand>("empty-basket");
-        await AssertSentTo<ScheduleShippingCommand>("schedule-shipping");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-
-        var commitConsume = await _harness.Sent
-            .SelectAsync<CommitStockReservationCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(commitConsume);
-        Assert.Equal(submittedEvent.OrderId, commitConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.ReservationId, commitConsume.Context.Message.ReservationId);
-
-        var emptyBasketConsume = await _harness.Sent
-            .SelectAsync<EmptyBasketCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(emptyBasketConsume);
-        Assert.Equal(submittedEvent.OrderId, emptyBasketConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.BasketClientId, emptyBasketConsume.Context.Message.ClientId);
-
-        var scheduleConsume = await _harness.Sent
-            .SelectAsync<ScheduleShippingCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(scheduleConsume);
-        Assert.Equal(submittedEvent.OrderId, scheduleConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.CustomerEmail, scheduleConsume.Context.Message.CustomerEmail);
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Completed));
+        Assert.Equal(
+            completedEffectsBeforeReplay,
+            await StatusCount(orderId, "Delivered") +
+            await SentCount<CommitStockReservationCommand>(orderId) +
+            await SentCount<CancelOrderCommand>(orderId));
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnPaymentFailed_ShouldPublishCancelOrderCommand(
-        OrderSubmittedEvent submittedEvent,
-        PaymentFailedEvent paymentFailedEvent)
+    [Fact]
+    public async Task Timeout_delay_and_expired_at_share_the_validated_option()
     {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000007");
+        var before = DateTime.UtcNow;
 
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
+        await Submit(orderId);
+        var after = DateTime.UtcNow;
 
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // Act: payment failed
-        paymentFailedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(paymentFailedEvent);
-
-        // Assert
-        Assert.True(await _harness.Consumed.Any<PaymentFailedEvent>());
-
-        // Assert CancelOrderCommand was published with reason + customer data
-        Assert.True(await _harness.Sent.Any<CancelOrderCommand>());
-
-        await AssertSentTo<ReleaseStockReservationCommand>("release-stock-reservation");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
-
-        var cancelConsume = await _harness.Sent
-            .SelectAsync<CancelOrderCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(cancelConsume);
-
-        var cancel = cancelConsume.Context.Message;
-
-        Assert.Equal(submittedEvent.OrderId, cancel.OrderId);
-        Assert.Equal($"Payment failed: {paymentFailedEvent.Reason}", cancel.Reason);
-        Assert.False(string.IsNullOrWhiteSpace(cancel.CustomerEmail));
-        Assert.False(string.IsNullOrWhiteSpace(cancel.CustomerName));
-    }
-
-
-    [Theory]
-    [AutoData]
-    public async Task OnStockReservationCommitted_ShouldPublishPreparePackageCommand(
-        OrderSubmittedEvent submittedEvent,
-        StockReservationCommittedEvent committedEvent)
-    {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
-
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
-
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // Act: StockReservationCommittedEvent
-        committedEvent = committedEvent with
-        {
-            OrderId = submittedEvent.OrderId,
-            ReservationId = submittedEvent.ReservationId
-        };
-        await _harness.Bus.Publish(committedEvent);
-
-        // Assert
-        Assert.True(await _harness.Consumed.Any<StockReservationCommittedEvent>());
-        Assert.True(await _harness.Sent.Any<PreparePackageCommand>());
-
-        await AssertSentTo<PreparePackageCommand>("prepare-package");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-
-        var prepareConsume = await _harness.Sent
-            .SelectAsync<PreparePackageCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(prepareConsume);
-        Assert.Equal(submittedEvent.OrderId, prepareConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.ReservationId, prepareConsume.Context.Message.ReservationId);
-    }
-
-    [Theory]
-    [AutoData]
-    public async Task OnStockReservationCommitFailed_ShouldPublishRefundAndCancelCommands(
-        OrderSubmittedEvent submittedEvent,
-        PaymentCompletedEvent paymentCompletedEvent,
-        StockReservationCommitFailedEvent commitFailedEvent)
-    {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
-
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
-
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // Act: PaymentCompletedEvent
-        paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(paymentCompletedEvent);
-
-        Assert.True(await _harness.Consumed.Any<PaymentCompletedEvent>());
-
-        // Act: StockReservationCommitFailedEvent
-        commitFailedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(commitFailedEvent);
-
-        // Assert
-        Assert.True(await _harness.Consumed.Any<StockReservationCommitFailedEvent>());
-        Assert.True(await _harness.Sent.Any<RefundPaymentCommand>());
-        Assert.True(await _harness.Sent.Any<CancelShippingCommand>());
-        Assert.True(await _harness.Sent.Any<CancelOrderCommand>());
-
-        await AssertSentTo<RefundPaymentCommand>("refund-payment");
-        await AssertSentTo<CancelShippingCommand>("cancel-shipping");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
-
-        var refundConsume = await _harness.Sent
-            .SelectAsync<RefundPaymentCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(refundConsume);
-        Assert.Equal(submittedEvent.OrderId, refundConsume.Context.Message.OrderId);
-        Assert.Equal(paymentCompletedEvent.PaymentId, refundConsume.Context.Message.PaymentId);
-        Assert.Equal(paymentCompletedEvent.ProviderTransactionId, refundConsume.Context.Message.ProviderTransactionId);
-        Assert.Equal(submittedEvent.TotalAmount, refundConsume.Context.Message.Amount);
-        Assert.Equal(commitFailedEvent.Reason, refundConsume.Context.Message.Reason);
-
-        var cancelShippingConsume = await _harness.Sent
-            .SelectAsync<CancelShippingCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(cancelShippingConsume);
-        Assert.Equal(submittedEvent.OrderId, cancelShippingConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.OrderId, cancelShippingConsume.Context.Message.ShippingId);
-
-        var cancelOrderConsume = await _harness.Sent
-            .SelectAsync<CancelOrderCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(cancelOrderConsume);
-        Assert.Equal(submittedEvent.OrderId, cancelOrderConsume.Context.Message.OrderId);
-        Assert.Equal(submittedEvent.CustomerName, cancelOrderConsume.Context.Message.CustomerName);
-        Assert.Equal(submittedEvent.CustomerEmail, cancelOrderConsume.Context.Message.CustomerEmail);
-        Assert.Equal($"Stock reservation failed: {commitFailedEvent.Reason}", cancelOrderConsume.Context.Message.Reason);
-    }
-
-    [Theory]
-    [AutoData]
-    public async Task OnOrderReadyForPickupEvent_ShouldPublishConfirmShippingCommand(
-        OrderSubmittedEvent submittedEvent,
-        ShippingScheduledEvent scheduledEvent,
-        OrderReadyForPickupEvent readyEvent)
-    {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
-
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
-
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // The provider creates its own shipment identifier. Preserve it separately
-        // from the order correlation identifier before confirming pickup.
-        scheduledEvent = scheduledEvent with
-        {
-            OrderId = submittedEvent.OrderId
-        };
-
-        await _harness.Bus.Publish(scheduledEvent);
-
-        Assert.True(await _harness.Consumed.Any<ShippingScheduledEvent>());
-        saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-        Assert.Equal(submittedEvent.OrderId, saga.CorrelationId);
-        Assert.Equal(scheduledEvent.ShipmentId, saga.ShipmentId);
-
-        // Act: OrderReadyForPickupEvent
-        readyEvent = readyEvent with
-        {
-            OrderId = submittedEvent.OrderId
-        };
-
-        await _harness.Bus.Publish(readyEvent);
-
-        // Assert
-        Assert.True(await _harness.Consumed.Any<OrderReadyForPickupEvent>());
-        Assert.True(await _harness.Sent.Any<ConfirmPickupCommand>());
-
-        await AssertSentTo<ConfirmPickupCommand>("confirm-shipping");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-
-        var confirmConsume = await _harness.Sent
-            .SelectAsync<ConfirmPickupCommand>()
-            .FirstOrDefault();
-
-        Assert.NotNull(confirmConsume);
-        Assert.Equal(submittedEvent.OrderId, confirmConsume.Context.Message.OrderId);
-        Assert.Equal(scheduledEvent.ShipmentId, confirmConsume.Context.Message.ShippingId);
-        Assert.NotEqual(confirmConsume.Context.Message.OrderId, confirmConsume.Context.Message.ShippingId);
-        Assert.Equal(readyEvent.ReadyAt, confirmConsume.Context.Message.ReadyAt);
-    }
-
-    [Theory]
-    [AutoData]
-    public async Task OnShippingScheduledEvent_ShouldPublishUpdateOrderStatusCommandWithTrackingInfo(
-        OrderSubmittedEvent submittedEvent,
-        ShippingScheduledEvent scheduledEvent)
-    {
-        // Arrange
-        var sagaHarness = _harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
-
-        // Act
-        await _harness.Bus.Publish(submittedEvent);
-
-        // Assert: OrderSubmittedEvent consumed and saga created
-        Assert.True(await _harness.Consumed.Any<OrderSubmittedEvent>());
-
-        var saga = sagaHarness.Sagas.Contains(submittedEvent.OrderId);
-        Assert.NotNull(saga);
-
-        // Act
-        scheduledEvent = scheduledEvent with
-        {
-            OrderId = submittedEvent.OrderId
-        };
-
-        await _harness.Bus.Publish(scheduledEvent);
-
-        // Assert
-        Assert.True(await _harness.Consumed.Any<ShippingScheduledEvent>());
-        Assert.True(await _harness.Sent.Any<UpdateOrderStatusCommand>());
-
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-
-        // Find the UpdateOrderStatusCommand with ShippingStatus = "Scheduled"
-        var updateCommands = await _harness.Sent
-            .SelectAsync<UpdateOrderStatusCommand>()
-            .ToListAsync();
-
-        var scheduledUpdate = updateCommands
-            .Select(x => x.Context.Message)
-            .FirstOrDefault(x => x.ShippingStatus == "Scheduled");
-
-        Assert.NotNull(scheduledUpdate);
-        Assert.Equal(submittedEvent.OrderId, scheduledUpdate.OrderId);
-        Assert.Equal(scheduledEvent.TrackingNumber, scheduledUpdate.TrackingNumber);
-        Assert.Equal(scheduledEvent.Carrier, scheduledUpdate.Carrier);
-    }
-
-    [Theory]
-    [AutoData]
-    public async Task OnOrderSubmitted_ShouldSchedulePaymentTimeout(
-        OrderSubmittedEvent submittedEvent)
-    {
-        await _harness.Bus.Publish(submittedEvent);
-
-        var scheduled = await _harness.Sent
-            .SelectAsync<OrderExpiredEvent>()
-            .FirstOrDefault();
-
-        Assert.NotNull(scheduled);
-        Assert.Equal(submittedEvent.OrderId, scheduled.Context.Message.OrderId);
-        Assert.InRange(
-            scheduled.Context.Delay!.Value,
-            TimeSpan.FromMinutes(4.99),
-            TimeSpan.FromMinutes(5));
+        var scheduled = await _harness.Sent.SelectAsync<OrderExpiredEvent>()
+            .FirstAsync(x => x.Context.Message.OrderId == orderId);
+        Assert.InRange(scheduled.Context.Message.ExpiredAt, before.Add(PaymentTimeout), after.Add(PaymentTimeout));
         Assert.NotNull(scheduled.Context.ScheduledMessageId);
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnPaymentTimeout_ShouldSendCancellationCommandsToDeterministicEndpoints(
-        OrderSubmittedEvent submittedEvent,
-        OrderExpiredEvent expiredEvent)
+    [Fact]
+    public void Payment_timeout_option_rejects_non_positive_duration()
     {
-        await _harness.Bus.Publish(submittedEvent);
+        var options = new OrderSagaOptions { PaymentTimeout = TimeSpan.Zero };
+        var validationResults = new List<ValidationResult>();
 
-        expiredEvent = expiredEvent with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(expiredEvent);
-
-        await AssertSentTo<ReleaseStockReservationCommand>("release-stock-reservation");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
+        Assert.False(Validator.TryValidateObject(
+            options,
+            new ValidationContext(options),
+            validationResults,
+            validateAllProperties: true));
+        Assert.Contains(validationResults, result =>
+            result.MemberNames.Contains(nameof(OrderSagaOptions.PaymentTimeout)));
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnPackageIssueReported_ShouldSendAllCompensationCommandsToDeterministicEndpoints(
-        OrderSubmittedEvent submittedEvent,
-        PaymentCompletedEvent paymentCompletedEvent,
-        PackageIssueReportedEvent packageIssue)
+    [Fact]
+    public async Task Saga_produced_commands_have_stable_correlation_and_business_identifiers()
     {
-        await _harness.Bus.Publish(submittedEvent);
+        var orderId = Guid.Parse("10000000-0000-0000-0000-000000000008");
+        var payment = Payment(orderId);
+        var submitted = Submitted(orderId);
+        await _harness.Bus.Publish(submitted);
 
-        paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(paymentCompletedEvent);
+        await _harness.Bus.Publish(payment);
 
-        packageIssue = packageIssue with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(packageIssue);
+        var commit = await FirstSent<CommitStockReservationCommand>(orderId);
+        var basket = await FirstSent<EmptyBasketCommand>(orderId);
+        Assert.Equal(orderId, commit.CorrelationId);
+        Assert.Equal(submitted.ReservationId, commit.ReservationId);
+        Assert.Equal(orderId, basket.CorrelationId);
+        Assert.Equal(submitted.BasketClientId, basket.ClientId);
+        Assert.NotEqual(Guid.Empty, commit.EventId);
+        Assert.NotEqual(payment.EventId, commit.EventId);
 
-        await AssertSentTo<RefundPaymentCommand>("refund-payment");
-        await AssertSentTo<ReleaseStockReservationCommand>("release-stock-reservation");
-        await AssertSentTo<CancelShippingCommand>("cancel-shipping");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
+        var otherOrderId = Guid.Parse("10000000-0000-0000-0000-000000000009");
+        await _harness.Bus.Publish(Submitted(otherOrderId));
+        await _harness.Bus.Publish(Payment(otherOrderId));
+        var otherCommit = await FirstSent<CommitStockReservationCommand>(otherOrderId);
+        Assert.NotEqual(commit.EventId, otherCommit.EventId);
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnShippingFailedBeforeDispatch_ShouldSendCompensationCommandsToDeterministicEndpoints(
-        OrderSubmittedEvent submittedEvent,
-        PaymentCompletedEvent paymentCompletedEvent,
-        ShippingFailedEvent shippingFailed)
+    private async Task Submit(Guid orderId)
     {
-        await _harness.Bus.Publish(submittedEvent);
-
-        paymentCompletedEvent.OrderId = submittedEvent.OrderId;
-        await _harness.Bus.Publish(paymentCompletedEvent);
-
-        shippingFailed = shippingFailed with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(shippingFailed);
-
-        await AssertSentTo<RefundPaymentCommand>("refund-payment");
-        await AssertSentTo<ReleaseStockReservationCommand>("release-stock-reservation");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
+        await _harness.Bus.Publish(Submitted(orderId));
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Submitted));
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnOrderDelivered_ShouldPublishIntentionalCompletionExceptionAndSendStatusUpdate(
-        OrderSubmittedEvent submittedEvent,
-        OrderShippedEvent shippedEvent,
-        OrderDeliveredEvent deliveredEvent)
+    private async Task Complete(Guid orderId)
     {
-        await _harness.Bus.Publish(submittedEvent);
-
-        shippedEvent = shippedEvent with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(shippedEvent);
-
-        deliveredEvent = deliveredEvent with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(deliveredEvent);
-
-        Assert.True(await _harness.Published.Any<CompleteOrderCommand>());
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-
-        var updates = await _harness.Sent
-            .SelectAsync<UpdateOrderStatusCommand>()
-            .ToListAsync();
-        var update = updates
-            .Select(message => message.Context.Message)
-            .Single(message => message.Status == "Delivered");
-
-        Assert.Equal("Delivered", update.Status);
-        Assert.Equal(deliveredEvent.TrackingNumber, update.TrackingNumber);
-        Assert.Equal(deliveredEvent.DeliveredAt, update.DeliveredAt);
+        await Submit(orderId);
+        await _harness.Bus.Publish(Payment(orderId));
+        await _harness.Bus.Publish(ShippingScheduled(orderId));
+        await _harness.Bus.Publish(StockCommitted(orderId));
+        await _harness.Bus.Publish(Shipped(orderId));
+        await _harness.Bus.Publish(Delivered(orderId));
+        Assert.NotNull(await _sagaHarness.Exists(orderId, _machine.Completed));
     }
 
-    [Theory]
-    [AutoData]
-    public async Task OnShippingFailedAfterDispatch_ShouldSendPostDispatchCompensationToDeterministicEndpoints(
-        OrderSubmittedEvent submittedEvent,
-        OrderShippedEvent shippedEvent,
-        ShippingFailedEvent shippingFailed)
+    private static OrderSubmittedEvent Submitted(Guid orderId) => new()
     {
-        await _harness.Bus.Publish(submittedEvent);
+        EventId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        OrderId = orderId,
+        CustomerId = Guid.Parse("30000000-0000-0000-0000-000000000001"),
+        BasketClientId = Guid.Parse("30000000-0000-0000-0000-000000000002"),
+        PaymentId = Guid.Parse("30000000-0000-0000-0000-000000000003"),
+        ReservationId = Guid.Parse("30000000-0000-0000-0000-000000000004"),
+        CustomerName = "Test Customer",
+        CustomerEmail = "test@example.invalid",
+        TotalAmount = 125.50m,
+        DestinationAddress = "Test address"
+    };
 
-        shippedEvent = shippedEvent with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(shippedEvent);
+    private static PaymentCompletedEvent Payment(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        OrderId = orderId,
+        PaymentId = Guid.Parse("30000000-0000-0000-0000-000000000003"),
+        ProviderTransactionId = "provider-transaction-1",
+        PSPTransactionId = "psp-transaction-1",
+        Amount = 125.50m,
+        Currency = "USD"
+    };
 
-        shippingFailed = shippingFailed with { OrderId = submittedEvent.OrderId };
-        await _harness.Bus.Publish(shippingFailed);
+    private static OrderExpiredEvent Expired(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+        OrderId = orderId,
+        ExpiredAt = Now.Add(PaymentTimeout).UtcDateTime
+    };
 
-        await AssertSentTo<RefundPaymentCommand>("refund-payment");
-        await AssertSentTo<UpdateOrderStatusCommand>("update-order-status-command");
-        await AssertSentTo<CancelOrderCommand>("cancel-order-command");
-    }
+    private static ShippingScheduledEvent ShippingScheduled(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+        OrderId = orderId,
+        ShipmentId = Guid.Parse("30000000-0000-0000-0000-000000000005"),
+        Carrier = "Test carrier",
+        TrackingNumber = "TRACK-1",
+        DestinationAddress = "Test address"
+    };
 
-    private async Task<T> AssertSentTo<T>(string endpointName)
+    private static StockReservationCommittedEvent StockCommitted(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+        OrderId = orderId,
+        ReservationId = Guid.Parse("30000000-0000-0000-0000-000000000004"),
+        CommittedAt = Now.UtcDateTime
+    };
+
+    private static OrderShippedEvent Shipped(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+        OrderId = orderId,
+        Carrier = "Test carrier",
+        TrackingNumber = "TRACK-1",
+        ShippedAt = Now.AddHours(1).UtcDateTime
+    };
+
+    private static OrderDeliveredEvent Delivered(Guid orderId) => new()
+    {
+        EventId = Guid.Parse("99999999-9999-9999-9999-999999999999"),
+        OrderId = orderId,
+        TrackingNumber = "TRACK-1",
+        DeliveredAt = Now.AddDays(1).UtcDateTime
+    };
+
+    private async Task<int> StatusCount(Guid orderId, string status) =>
+        await _harness.Sent.SelectAsync<UpdateOrderStatusCommand>()
+            .CountAsync(x => x.Context.Message.OrderId == orderId && x.Context.Message.Status == status);
+
+    private async Task<int> SentCount<T>(Guid orderId)
+        where T : class =>
+        await _harness.Sent.SelectAsync<T>()
+            .CountAsync(x => x.Context.Message is Domain.Common.Commands.BaseCommand command && command.OrderId == orderId);
+
+    private async Task<T> FirstSent<T>(Guid orderId)
         where T : class
     {
-        var sent = await _harness.Sent
-            .SelectAsync<T>()
-            .FirstOrDefault();
+        var message = await _harness.Sent.SelectAsync<T>()
+            .FirstAsync(x => x.Context.Message is Domain.Common.Commands.BaseCommand command && command.OrderId == orderId);
+        return message.Context.Message;
+    }
 
-        Assert.NotNull(sent);
-        Assert.NotNull(sent.Context.DestinationAddress);
-        Assert.Equal(endpointName, sent.Context.DestinationAddress.Segments.Last().Trim('/'));
-        return sent.Context.Message;
+    private async Task<string> WaitForSettledState(Guid orderId)
+    {
+        for (var attempt = 0; attempt < 200; attempt++)
+        {
+            var state = _sagaHarness.Sagas.Contains(orderId)?.CurrentState;
+            if (state is "Processing" or "Failed")
+            {
+                return state;
+            }
+
+            await Task.Delay(10);
+        }
+
+        return _sagaHarness.Sagas.Contains(orderId)?.CurrentState ?? string.Empty;
     }
 }

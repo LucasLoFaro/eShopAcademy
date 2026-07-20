@@ -43,4 +43,5 @@ static async Task SeedTestData(WebApplication app)
         await ProductSeedData.InitializeAsync(db, messagingService);
     }
 }
+
 public partial class Program;

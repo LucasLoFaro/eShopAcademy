@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults()
        .WithSwagger();
+builder.Services.AddProblemDetails();
 
 // Authentication - Entra ID JWT Bearer
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "EntraId");
@@ -52,16 +53,16 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("allowAll", policy =>
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-});
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? (builder.Environment.IsDevelopment() ? ["http://localhost:5173", "http://localhost:5174"] : []);
+builder.Services.AddCors(options => options.AddPolicy("gateway", policy =>
+    policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseRouting();
-app.UseCors("allowAll");
+app.UseCors("gateway");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
@@ -69,3 +70,5 @@ app.UseDefaultEndpoints();
 app.MapReverseProxy();
 
 app.Run();
+
+public partial class Program { }

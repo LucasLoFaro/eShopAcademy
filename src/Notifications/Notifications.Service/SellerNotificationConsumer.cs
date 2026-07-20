@@ -48,7 +48,7 @@ public class SellerNotificationConsumer : IConsumer<SellerVerificationCompletedE
         await _dbContext.Notifications.InsertOneAsync(notification, cancellationToken: context.CancellationToken);
 
         _logger.LogInformation(
-            "[Notification] Persisted seller verification notification for {Email}, approved: {Approved}",
-            message.Email, message.Approved);
+            "Persisted seller verification notification; approved: {Approved}",
+            message.Approved);
     }
 }

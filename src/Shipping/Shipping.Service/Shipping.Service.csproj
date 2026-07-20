@@ -13,7 +13,12 @@
     <!-- TODO: revert to the Shipping.Domain package once the nuget workflow is restored -->
     <!-- <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" /> -->
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
+    <PackageReference Include="MassTransit.MongoDb" Version="$(MassTransitVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

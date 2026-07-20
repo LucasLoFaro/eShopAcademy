@@ -85,7 +85,20 @@ public class StockService : StockProtoService.StockProtoServiceBase
     GrpcContracts.ReserveStockRequest request,
     ServerCallContext context)
     {
-        var reservation = new StockReservation(request.OrderId);
+        var orderId = Guid.Parse(request.OrderId);
+        var existingReservation = await _reservationRepository.GetByIdAsync(orderId, context.CancellationToken);
+        if (existingReservation is not null)
+        {
+            return new GrpcContracts.ReserveStockResponse
+            {
+                ReservationId = existingReservation.Id.ToString(),
+                Success = true,
+                CreatedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(existingReservation.CreatedAt.ToUniversalTime()),
+                ValidUntil = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(existingReservation.ValidUntil.ToUniversalTime())
+            };
+        }
+
+        var reservation = new StockReservation(request.OrderId) { Id = orderId };
         var outOfStock = new List<string>();
 
         foreach (var reservationItem in request.Stock)
@@ -99,6 +112,7 @@ public class StockService : StockProtoService.StockProtoServiceBase
 
                 if (stock == null || stock.Quantity < stockItem.Quantity)
                 {
+                    StockMetrics.RecordFailure("reserve", "insufficient_stock");
                     outOfStock.Add(stockItem.ProductGuid);
                     continue;
                 }
@@ -162,6 +176,9 @@ public class StockService : StockProtoService.StockProtoServiceBase
         if (reservation.IsCommitted)
             throw new RpcException(new Status(StatusCode.AlreadyExists, $"Reservation {reservationId} is already committed."));
 
+        if (reservation.CommittedAt.HasValue)
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Reservation {reservationId} was released."));
+
         if (reservation.ValidUntil < DateTime.UtcNow)
             throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Reservation {reservationId} has expired."));
 
@@ -208,6 +225,15 @@ public class StockService : StockProtoService.StockProtoServiceBase
         if (reservation.IsCommitted)
             throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Reservation {reservationId} is already committed."));
 
+        if (reservation.CommittedAt.HasValue)
+            return new GrpcContracts.CancelReservationResponse
+            {
+                OrderId = request.OrderId,
+                ReservationId = request.ReservationId,
+                Success = true,
+                Reason = request.Reason
+            };
+
         if (reservation.ValidUntil < DateTime.UtcNow)
             throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Reservation {reservationId} has already expired."));
 
@@ -224,10 +250,10 @@ public class StockService : StockProtoService.StockProtoServiceBase
             }
         }
 
-        await _messagingClient.SendStockReleased(Guid.Parse(request.OrderId), reservationId, request.Reason, context.CancellationToken);
-
         reservation.IsCommitted = false;
+        reservation.CommittedAt = DateTime.UtcNow;
         await _reservationRepository.UpdateAsync(reservation, context.CancellationToken);
+        await _messagingClient.SendStockReleased(Guid.Parse(request.OrderId), reservationId, request.Reason, context.CancellationToken);
 
         var response = new GrpcContracts.CancelReservationResponse
         {

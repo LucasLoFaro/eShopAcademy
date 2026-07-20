@@ -4,6 +4,7 @@ namespace Operations.Application.Repositories;
 
 public interface IPackageRepository
 {
+    Task PingAsync(CancellationToken cancellationToken);
     Task<IReadOnlyList<Package>> GetPendingAsync(CancellationToken cancellationToken);
     Task<IReadOnlyList<Package>> GetPendingBySellerAsync(Guid sellerId, CancellationToken cancellationToken);
     Task<IReadOnlyList<Package>> GetBySellerAsync(Guid sellerId, int limit, CancellationToken cancellationToken);

@@ -1,6 +1,7 @@
 using Infrastructure.Services;
 using Infrastructure.Data;
 using ServiceDefaults;
+using OpenTelemetry.Metrics;
 using Microsoft.Extensions.Options;
 
 
@@ -19,11 +20,12 @@ public class Program
 
         builder.Services.AddControllers()
             .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); });
-
+        builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(StockMetrics.MeterName));
         builder.Services.AddSingleton(sp => new StockDbContext(
             sp.GetRequiredService<IOptionsMonitor<RequiredConnectionString>>().Get("stock").Value,
             "stock"));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
+        builder.Services.AddScoped<IStockOperationStore, StockOperationStore>();
 
         builder.Services.AddHealthChecks().AddCriticalDependency(
             "stock-mongodb",

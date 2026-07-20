@@ -11,7 +11,12 @@
     <!-- TODO: revert to the Stock.Domain package once the temporary project reference is no longer necessary -->
     <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
+    <PackageReference Include="MassTransit.MongoDb" Version="$(MassTransitVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

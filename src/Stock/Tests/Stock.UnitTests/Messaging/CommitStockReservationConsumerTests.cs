@@ -79,7 +79,7 @@ public class CommitStockReservationConsumerTests
 
     [Theory]
     [AutoData]
-    public async Task Consume_WhenReservationAlreadyCommitted_PublishesFailure(CommitStockReservationCommand command)
+    public async Task Consume_WhenReservationAlreadyCommitted_IsIdempotent(CommitStockReservationCommand command)
     {
         // Arrange
         var repository = new InMemoryStockReservationRepository();
@@ -106,10 +106,9 @@ public class CommitStockReservationConsumerTests
         updated.CommittedAt.Should().Be(committedAt);
 
         context.Verify(ctx => ctx.Publish(
-                It.Is<StockReservationCommitFailedEvent>(evt =>
-                    evt.OrderId == command.OrderId && evt.ReservationId == command.ReservationId),
+                It.IsAny<StockReservationCommitFailedEvent>(),
                 It.IsAny<CancellationToken>()),
-            Times.Once);
+            Times.Never);
         publishEndpoint.Verify(endpoint => endpoint.Publish(
                 It.IsAny<StockReservationCommittedEvent>(),
                 It.IsAny<CancellationToken>()),

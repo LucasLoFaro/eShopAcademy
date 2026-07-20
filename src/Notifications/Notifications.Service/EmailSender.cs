@@ -17,7 +17,7 @@ public class SendGridEmailSender : IEmailSender
         _fromName = config["SendGrid:FromName"] ?? "Lucas";
     }
 
-    public async Task SendAsync(string to, string subject, string htmlBody)
+    public async Task SendAsync(string to, string subject, string htmlBody, CancellationToken cancellationToken = default)
     {
         var plainText = subject;
         var msg = MailHelper.CreateSingleEmail(
@@ -27,18 +27,19 @@ public class SendGridEmailSender : IEmailSender
             plainText,
             htmlBody);
 
-        var response = await _client.SendEmailAsync(msg);
+        var response = await _client.SendEmailAsync(msg, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Body.ReadAsStringAsync();
-            throw new InvalidOperationException(
-                $"SendGrid send failed: {(int)response.StatusCode} - {content}");
+            throw new HttpRequestException(
+                $"SendGrid send failed with status {(int)response.StatusCode}.",
+                inner: null,
+                response.StatusCode);
         }
     }
 }
 
 public interface IEmailSender
 {
-    Task SendAsync(string to, string subject, string htmlBody);
+    Task SendAsync(string to, string subject, string htmlBody, CancellationToken cancellationToken = default);
 }

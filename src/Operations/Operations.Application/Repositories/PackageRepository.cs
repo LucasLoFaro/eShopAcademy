@@ -8,6 +8,7 @@ namespace Operations.Application.Repositories;
 public class PackageRepository : IPackageRepository
 {
     private readonly IMongoCollection<Package> _collection;
+    private readonly IMongoDatabase _database;
 
     public PackageRepository(IConfiguration configuration)
     {
@@ -22,8 +23,20 @@ public class PackageRepository : IPackageRepository
         var collectionName = configuration["Operations:PackagesCollection"] ?? "packages";
 
         var client = new MongoClient(connectionString);
-        _collection = client.GetDatabase(databaseName).GetCollection<Package>(collectionName);
+        _database = client.GetDatabase(databaseName);
+        _collection = _database.GetCollection<Package>(collectionName);
     }
+
+    public PackageRepository(IMongoDatabase database, string collectionName = "packages")
+    {
+        _database = database;
+        _collection = database.GetCollection<Package>(collectionName);
+    }
+
+    public async Task PingAsync(CancellationToken cancellationToken)
+        => await _database.RunCommandAsync<MongoDB.Bson.BsonDocument>(
+            new MongoDB.Bson.BsonDocument("ping", 1),
+            cancellationToken: cancellationToken);
 
     public async Task<IReadOnlyList<Package>> GetPendingAsync(CancellationToken cancellationToken)
     {

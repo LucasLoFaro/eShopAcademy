@@ -3,33 +3,46 @@ using System.Text.Json;
 using Domain.Shipping.Contracts.Responses;
 using Shipping.Simulator.Storage;
 using StackExchange.Redis;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddHttpClient("webhook");
+builder.Services.AddProblemDetails();
+builder.Services.AddHttpClient("webhook", client => client.Timeout = TimeSpan.FromSeconds(5));
 
 var redisConnectionString = builder.Configuration.GetConnectionString("redis")
     ?? throw new InvalidOperationException("Redis connection string 'redis' is missing.");
 var redisDatabase = builder.Configuration.GetValue<int?>("ShippingSimulator__RedisDatabase") ?? 1;
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-{
-    var options = ConfigurationOptions.Parse(redisConnectionString);
-    options.AbortOnConnectFail = false;
-    return ConnectionMultiplexer.Connect(options);
-});
+var redisOptions = ConfigurationOptions.Parse(redisConnectionString);
+redisOptions.AbortOnConnectFail = false;
+redisOptions.ConnectTimeout = 3000;
+redisOptions.SyncTimeout = 3000;
+var redis = ConnectionMultiplexer.Connect(redisOptions);
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddSingleton(sp =>
     new ShipmentStore(sp.GetRequiredService<IConnectionMultiplexer>(), redisDatabase));
+builder.Services.AddHealthChecks().AddAsyncCheck(
+    "shipping-simulator-storage",
+    async cancellationToken =>
+    {
+        await redis.GetDatabase(redisDatabase).PingAsync().WaitAsync(cancellationToken);
+        return HealthCheckResult.Healthy();
+    },
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
 
 var app = builder.Build();
 
 // Shipping provider endpoints (called by the Shipping service)
-app.MapPost("/shipping/schedule", async (ShippingScheduleRequest request, HttpRequest httpRequest, IHttpClientFactory httpClientFactory, ShipmentStore store) =>
+app.MapPost("/shipping/schedule", async (ShippingScheduleRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var id = Guid.NewGuid();
-    var trackingNumber = $"SIM-{Guid.NewGuid().ToString()[..8].ToUpper()}";
-    var baseUrl = $"{httpRequest.Scheme}://{httpRequest.Host}";
+    if (request.OrderId == Guid.Empty)
+        return Results.BadRequest(new { error = "A non-empty orderId is required." });
+
+    var id = request.OrderId;
+    var trackingNumber = $"SIM-{request.OrderId:N}"[..12].ToUpperInvariant();
 
     var shipment = new SimulatedShipment
     {
@@ -45,10 +58,21 @@ app.MapPost("/shipping/schedule", async (ShippingScheduleRequest request, HttpRe
         EstimatedDelivery = DateTime.UtcNow.AddDays(3)
     };
 
-    await store.SaveAsync(shipment);
+    if (!await store.TryCreateAsync(shipment, cancellationToken))
+    {
+        var existing = await store.GetByIdAsync(id.ToString(), cancellationToken);
+        return existing is null
+            ? Results.Conflict(new { error = "The shipment operation is already in progress." })
+            : Results.Ok(new ScheduleShippingResponse(
+                existing.ShipmentId,
+                existing.OrderId,
+                existing.Carrier,
+                existing.TrackingNumber,
+                existing.Status));
+    }
 
     // Notify the shipping service so it records the initial history entry
-    await SendWebhook(httpClientFactory, shipment, "accepted");
+    await SendWebhook(httpClientFactory, shipment, "accepted", logger, cancellationToken);
 
     return Results.Ok(new ScheduleShippingResponse(
         id,
@@ -58,19 +82,21 @@ app.MapPost("/shipping/schedule", async (ShippingScheduleRequest request, HttpRe
         "accepted"));
 });
 
-app.MapPost("/shipping/confirm-pickup", async (PickupConfirmRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store) =>
+app.MapPost("/shipping/confirm-pickup", async (PickupConfirmRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var shipment = await store.FindByShipmentIdAsync(request.ShippingId);
+    var shipment = await store.FindByShipmentIdAsync(request.ShippingId, cancellationToken);
     if (shipment is null)
         return Results.NotFound();
+    if (shipment.Status == "picked_up")
+        return Results.Ok();
 
     shipment.Status = "picked_up";
     shipment.PickedUpAt = DateTime.UtcNow;
     shipment.StatusHistory.Add(new StatusHistoryEntry { Status = "picked_up", OccurredAt = DateTime.UtcNow });
-    await store.SaveAsync(shipment);
+    await store.SaveAsync(shipment, cancellationToken);
 
     // Notify the shipping service so pickup is reflected in history
-    await SendWebhook(httpClientFactory, shipment, "picked_up");
+    await SendWebhook(httpClientFactory, shipment, "picked_up", logger, cancellationToken);
 
     return Results.Ok();
 });
@@ -97,11 +123,13 @@ app.MapGet("/simulator/shipments/{id}", async (string id, ShipmentStore store) =
     return shipment is not null ? Results.Ok(shipment) : Results.NotFound();
 });
 
-app.MapPost("/simulator/shipments/{id}/transition", async (string id, StatusTransitionRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store) =>
+app.MapPost("/simulator/shipments/{id}/transition", async (string id, StatusTransitionRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var shipment = await store.GetByIdAsync(id);
+    var shipment = await store.GetByIdAsync(id, cancellationToken);
     if (shipment is null)
         return Results.NotFound("Shipment not found.");
+    if (string.Equals(shipment.Status, request.Status, StringComparison.OrdinalIgnoreCase))
+        return Results.Ok(shipment);
 
     shipment.Status = request.Status;
     shipment.StatusHistory.Add(new StatusHistoryEntry { Status = request.Status, OccurredAt = DateTime.UtcNow });
@@ -111,27 +139,29 @@ app.MapPost("/simulator/shipments/{id}/transition", async (string id, StatusTran
     else if (request.Status == "delivered")
         shipment.DeliveredAt = DateTime.UtcNow;
 
-    await store.SaveAsync(shipment);
+    await store.SaveAsync(shipment, cancellationToken);
 
     // Call shipping webhook
-    await SendWebhook(httpClientFactory, shipment, request.Status);
+    await SendWebhook(httpClientFactory, shipment, request.Status, logger, cancellationToken);
 
     return Results.Ok(shipment);
 });
 
-app.MapPost("/simulator/shipments/{id}/report-issue", async (string id, ReportIssueRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store) =>
+app.MapPost("/simulator/shipments/{id}/report-issue", async (string id, ReportIssueRequest request, IHttpClientFactory httpClientFactory, ShipmentStore store, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var shipment = await store.GetByIdAsync(id);
+    var shipment = await store.GetByIdAsync(id, cancellationToken);
     if (shipment is null)
         return Results.NotFound("Shipment not found.");
+    if (shipment.Status == "failed")
+        return Results.Ok(shipment);
 
     shipment.Status = "failed";
     shipment.IssueDetails = request.Details;
     shipment.StatusHistory.Add(new StatusHistoryEntry { Status = "failed", OccurredAt = DateTime.UtcNow });
 
-    await store.SaveAsync(shipment);
+    await store.SaveAsync(shipment, cancellationToken);
 
-    await SendWebhook(httpClientFactory, shipment, "failed");
+    await SendWebhook(httpClientFactory, shipment, "failed", logger, cancellationToken);
 
     return Results.Ok(shipment);
 });
@@ -162,7 +192,12 @@ app.MapGet("/shipment/by-order/{orderId:guid}", async (Guid orderId, HttpRequest
 app.UseDefaultEndpoints();
 app.Run();
 
-static async Task SendWebhook(IHttpClientFactory httpClientFactory, SimulatedShipment shipment, string status)
+static async Task SendWebhook(
+    IHttpClientFactory httpClientFactory,
+    SimulatedShipment shipment,
+    string status,
+    ILogger logger,
+    CancellationToken cancellationToken)
 {
     var client = httpClientFactory.CreateClient("webhook");
     var payload = new
@@ -184,11 +219,14 @@ static async Task SendWebhook(IHttpClientFactory httpClientFactory, SimulatedShi
 
     try
     {
-        await client.SendAsync(request);
+        var response = await client.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+            logger.LogWarning("Shipping webhook delivery failed with status {StatusCode} for shipment {ShipmentId}.",
+                (int)response.StatusCode, shipment.ShipmentId);
     }
-    catch
+    catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
     {
-        // Webhook delivery failure is non-fatal for the simulator
+        logger.LogWarning(exception, "Shipping webhook delivery failed for shipment {ShipmentId}.", shipment.ShipmentId);
     }
 }
 

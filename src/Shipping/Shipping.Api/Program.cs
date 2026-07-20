@@ -1,35 +1,50 @@
 using Domain.Shipping.Contracts.Requests;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ServiceDefaults;
 using Shipping.Application.Clients;
 using Shipping.Application.Data;
 using Shipping.Application.Options;
 using Shipping.Application.Services;
+using Shipping.Application;
+using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(ShippingMetrics.MeterName));
 
 builder.AddServiceDefaults()
        .WithSwagger()
        .WithMassTransit();
 
-builder.Services.AddSingleton(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var connectionString = configuration.GetConnectionString("shipping");
+var connectionString = builder.Configuration.GetConnectionString("shipping");
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("The shipping MongoDB connection string is not configured.");
 
-    if (string.IsNullOrWhiteSpace(connectionString))
+var shippingDatabase = new ShippingDbContext(
+    connectionString,
+    builder.Configuration["Shipping:Database"] ?? "shipping");
+builder.Services.AddSingleton(shippingDatabase);
+builder.Services.AddHealthChecks().AddAsyncCheck(
+    "shipping-database",
+    async cancellationToken =>
     {
-        throw new InvalidOperationException("The shipping MongoDB connection string is not configured.");
-    }
-
-    var databaseName = configuration["Shipping:Database"] ?? "shipping";
-
-    return new ShippingDbContext(connectionString, databaseName);
-});
+        await shippingDatabase.PingAsync(cancellationToken);
+        return HealthCheckResult.Healthy();
+    },
+    tags: ["ready"],
+    timeout: TimeSpan.FromSeconds(3));
+builder.Services.AddProblemDetails();
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
 
 builder.Services.AddScoped<IShippingStatusHistoryRepository, ShippingStatusHistoryRepository>();
 builder.Services.AddScoped<IShippingStatusService, ShippingStatusService>();
-builder.Services.Configure<ShippingProviderOptions>(builder.Configuration.GetSection("Shipping:Provider"));
+builder.Services.AddOptions<ShippingProviderOptions>()
+    .Bind(builder.Configuration.GetSection("Shipping:Provider"))
+    .Validate(ShippingProviderOptions.IsValid, "Shipping provider BaseUrl must be an absolute HTTP(S) URI.")
+    .ValidateOnStart();
 builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>((sp, client) =>
 {
     var options = sp.GetRequiredService<IOptions<ShippingProviderOptions>>().Value;
@@ -43,6 +58,8 @@ builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>(
 });
 
 var app = builder.Build();
+app.UseExceptionHandler();
+app.UseCors();
 
 app.MapPost("/api/shipping/webhook", async (
     ShippingStatusUpdateRequest? update,

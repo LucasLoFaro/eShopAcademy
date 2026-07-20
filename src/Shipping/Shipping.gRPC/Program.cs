@@ -7,5 +7,6 @@ var app = builder.Build();
 
 app.MapGrpcService<ShippingService>();
 app.MapGet("/", () => "Shipping service mock");
+app.UseDefaultEndpoints();
 
 app.Run();

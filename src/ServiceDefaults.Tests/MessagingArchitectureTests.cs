@@ -43,9 +43,7 @@ public class MessagingArchitectureTests
             .ToArray();
 
         var sourceConsumers = Directory.EnumerateFiles(Path.Combine(root, "src"), "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}Tests{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}ServiceDefaults.Tests{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+            .Where(path => !IsTestOrGeneratedSource(path))
             .SelectMany(path => Regex.Matches(File.ReadAllText(path), @"class\s+(\w+)[^{:]*:\s*IConsumer<")
                 .Select(match => match.Groups[1].Value))
             .OrderBy(name => name)
@@ -91,10 +89,8 @@ public class MessagingArchitectureTests
 
         var violations = Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories)
             .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}ServiceDefaults{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}ServiceDefaults.Tests{Path.DirectorySeparatorChar}"))
             .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}AppHost{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}Tests{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+            .Where(path => !IsTestOrGeneratedSource(path))
             .SelectMany(path => forbidden
                 .Where(token => File.ReadAllText(path).Contains(token, StringComparison.Ordinal))
                 .Select(token => $"{Path.GetRelativePath(root, path)}: {token}"))
@@ -169,8 +165,7 @@ public class MessagingArchitectureTests
             .ToArray();
 
         var publishedCommands = Directory.EnumerateFiles(Path.Combine(root, "src"), "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}Tests{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+            .Where(path => !IsTestOrGeneratedSource(path))
             .SelectMany(path => Regex.Matches(
                     File.ReadAllText(path),
                     @"\.Publish\s*\(\s*(?:\w+\s*=>\s*)?new\s+(\w+Command)")
@@ -235,8 +230,7 @@ public class MessagingArchitectureTests
         Assert.Contains(".TrimKeyPrefix($\"{builder.Environment.ApplicationName}:\")", configurationExtensions);
 
         var messagingHosts = Directory.EnumerateFiles(Path.Combine(root, "src"), "Program.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}Tests{Path.DirectorySeparatorChar}"))
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"))
+            .Where(path => !IsTestOrGeneratedSource(path))
             .Where(path => File.ReadAllText(path).Contains("WithMassTransit", StringComparison.Ordinal))
             .ToArray();
 
@@ -250,6 +244,15 @@ public class MessagingArchitectureTests
         "plans",
         "production-readiness",
         "messaging-topology.json")));
+
+    private static bool IsTestOrGeneratedSource(string path) => path
+        .Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries)
+        .Any(segment =>
+            segment.Equals("Tests", StringComparison.OrdinalIgnoreCase)
+            || segment.EndsWith(".Tests", StringComparison.OrdinalIgnoreCase)
+            || segment.Equals("obj", StringComparison.OrdinalIgnoreCase));
 
     private static string RepositoryRoot()
     {

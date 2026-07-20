@@ -16,10 +16,10 @@ public static partial class Extensions
         var enableMonitoring = builder.Configuration.GetValue("Aspire:Monitoring:Enabled", true);
 
         builder.AddDefaultConfiguration();
+        builder.AddDefaultHealthChecks();
         if (enableMonitoring)
         {
             builder.ConfigureOpenTelemetry();
-            builder.AddDefaultHealthChecks();
         }
         builder.Services.AddServiceDiscovery();
         builder.Services.Configure<ServiceDiscoveryOptions>(options =>

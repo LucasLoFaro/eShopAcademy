@@ -55,7 +55,6 @@ If interactive Entra authentication is unavailable, run the catalog portion thro
 
 ## Known limitations requiring separate work
 
-- `Orders.EventsProcessor` and its `submit-order` endpoint remain legacy-unbuildable and cannot participate in runtime regression.
 - Duplicate delivery/idempotency is not comprehensively enforced for every saga event. This deserves dedicated inbox/outbox or state-machine idempotency tests before production traffic.
 - The orchestration tests currently report an unrelated EF Core 10.0.4/10.0.9 assembly-version warning.
 - External SendGrid delivery is not a safe local assertion; notification persistence and consumer completion should be asserted instead.

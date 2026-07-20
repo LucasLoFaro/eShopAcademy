@@ -1,5 +1,7 @@
 # Message delivery semantics
 
+Status: proposed production-readiness contract and risk inventory. The retry, inbox/outbox, idempotency, and replay standards below are not implemented as a shared platform today.
+
 ## Scope and current platform behavior
 
 This specification covers every application `IConsumer<T>` in `src` at commit `15365b8` and the order saga because it owns the highest-risk delivery workflow. Endpoint ownership is cross-checked against `messaging-topology.json`.

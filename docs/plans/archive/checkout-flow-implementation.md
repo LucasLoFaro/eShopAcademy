@@ -1,5 +1,7 @@
 # Multi-Step Checkout Flow
 
+> Historical implementation note. Saved-address persistence and selection have since been integrated. See [`../../development/frontends.md`](../../development/frontends.md) for the active frontend entry points.
+
 ## Overview
 The checkout process has been enhanced to provide a comprehensive 3-step flow for a better user experience.
 

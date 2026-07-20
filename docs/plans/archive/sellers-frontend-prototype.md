@@ -1,5 +1,7 @@
 # Sellers Frontend (Microfrontend Starter)
 
+> Historical prototype note. This describes `src/Sellers/Frontend`, which is not referenced by the AppHost. The active seller microfrontend is `src/Frontend/eshop-sellers`.
+
 This folder now contains the initial Sellers microfrontend shell built with React + Vite.
 
 ## Run locally

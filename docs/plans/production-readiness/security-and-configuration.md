@@ -1,5 +1,7 @@
 # Security and configuration
 
+Status: current-state risk inventory and proposed production standard. Findings are not claims that the recommended controls are already implemented.
+
 ## Current inventory
 
 ### Configuration and secret sources

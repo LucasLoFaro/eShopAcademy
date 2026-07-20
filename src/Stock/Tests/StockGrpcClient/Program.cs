@@ -1,52 +1,51 @@
-﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
-using StockGrpcClient.Protos;
+using Protos;
 
-namespace StockGrpcClient
+namespace StockGrpcClient;
+
+internal class Program
 {
-    internal class Program
+    private static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
+        var serviceUrl = args.FirstOrDefault()
+            ?? Environment.GetEnvironmentVariable("STOCK_GRPC_URL")
+            ?? "http://localhost:8022";
+
+        using var channel = GrpcChannel.ForAddress(serviceUrl);
+        var client = new StockProtoService.StockProtoServiceClient(channel);
+
+        Console.WriteLine("*********GetStockByProdAndWarehouseRequest()*********");
+        var request = new GetStockByProdAndWarehouseRequest
         {
+            ProductGuid = "1234",
+            Warehouse = "South"
+        };
+        var response = await client.GetStockByProductGuidAndWarehouseAsync(request);
 
-            using var channel = GrpcChannel.ForAddress("https://localhost:7059");
-            var client = new StockProtoService.StockProtoServiceClient(channel);
+        Console.WriteLine(
+            $"Stock:\n" +
+            $"_id: {response.Id}\n" +
+            $"ProductGuid: {response.ProductGuid}\n" +
+            $"Quantity: {response.Quantity}\n" +
+            $"Warehouse: {response.Warehouse}\n");
 
-            Console.WriteLine("*********GetStockByProdAndWarehouseRequest()*********");
-            GetStockByProdAndWarehouseRequest request = new GetStockByProdAndWarehouseRequest() { ProductGuid = "1234", Warehouse = "South" };
-            StockModel response = await client.GetStockByProductGuidAndWarehouseAsync(request);
-            
-            Console.WriteLine($"Stock:\n" +
-                $"_id: {response.Id}\n" +
-                $"ProductGuid: {response.ProductGuid}\n" +
-                $"Quantity: {response.Quantity}\n" +
-                $"$Warehouse: {response.Warehouse}\n");
+        Console.WriteLine("******************************");
+        Console.WriteLine("\n\n*********GetAll()*********");
 
-            Console.WriteLine("******************************");
-
-
-            Console.WriteLine("\n\n*********GetAll()*********");
-            GetStockByProdGuidRequest getStockRequest = new GetStockByProdGuidRequest() { ProductGuid = "1234" };
-            using var clientData = client.GetAll(getStockRequest);
-            await foreach (StockModel stockModel in clientData.ResponseStream.ReadAllAsync())
-            {
-                Console.WriteLine($"Stock:\n" +
-                    $"_id: {stockModel.Id}\n" +
-                    $"ProductGuid: {stockModel.ProductGuid}\n" +
-                    $"Quantity: {stockModel.Quantity}\n" +
-                    $"$Warehouse: {stockModel.Warehouse}\n");
-            }
-            Console.WriteLine("******************************");
-
-
-            Console.WriteLine("\n\n*********Test()*********");
-            //GetStockByProdGuidRequest getStockRequest = new GetStockByProdGuidRequest() { ProductGuid = "1234" };
-            Empty testResponse = await client.TestAsync(new Empty());
-            Console.WriteLine($"Response: {testResponse}");
-            Console.WriteLine("******************************");
-
-            Console.ReadKey();
+        var getStockRequest = new GetStockByProdGuidRequest { ProductGuid = "1234" };
+        using var clientData = client.GetAll(getStockRequest);
+        await foreach (var stockModel in clientData.ResponseStream.ReadAllAsync())
+        {
+            Console.WriteLine(
+                $"Stock:\n" +
+                $"_id: {stockModel.Id}\n" +
+                $"ProductGuid: {stockModel.ProductGuid}\n" +
+                $"Quantity: {stockModel.Quantity}\n" +
+                $"Warehouse: {stockModel.Warehouse}\n");
         }
+
+        Console.WriteLine("******************************");
+        Console.ReadKey();
     }
 }

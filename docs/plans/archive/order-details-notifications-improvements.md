@@ -1,5 +1,7 @@
 # Order Details Page & Notifications UI Improvements
 
+> Historical implementation note. The current frontend now uses `useOrderStatusStream` for SSE and `useNotifications` plus notification API endpoints; the future-work sections below reflect the state when this note was written.
+
 ## Overview
 Enhanced the order details page with a cleaner, more intuitive status visualization and added a notifications dropdown to the navbar.
 

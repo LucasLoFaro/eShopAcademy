@@ -1,5 +1,7 @@
 # MongoDB GUID Serialization Fix
 
+> Historical implementation note. The described `[BsonRepresentation(BsonType.String)]` attribute remains present on `SavedAddress.CustomerId`.
+
 ## Problem
 
 **Error:**

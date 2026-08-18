@@ -23,14 +23,25 @@ public class SellerDocumentVerificationConsumer : IConsumer<SellerRegistrationRe
     {
         var message = context.Message;
 
+        if (message.SellerId == Guid.Empty || string.IsNullOrWhiteSpace(message.DocumentUrl))
+        {
+            throw new ArgumentException("Seller identifier and document reference are required.");
+        }
+
         _logger.LogInformation(
-            "[Sellers] Document verification requested for seller {SellerId} with document {DocumentUrl}",
-            message.SellerId, message.DocumentUrl);
+            "[Sellers] Document verification requested for seller {SellerId}",
+            message.SellerId);
 
         var seller = await _repository.GetByIdAsync(message.SellerId, context.CancellationToken);
         if (seller is null)
         {
             _logger.LogWarning("[Sellers] Seller {SellerId} not found, skipping verification", message.SellerId);
+            return;
+        }
+
+        if (seller.VerificationStatus is DocumentVerificationStatus.Verified or DocumentVerificationStatus.Rejected)
+        {
+            _logger.LogInformation("[Sellers] Document verification already completed for seller {SellerId}", message.SellerId);
             return;
         }
 

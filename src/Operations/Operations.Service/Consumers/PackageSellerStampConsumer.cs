@@ -23,15 +23,21 @@ public class PackageSellerStampConsumer : IConsumer<OrderSellerSaleRegistrationR
         var message = context.Message;
 
         var package = await _repository.GetByOrderIdAsync(message.OrderId, context.CancellationToken);
-        if (package is null)
+        var isNew = package is null;
+        if (isNew)
         {
-            _logger.LogWarning(
-                "[Operations] No package found for order {OrderId} when stamping seller {SellerId}.",
+            _logger.LogInformation(
+                "[Operations] No package found for order {OrderId}. Creating package from seller sale registration event for seller {SellerId}.",
                 message.OrderId, message.SellerId);
-            return;
+            package = new Package
+            {
+                OrderId = message.OrderId,
+                SellerId = message.SellerId,
+                Items = new List<PackageItem>()
+            };
         }
 
-        var updated = false;
+        var updated = isNew;
 
         if (package.SellerId is null)
         {

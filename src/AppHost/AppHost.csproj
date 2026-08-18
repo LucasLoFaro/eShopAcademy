@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.4.0">
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.4.0">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -48,6 +48,10 @@
     <ProjectReference Include="..\Stock\Stock.gRPC\Stock.gRPC.csproj" />
     <ProjectReference Include="..\Stock\Stock.Messaging.Processor\Stock.Messaging.Processor.csproj" />
     <ProjectReference Include="..\Shipping\Shipping.Simulator\Shipping.Simulator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Setup\mongo-init\" />
   </ItemGroup>
 
 </Project>

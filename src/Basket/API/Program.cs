@@ -1,35 +1,47 @@
-using Microsoft.AspNetCore.Mvc;
-using Domain.Basket.Entities;
-using Data.Interfaces;
 using Data;
-
+using Data.Interfaces;
+using Domain.Basket.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults()
-       .WithSwagger();
+    .WithSwagger();
 
-//Inject services
-builder.Services.AddSingleton<IDatabaseClient>(sp => new DatabaseClient(builder.Configuration.GetConnectionString("Redis")!));
-builder.Services.AddTransient<IBasketCache, BasketCache>();
+builder.Services.AddProblemDetails();
+builder.Services.AddBasketStorage(builder.Configuration);
 
 var app = builder.Build();
+app.UseExceptionHandler();
 app.UseDefaultEndpoints();
 
-app.MapGet("/basket/clientId", async Task<IResult> (Guid clientID, IBasketCache basketRepository) =>
+app.MapGet("/basket/clientId", async Task<IResult> (
+    Guid clientID,
+    IBasketCache basketRepository,
+    CancellationToken cancellationToken) =>
 {
-    var basket = await basketRepository.GetBasketLoadedByClientId(clientID);
-    return basket != null ? Results.Ok(basket) : Results.NotFound();
+    var basket = await basketRepository.GetBasketLoadedByClientId(clientID, cancellationToken);
+    return basket is not null ? Results.Ok(basket) : Results.NotFound();
 });
 
-app.MapPost("/basket/clientId/add", async (Guid clientID, [FromBody] Item item, IBasketCache basketRepository) =>
-{
-    return await basketRepository.AddProductToBasket(clientID, item) ? Results.Ok() : Results.NotFound();
-});
+app.MapPost("/basket/clientId/add", async (
+    Guid clientID,
+    [FromBody] Item item,
+    IBasketCache basketRepository,
+    CancellationToken cancellationToken) =>
+    await basketRepository.AddProductToBasket(clientID, item, cancellationToken)
+        ? Results.Ok()
+        : Results.NotFound());
 
-app.MapPost("/basket/clientId/remove", async (Guid clientID, [FromBody] Item item, IBasketCache basketRepository) =>
-{
-    return await basketRepository.RemoveProductFromBasket(clientID, item) ? Results.Ok() : Results.NotFound();
-});
+app.MapPost("/basket/clientId/remove", async (
+    Guid clientID,
+    [FromBody] Item item,
+    IBasketCache basketRepository,
+    CancellationToken cancellationToken) =>
+    await basketRepository.RemoveProductFromBasket(clientID, item, cancellationToken)
+        ? Results.Ok()
+        : Results.NotFound());
 
 app.Run();
+
+public partial class Program;

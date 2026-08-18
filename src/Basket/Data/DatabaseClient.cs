@@ -1,22 +1,28 @@
-﻿using Data.Interfaces;
+using Data.Interfaces;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace Data
+namespace Data;
+
+public sealed class DatabaseClient : IDatabaseClient, IDisposable
 {
-    public class DatabaseClient : IDatabaseClient
+    private readonly ConnectionMultiplexer _redis;
+    private readonly IDatabase _database;
+
+    public DatabaseClient(IOptions<BasketRedisOptions> options)
     {
-        ConnectionMultiplexer redis;
-        IDatabase db;
-
-        public DatabaseClient(string connectionString)
-        {
-            var options = ConfigurationOptions.Parse(connectionString);
-            options.AbortOnConnectFail = false;
-            redis = ConnectionMultiplexer.Connect(options);
-            db = redis.GetDatabase();
-        }
-
-        public IDatabase GetDatabase()
-            => db;
+        var configuration = ConfigurationOptions.Parse(options.Value.ConnectionString);
+        configuration.AbortOnConnectFail = false;
+        configuration.ConnectTimeout = (int)TimeSpan.FromSeconds(3).TotalMilliseconds;
+        configuration.SyncTimeout = (int)TimeSpan.FromSeconds(3).TotalMilliseconds;
+        _redis = ConnectionMultiplexer.Connect(configuration);
+        _database = _redis.GetDatabase();
     }
+
+    public IDatabase GetDatabase() => _database;
+
+    public Task<TimeSpan> PingAsync(CancellationToken cancellationToken = default)
+        => _database.PingAsync().WaitAsync(cancellationToken);
+
+    public void Dispose() => _redis.Dispose();
 }

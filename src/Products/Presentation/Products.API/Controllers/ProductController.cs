@@ -21,9 +21,10 @@ namespace API.Controllers
             [FromQuery] string? sort = null,
             [FromQuery] string? cat = null,
             [FromQuery] bool? deals = null,
-            [FromQuery] Guid? sellerId = null)
+            [FromQuery] Guid? sellerId = null,
+            CancellationToken cancellationToken = default)
         {
-            var products = (await _productService.GetAllAsync()).ToList();
+            var products = (await _productService.GetAllAsync(cancellationToken)).ToList();
 
             if (!string.IsNullOrEmpty(cat))
                 products = products.Where(p =>
@@ -51,49 +52,49 @@ namespace API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] ProductSearchFilter filter)
+        public async Task<IActionResult> Search([FromQuery] ProductSearchFilter filter, CancellationToken cancellationToken)
         {
-            var result = await _productService.SearchAsync(filter);
+            var result = await _productService.SearchAsync(filter, cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id)
-            => await _productService.GetByIdAsync(id) is Product product? base.Ok(product) : base.NotFound();
+        public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
+            => await _productService.GetByIdAsync(id, cancellationToken) is Product product? base.Ok(product) : base.NotFound();
 
         [HttpGet("MostExpensive")]
-        async public Task<IActionResult> GetMostExpensive()
-            => Ok(await _productService.GetMostExpensive());
+        async public Task<IActionResult> GetMostExpensive(CancellationToken cancellationToken)
+            => Ok(await _productService.GetMostExpensive(cancellationToken));
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Product product)
+        public async Task<IActionResult> Post([FromBody] Product product, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _productService.AddOrUpdateAsync(product);
+            await _productService.AddOrUpdateAsync(product, cancellationToken);
             return StatusCode(StatusCodes.Status201Created, "Product created successfully");
         }
 
         [HttpPut()]
-        public async Task<IActionResult> Put([FromBody] Product product)
+        public async Task<IActionResult> Put([FromBody] Product product, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
            
-            await _productService.AddOrUpdateAsync(product);
+            await _productService.AddOrUpdateAsync(product, cancellationToken);
             return StatusCode(StatusCodes.Status201Created, "Product updated successfully");
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            Product? product = await _productService.GetByIdAsync(id);
+            Product? product = await _productService.GetByIdAsync(id, cancellationToken);
             if (product == null)
                 return BadRequest("Product " + id + " not found.");
 
-            await _productService.DeleteAsync(product);
+            await _productService.DeleteAsync(product, cancellationToken);
             return StatusCode(StatusCodes.Status201Created, "Product deleted successfully");
         }
     }

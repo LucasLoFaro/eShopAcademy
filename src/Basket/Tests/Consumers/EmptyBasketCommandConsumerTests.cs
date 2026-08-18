@@ -45,4 +45,30 @@ public class EmptyBasketCommandConsumerTests
         // Assert: consumer swallows the result without throwing
         await act.Should().NotThrowAsync();
     }
+
+    [Fact]
+    public async Task Consume_WhenTransientCacheFailureOccurs_PropagatesForRetry()
+    {
+        var command = new EmptyBasketCommand { ClientId = Guid.NewGuid() };
+        var basketCache = new Mock<IBasketCache>();
+        basketCache.Setup(c => c.EmptyBasket(command.ClientId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TimeoutException("Redis timeout"));
+        var context = new Mock<ConsumeContext<EmptyBasketCommand>>();
+        context.Setup(c => c.Message).Returns(command);
+
+        var act = () => new EmptyBasketCommandConsumer(basketCache.Object).Consume(context.Object);
+
+        await act.Should().ThrowAsync<TimeoutException>();
+    }
+
+    [Fact]
+    public async Task Consume_WhenBusinessIdentifierIsMissing_ThrowsPermanentFailure()
+    {
+        var context = new Mock<ConsumeContext<EmptyBasketCommand>>();
+        context.Setup(c => c.Message).Returns(new EmptyBasketCommand { ClientId = Guid.Empty });
+
+        var act = () => new EmptyBasketCommandConsumer(Mock.Of<IBasketCache>()).Consume(context.Object);
+
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
 }

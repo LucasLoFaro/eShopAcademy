@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Domain.Sellers.Contracts;
 
 public record PublishProductRequest(
-    string Name,
+    [Required] string Name,
     double Price,
     string Description,
-    string ImageUrl,
+    [Required, Url] string ImageUrl,
     string CategoryId,
     List<string> AdditionalImages,
     string AboutHtml,

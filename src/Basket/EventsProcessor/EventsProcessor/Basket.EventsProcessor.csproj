@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -8,18 +7,14 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
-    <!--<PackageReference Include="eShopAcademy.Basket.Domain" Version="1.0.0" />-->
-    <!--<PackageReference Include="eShopAcademy.Common.Domain" Version="1.0.4" />-->
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.5.0" />
   </ItemGroup>
-
   <ItemGroup>
-	  <ProjectReference Include="..\..\..\Domain\Basket.Domain\Basket.Domain.csproj" />
-	  <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Domain\Basket.Domain\Basket.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Domain\Common.Domain\Common.Domain.csproj" />
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Data\Basket.Data.csproj" />
   </ItemGroup>

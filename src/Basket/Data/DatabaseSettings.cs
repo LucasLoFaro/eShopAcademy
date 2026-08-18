@@ -2,5 +2,5 @@
 
 public class DatabaseSettings
 {
-    public String URL { get; set; }
+    public string URL { get; set; } = string.Empty;
 }

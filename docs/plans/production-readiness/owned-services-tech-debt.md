@@ -9,6 +9,7 @@ Scope: `src/Stock`, `src/Shipping`, `src/Operations`, `src/Notifications`, and `
 This document is the authoritative status ledger for the production-readiness program. Other readiness documents describe contracts, inventories, or implementation plans; when their wording conflicts with an item's status here, this ledger controls.
 
 - **Open:** acceptance evidence is incomplete.
+- **In progress:** a named delivery PR is active, but acceptance evidence or required traceability is incomplete.
 - **Proven:** the stated runtime or automated check passed in the recorded environment. Proven evidence can satisfy part of an open item's acceptance criteria without closing the item.
 - **Closed:** every acceptance criterion has linked runtime or automated evidence and the implementation is linked through its issue and delivery PR.
 - Documentation, code review, a successful build, or a passing unit test cannot close an item that requires representative infrastructure, fault injection, restart recovery, or a process-crash boundary.
@@ -22,6 +23,38 @@ This document is the authoritative status ledger for the production-readiness pr
 | Dependency failure and recovery | Open | No complete runtime evidence currently records independent failure and recovery for every critical database, broker, storage, and provider dependency. | Inject each dependency failure, record `/alive` and `/health`, recovery timing, isolation, and sanitized telemetry. |
 | Podman 6.0.x on Windows | Unsupported | A forwarding regression prevents Podman 6.0.x from being treated as a supported Windows runtime for this repository. | Revalidate after the upstream forwarding regression is resolved; do not use 6.0.x evidence to close readiness work before then. |
 
+## Delivery sequence
+
+Shared platform and contract changes are delivered sequentially. PR-01 is intentionally skipped for now; starting PR-02 does not remove PR-01 as a prerequisite for later context reliability work.
+
+| Planned PR | Owner | Status | Scope | Blocks |
+| --- | --- | --- | --- | --- |
+| PR-01 — Durable messaging primitives | Shared messaging platform | Planned; skipped for now | MongoDB and EF inbox/outbox registration; stable operation/effect identifiers; failure classifications; bounded retry/redelivery; duplicate, backlog, retry, and fault instrumentation; RabbitMQ/Azure Service Bus parity tests. | Most context reliability PRs. |
+| PR-02 — Shared product deletion contract | Shared domain contracts | In progress | Versioned `ProductDeletedEvent`; stable product and correlation metadata; contract compatibility tests. | Products/Basket deletion behavior. |
+| PR-03 — Shared seller attribution contract | Shared order contracts | In progress | Authoritative seller identity; stable seller-sale operation identifier; validation and serialization compatibility tests. | Deterministic seller routing. |
+| PR-04 — Private worker management endpoints | AppHost/deployment platform | In progress | Unique private `/alive` and `/health` endpoints and readiness probes for Basket, Customers, Sellers, Stock, Shipping, Operations, Notifications, Orders, Orchestration, and Payments workers. | Worker deployment and full-topology readiness validation. |
+| PR-05 — Production configuration and secrets | Platform security | Planned | Shipping and PSP signature secrets; shared option validation; production-safe web and service-authentication defaults; secret/PII telemetry canaries. | Production configuration and security validation. |
+
+### PR-04 runtime evidence
+
+On 2026-08-18, an isolated Aspire run on Windows with Podman client 5.8.3 and machine 5.8.6 reported all eleven worker resources `Running` and `Healthy`. Aspire reported a healthy `/health` check for every endpoint below.
+
+| Worker | Private endpoint |
+| --- | --- |
+| Basket EventsProcessor | `http://localhost:8101` |
+| Customers Messaging | `http://localhost:8102` |
+| Sellers Service | `http://localhost:8103` |
+| Sellers EventsProcessor | `http://localhost:8104` |
+| Stock Messaging | `http://localhost:8105` |
+| Shipping Service | `http://localhost:8106` |
+| Operations Service | `http://localhost:8107` |
+| Notifications Service | `http://localhost:8108` |
+| Orders Messaging | `http://localhost:8109` |
+| Orchestration | `http://localhost:8110` |
+| Payments Messaging | `http://localhost:8111` |
+
+This proves endpoint publication, unique port assignment, and healthy-path readiness probing. It does not prove dependency failure isolation or recovery, so the mapped debt items remain in progress.
+
 ## Priority definitions
 
 - **P0**: a production rollout can expose a security, correctness, or availability failure; resolve before rollout.
@@ -34,37 +67,37 @@ PR-00 establishes the ledger and baseline only; it does not deliver or close any
 
 | Tech-debt item | Status | GitHub issue | Delivery PR | Origin |
 | --- | --- | --- | --- | --- |
-| TD-OWNED-001 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-002 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-003 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-004 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-005 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-006 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-007 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-008 | Open | Not filed | Not opened | PR #40 |
-| TD-OWNED-009 | Open | Not filed | Not opened | PR #40 |
+| TD-OWNED-001 | In progress | Not filed | PR-04; runtime evidence open | PR #40 |
+| TD-OWNED-002 | Open | Not filed | Planned PR-05 | PR #40 |
+| TD-OWNED-003 | Open | Not filed | Not opened; blocked by PR-01 | PR #40 |
+| TD-OWNED-004 | Open | Not filed | Not opened; blocked by PR-01 | PR #40 |
+| TD-OWNED-005 | Open | Not filed | Not opened; blocked by PR-01 | PR #40 |
+| TD-OWNED-006 | Open | Not filed | Planned PR-01 | PR #40 |
+| TD-OWNED-007 | In progress | Not filed | PR-04 endpoints; failure/recovery PR not opened | PR #40 |
+| TD-OWNED-008 | Open | Not filed | Not opened; partially blocked by PR-05 | PR #40 |
+| TD-OWNED-009 | Open | Not filed | Not opened; partially blocked by PR-05 | PR #40 |
 | TD-OWNED-010 | Open | Not filed | Not opened | PR #40 |
-| TD-BCPS-001 | Open | Not filed | Not opened | PR #43 |
-| TD-BCPS-002 | Open | Not filed | Not opened | PR #43 |
-| TD-BCPS-003 | Open | Not filed | Not opened | PR #43 |
-| TD-BCPS-004 | Open | Not filed | Not opened | PR #43 |
-| TD-BCPS-005 | Open | Not filed | Not opened | PR #43 |
-| TD-BCPS-006 | Open | Not filed | Not opened | PR #43 |
+| TD-BCPS-001 | Open | Not filed | Not opened; blocked by PR-01 | PR #43 |
+| TD-BCPS-002 | In progress | Not filed | PR-02 contract; context PR not opened | PR #43 |
+| TD-BCPS-003 | In progress | Not filed | PR-03 contract; routing PR not opened | PR #43 |
+| TD-BCPS-004 | Open | Not filed | Not opened; blocked by PR-01 | PR #43 |
+| TD-BCPS-005 | In progress | Not filed | PR-04; runtime evidence open | PR #43 |
+| TD-BCPS-006 | Open | Not filed | Not opened; partially blocked by PR-05 | PR #43 |
 | TD-BCPS-007 | Open | Not filed | Not opened | PR #43 |
 | TD-BCPS-008 | Open | Not filed | Not opened | PR #43 |
 | TD-BCPS-009 | Open | Not filed | Not opened | PR #43 |
-| OSD-01 | Open | Not filed | Not opened | PR #42 |
+| OSD-01 | Open | Not filed | Not opened; blocked by PR-01 | PR #42 |
 | OSD-02 | Open | Not filed | Not opened | PR #42 |
-| OSD-03 | Open | Not filed | Not opened | PR #42 |
-| OSD-04 | Open | Not filed | Not opened | PR #42 |
-| OSD-05 | Open | Not filed | Not opened | PR #42 |
+| OSD-03 | Open | Not filed | Planned PR-05 | PR #42 |
+| OSD-04 | Open | Not filed | Not opened; blocked by PR-01 | PR #42 |
+| OSD-05 | Open | Not filed | Not opened; blocked by PR-01 | PR #42 |
 | OSD-06 | Open | Not filed | Not opened | PR #42 |
-| OSD-07 | Open | Not filed | Not opened | PR #42 |
+| OSD-07 | In progress | Not filed | PR-04; runtime evidence open | PR #42 |
 | OSD-08 | Open | Not filed | Not opened | PR #42 |
 | OSD-09 | Open | Not filed | Not opened | PR #42 |
 | OSD-10 | Open | Not filed | Not opened | PR #42 |
-| OSD-11 | Open | Not filed | Not opened | PR #42 |
-| OSD-12 | Open | Not filed | Not opened | PR #42 |
+| OSD-11 | Open | Not filed | Planned PR-01 | PR #42 |
+| OSD-12 | Open | Not filed | Planned PR-05 | PR #42 |
 
 ## To-do
 
@@ -242,6 +275,8 @@ The following items remain after rebasing the Basket, Customers, Products, and S
 
 **Acceptance criteria:** Product deletion publishes one logical deletion fact; update and deletion are distinguishable; duplicate deletion delivery is harmless; Basket cache eviction is covered by contract and integration tests.
 
+**PR-02 evidence:** [`ProductDeletedEvent`](../../../src/Domain/Common.Domain/Events/Products/ProductDeletedEvent.cs) introduces the additive version-one contract, and [`ProductDeletionContractTests`](../../../src/Products/Tests/Tests/ProductDeletionContractTests.cs) pins its identity, correlation metadata, serialization, and distinction from `ProductUpdatedEvent`. Products publication and Basket eviction remain for the blocked context PR, so this item is not closed.
+
 **Owner:** Shared domain-contract owner with Products and Basket.
 
 ### TD-BCPS-003 — Define authoritative seller attribution for submitted orders (P1)
@@ -251,6 +286,8 @@ The following items remain after rebasing the Basket, Customers, Products, and S
 **Work:** Define authoritative seller attribution fields and a stable business identifier in the shared order contract, then implement the seller-side transition and failure classification.
 
 **Acceptance criteria:** Every eligible order item maps to one seller; replay cannot duplicate work; missing or invalid attribution follows a documented permanent or business-error path.
+
+**PR-03 evidence:** [`OrderItemSellerAttribution`](../../../src/Domain/Common.Domain/Events/Orders/OrderItemSellerAttribution.cs) adds authoritative eligible-item seller metadata to `OrderSubmittedEvent`; [`SellerAttributionContract`](../../../src/Domain/Common.Domain/Events/Orders/SellerAttributionContract.cs) defines deterministic seller-sale operation identity and validation; and [`SellerAttributionContractTests`](../../../src/Orders/Tests/Messaging/SellerAttributionContractTests.cs) covers replay stability, invalid attribution, and old/new serialization compatibility. Deterministic seller routing remains for the blocked context PR, so this item is not closed.
 
 **Owner:** Shared order-contract owner with Sellers.
 

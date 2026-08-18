@@ -48,6 +48,8 @@ Use the Aspire dashboard or `aspire describe` for actual endpoint URLs. Although
 
 The bounded-context API ports requested in AppHost extensions are Products 8001, Stock 8002, Orders 8003, Basket 8004, Payments 8006, Shipping 8007, Customers 8008, Operations 8009, Sellers 8010, and Notifications 8011. gRPC endpoints request Products 8021, Stock 8022, and Payments 8026. The shipping and PSP simulators request 8027 and 8050. Prefer discovered URLs over these requested values.
 
+Private worker management endpoints use ports 8101 through 8111 in this order: Basket EventsProcessor, Customers Messaging, Sellers Service, Sellers EventsProcessor, Stock Messaging, Shipping Service, Operations Service, Notifications Service, Orders Messaging, Orchestration, and Payments Messaging. Each listener exposes `/alive` and `/health`, is not routed through the Gateway, and is registered with an Aspire `/health` readiness probe.
+
 ## Messaging by environment
 
 The Visual Studio AppHost profiles explicitly set `Messaging__Transport=RabbitMq`. The shared resolver also defaults Development to RabbitMQ and other environments to Azure Service Bus.

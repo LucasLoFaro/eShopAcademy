@@ -215,6 +215,51 @@ public class MessagingArchitectureTests
     }
 
     [Fact]
+    public void Every_worker_has_a_unique_private_management_endpoint_and_readiness_probe()
+    {
+        var source = File.ReadAllText(Path.Combine(
+            RepositoryRoot(),
+            "src",
+            "AppHost",
+            "Setup",
+            "WorkerManagementEndpoints.cs"));
+        var registrations = Regex.Matches(
+                source,
+                @"ConfigureEndpoint\(\s*(\w+),\s*""([^""]+)"",\s*(\d+)(?:,\s*useDedicatedHealthListener:\s*true)?\s*\);")
+            .Select(match => new
+            {
+                Resource = match.Groups[1].Value,
+                Endpoint = match.Groups[2].Value,
+                Port = int.Parse(match.Groups[3].Value)
+            })
+            .ToArray();
+        var expectedResources = new[]
+        {
+            "basketEvents",
+            "customersMessaging",
+            "sellersService",
+            "sellersEventsProcessor",
+            "stockMessaging",
+            "shippingService",
+            "operationsService",
+            "notificationService",
+            "ordersMessaging",
+            "ordersOrchestration",
+            "paymentsMessaging"
+        };
+
+        Assert.Equal(expectedResources.Order(), registrations.Select(item => item.Resource).Order());
+        Assert.Equal(registrations.Length, registrations.Select(item => item.Endpoint).Distinct().Count());
+        Assert.Equal(registrations.Length, registrations.Select(item => item.Port).Distinct().Count());
+        Assert.Contains("isProxied: false", source);
+        Assert.Contains(
+            ".WithHttpHealthCheck(() => resource.GetEndpoint(endpointName), \"/health\")",
+            source);
+        Assert.Contains("\"Management__Health__Url\"", source);
+        Assert.Contains("\"ASPNETCORE_URLS\"", source);
+    }
+
+    [Fact]
     public void Non_development_hosts_load_and_unprefix_shared_Azure_App_Configuration()
     {
         var root = RepositoryRoot();

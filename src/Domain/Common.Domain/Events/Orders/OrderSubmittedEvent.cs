@@ -8,4 +8,5 @@ public record OrderSubmittedEvent : OrderEvent
     public Guid BasketClientId { get; init; }
     public decimal TotalAmount { get; init; }
     public string DestinationAddress { get; init; } = string.Empty;
+    public IReadOnlyList<OrderItemSellerAttribution> SellerAttributions { get; init; } = [];
 }

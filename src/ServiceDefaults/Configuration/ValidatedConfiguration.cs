@@ -10,6 +10,11 @@ public sealed class RequiredConnectionString
     public string Value { get; set; } = string.Empty;
 }
 
+public sealed class RequiredSecret
+{
+    public string Value { get; set; } = string.Empty;
+}
+
 public static partial class Extentions
 {
     public static TBuilder AddRequiredConnectionString<TBuilder>(this TBuilder builder, string name)
@@ -21,6 +26,24 @@ public static partial class Extentions
         builder.Services.AddOptions<RequiredConnectionString>(name)
             .Configure(options => options.Value = builder.Configuration.GetConnectionString(name) ?? string.Empty)
             .Validate(options => !string.IsNullOrWhiteSpace(options.Value), $"Required configuration key {key} is missing.")
+            .ValidateOnStart();
+        return builder;
+    }
+
+    public static TBuilder AddRequiredSecret<TBuilder>(
+        this TBuilder builder,
+        string key,
+        int minimumLength = 32)
+        where TBuilder : IHostApplicationBuilder
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        ArgumentOutOfRangeException.ThrowIfLessThan(minimumLength, 1);
+
+        builder.Services.AddOptions<RequiredSecret>(key)
+            .Configure(options => options.Value = builder.Configuration[key] ?? string.Empty)
+            .Validate(
+                options => !string.IsNullOrWhiteSpace(options.Value) && options.Value.Length >= minimumLength,
+                $"Required secret configuration key {key} is missing or invalid; it must contain at least {minimumLength} characters.")
             .ValidateOnStart();
         return builder;
     }

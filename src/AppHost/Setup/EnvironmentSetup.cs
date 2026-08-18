@@ -58,7 +58,7 @@ public static class EnvironmentSetup
             .WithLifetime(ContainerLifetime.Persistent);
 
         var ordersdb = postgres.AddDatabase("orders");
-        var orchestrationdb = postgres.AddDatabase("orchestration");        
+        var orchestrationdb = postgres.AddDatabase("orchestration");
 
         postgres.WithPgAdmin()
             .WithLifetime(ContainerLifetime.Persistent);
@@ -76,13 +76,21 @@ public static class EnvironmentSetup
         var productImages = builder.AddConnectionString("productimages");
 
         var sendGridApiKey = builder.AddParameter("sendgrid-apikey", secret: true);
+        var shippingSignatureSecret = builder.AddParameter("shipping-signature-secret", secret: true);
 
         BasketExtensions.Configure(basketApi, basketEvents, redis, rabbit);
         ProductsExtensions.Configure(productsApi, productsGrpc, productsdb, rabbit);
         OrdersExtensions.Configure(ordersApi, ordersOrchestration, ordersMessaging, ordersdb, orchestrationdb, rabbit);
         StockExtensions.Configure(stockApi, stockGrpc, stockMessaging, stockdb, rabbit);
         PaymentsExtensions.Configure(paymentsApi, paymentsGrpc, paymentsMessaging, pspSimulator, rabbit);
-        ShippingExtensions.Configure(shippingApi, shippingService, shippingSimulator, rabbit, shippingdb, redis);
+        ShippingExtensions.Configure(
+            shippingApi,
+            shippingService,
+            shippingSimulator,
+            rabbit,
+            shippingdb,
+            redis,
+            shippingSignatureSecret);
         NotificationExtensions.Configure(notificationService, notificationApi, notificationsdb, rabbit, sendGridApiKey);
         CustomersExtensions.Configure(customersApi, customersdb, rabbit);
         CustomersExtensions.ConfigureMessaging(customersMessaging, customersdb, rabbit);
@@ -103,4 +111,3 @@ public static class EnvironmentSetup
             paymentsMessaging);
     }
 }
-

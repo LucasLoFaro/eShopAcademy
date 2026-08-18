@@ -118,7 +118,9 @@ PR-00 establishes the ledger and baseline only; it does not deliver or close any
 
 ### TD-OWNED-002 — Remove the shipping signature secret from AppHost configuration (P0)
 
-**Risk:** The shipping simulator signature secret is hardcoded in shared AppHost configuration. A committed secret cannot be safely rotated and can make non-production conventions leak into deployed environments.
+**Status (2026-08-18):** Application work completed. AppHost now supplies one secret Aspire parameter to all three Shipping processes, non-development configuration has a documented App Configuration/Key Vault reference contract, and startup validation is secret-safe. External Azure resources and a real rotation are not present or proven by this repository.
+
+**Historical risk:** The shipping simulator signature secret was hardcoded in shared AppHost configuration. A committed secret could not be safely rotated and could make non-production conventions leak into deployed environments.
 
 **Work:** Move the value to the platform secret/configuration mechanism and rotate the existing value. Keep signature or credential values out of logs, traces, health payloads, and exception messages.
 

@@ -4,6 +4,7 @@ public record OrderSellerSaleRegistrationRequestedEvent : OrderEvent
 {
     public Guid SellerId { get; init; }
     public Guid OrderItemId { get; init; }
+    public Guid SellerSaleOperationId { get; init; }
     public Guid ProductId { get; init; }
     public string ProductName { get; init; } = string.Empty;
     public int Quantity { get; init; }

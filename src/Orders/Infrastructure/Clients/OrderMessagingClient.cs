@@ -19,7 +19,7 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
     public Task PublishOrderSubmitted(Order order, Guid basketClientId, CancellationToken ct = default)
     {
         var messageId = OrderMessageIdentity.Create(order.Id, Guid.Empty, "order-submitted");
-        return _publishEndpoint.Publish(new OrderSubmittedEvent
+        var message = new OrderSubmittedEvent
         {
             EventId = messageId,
             CorrelationId = order.Id,
@@ -31,8 +31,12 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             TotalAmount = Convert.ToDecimal(order.TotalPrice),
             PaymentId = order.Payment?.Id ?? Guid.Empty,
             ReservationId = order.Stock?.ReservationId ?? Guid.Empty,
-            DestinationAddress = FormatAddress(order.Customer?.Address)
-        }, context =>
+            DestinationAddress = FormatAddress(order.Customer?.Address),
+            SellerAttributions = CreateSellerAttributions(order)
+        };
+        SellerAttributionContract.Validate(message);
+
+        return _publishEndpoint.Publish(message, context =>
         {
             context.MessageId = messageId;
             context.CorrelationId = order.Id;
@@ -54,6 +58,18 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
         
         return string.Join(", ", parts);
     }
+
+    private static IReadOnlyList<OrderItemSellerAttribution> CreateSellerAttributions(Order order) =>
+        order.Items
+            .Where(item => item.Product is not null && item.Product.SellerId != Guid.Empty)
+            .Select(item => new OrderItemSellerAttribution
+            {
+                OrderItemId = item.Id,
+                ProductId = item.ProductID,
+                SellerId = item.Product.SellerId,
+                SellerSaleOperationId = SellerAttributionContract.CreateOperationId(order.Id, item.Id)
+            })
+            .ToArray();
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken ct = default)
     {

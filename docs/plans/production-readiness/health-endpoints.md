@@ -1,6 +1,6 @@
 # Health endpoints
 
-Status: proposed production-readiness contract plus a current-state inventory. Dependency-aware readiness and worker management endpoints are not implemented.
+Status: proposed production-readiness contract plus a current-state inventory. Private worker management endpoints and Aspire readiness probes are implemented; complete dependency failure/recovery evidence remains open.
 
 ## Contract
 
@@ -10,40 +10,40 @@ Status: proposed production-readiness contract plus a current-state inventory. D
 - Responses are unauthenticated only on a private management listener. The body is a fixed `Healthy`, `Degraded`, or `Unhealthy` shape with check names and durations; it never includes connection strings, hosts, database names, exception messages, stack traces, provider bodies, or credentials.
 - Telemetry enablement must not control endpoint existence. Disabling `Aspire:Monitoring:Enabled` may disable exporters, but not health registration or mapping.
 
-Current `AddDefaultHealthChecks` registers only `self` tagged `live`, independently of telemetry enablement. Consequently, every web process that calls `UseDefaultEndpoints()` exposes `/alive` and `/health`, but both are effectively process-only. `Host.CreateApplicationBuilder` workers have no HTTP server. “Yes (self)” below means a route exists but readiness is incomplete.
+Web workers call `UseDefaultEndpoints()` and expose `/alive` and `/health` on their private management listener. Stock.Messaging.Processor uses the shared dedicated worker listener because it is based on `Host.CreateApplicationBuilder`. AppHost publishes all eleven listeners as non-proxied endpoints and probes `/health`. Dependency registrations vary by process, and the complete outage/recovery matrix remains unproven.
 
 ## Dependency matrix
 
 | Process / affected `Program.cs` | Current `/alive`; `/health` | Owned database / critical cache / blob | MassTransit | Other critical dependencies | Must not affect readiness |
 |---|---|---|---|---|---|
 | Basket.API — `src/Basket/API/Program.cs` | Yes; Yes (self) | Redis is critical | No, despite local AppHost RabbitMQ reference | None | RabbitMQ; downstream product/stock services |
-| Basket.EventsProcessor — `src/Basket/EventsProcessor/EventsProcessor/Program.cs` | No; No | Redis is critical | Consumer bus is critical | None | Producers and unrelated APIs |
+| Basket.EventsProcessor — `src/Basket/EventsProcessor/EventsProcessor/Program.cs` | Yes; Yes (private management) | Redis is critical | Consumer bus is critical | None | Producers and unrelated APIs |
 | Customers.Api — `src/Customers/Customers.Api/Program.cs` | Yes; Yes (self) | MongoDB `customers` is critical | No, despite local AppHost RabbitMQ reference | None | RabbitMQ; seed data status after startup |
-| Customers.Messaging — `src/Customers/Customers.Messaging/Program.cs` | No; No | MongoDB `customers` is critical | Consumer bus is critical | None | Customers API |
+| Customers.Messaging — `src/Customers/Customers.Messaging/Program.cs` | Yes; Yes (private management) | MongoDB `customers` is critical | Consumer bus is critical | None | Customers API |
 | Gateway — `src/Gateway/Program.cs` | Yes; Yes (self) | None | No | Reverse-proxy route/auth configuration must validate at startup | **Every downstream**, Entra discovery/JWKS, DNS, and service discovery resolution |
 | Notifications.Api — `src/Notifications/Notifications.Api/Program.cs` | Yes; Yes (self) | MongoDB `notifications` is critical | No | None | SendGrid and notification worker |
-| Notifications.Service — `src/Notifications/Notifications.Service/Program.cs` | No; No | MongoDB `notifications` is critical | Consumer bus is critical | None | SendGrid provider availability; provider outages are workload failures, not process readiness |
+| Notifications.Service — `src/Notifications/Notifications.Service/Program.cs` | Yes; Yes (private management) | MongoDB `notifications` is critical | Consumer bus is critical | None | SendGrid provider availability; provider outages are workload failures, not process readiness |
 | Operations.Api — `src/Operations/Operations.Api/Program.cs` | Yes; Yes (self) | MongoDB `operations` is critical | Publisher bus is critical for workflow commands/events | None | Shipping/seller/order APIs |
-| Operations.Service — `src/Operations/Operations.Service/Program.cs` | No; No | MongoDB `operations` is critical | Consumer bus is critical | None | APIs and external fulfillment systems |
-| Orchestration — `src/Orchestration/Orchestration/Program.cs` | No; No | PostgreSQL `orchestration` is critical | Saga bus and scheduler are critical | Database schema compatibility is startup validation | Payment, stock, basket, shipping, and order services; telemetry exporter |
-| Orders.Messaging — `src/Orders/Orders.Messaging/Program.cs` | No; No | PostgreSQL `orders` is critical | Consumer bus is critical | None | Downstream compensation consumers |
+| Operations.Service — `src/Operations/Operations.Service/Program.cs` | Yes; Yes (private management) | MongoDB `operations` is critical | Consumer bus is critical | None | APIs and external fulfillment systems |
+| Orchestration — `src/Orchestration/Orchestration/Program.cs` | Yes; Yes (private management) | PostgreSQL `orchestration` is critical | Saga bus and scheduler are critical | Database schema compatibility is startup validation | Payment, stock, basket, shipping, and order services; telemetry exporter |
+| Orders.Messaging — `src/Orders/Orders.Messaging/Program.cs` | Yes; Yes (private management) | PostgreSQL `orders` is critical | Consumer bus is critical | None | Downstream compensation consumers |
 | Orders.API — `src/Orders/Presentation/API/Program.cs` | Yes; Yes (self) | PostgreSQL `orders` is critical | Publisher/SSE consumer bus is critical | None | Customers/Products HTTP, Payments/Stock gRPC; these fail individual requests and must not create readiness fan-out |
 | Payments.API — `src/Payments/Payments.API/Program.cs` | Yes; Yes (self) | None | Publisher bus is critical to accept webhooks | Signature configuration validates at startup | PSP, order service |
 | Payments.gRPC — `src/Payments/Payments.gRPC/Program.cs` | Yes; Yes (self) | None | Publisher bus is critical | PSP base URI must be syntactically valid at startup | PSP availability |
-| Payments.Messaging — `src/Payments/Payments.Messaging/Program.cs` | No; No | No current owned store | Consumer bus is critical | None today | PSP reference (currently unused); future PSP availability |
+| Payments.Messaging — `src/Payments/Payments.Messaging/Program.cs` | Yes; Yes (private management) | No current owned store | Consumer bus is critical | None today | PSP reference (currently unused); future PSP availability |
 | Products.API — `src/Products/Presentation/Products.API/Program.cs` | Yes; Yes (self) | MongoDB `products` is critical | Publisher bus is critical for product events | None | Azure Content Safety and image URLs; development seeding after startup |
 | Products.gRPC — `src/Products/Presentation/Products.gRPC/Program.cs` | No; No | AppHost supplies products MongoDB, but Program wires no repository/database | No, despite AppHost RabbitMQ reference | `IProductService` graph must be valid before ready | RabbitMQ; unrelated APIs |
 | PSP.Simulator — `src/PSP/PSP.Simulator/Program.cs` | No; No | In-memory process state only | No | None | Webhook destinations |
 | Sellers.Api — `src/Sellers/Sellers.Api/Program.cs` | Yes; Yes (self) | MongoDB `sellers` is critical; Blob `productimages` is feature-scoped, not global | Publisher bus is critical for registration workflow | Auth/config validation | Products, Shipping, Orders, Stock APIs; Blob service and Entra availability |
-| Sellers.EventsProcessor — `src/Sellers/Sellers.EventsProcessor/Program.cs` | No; No | MongoDB `sellers` is critical | Consumer/publisher bus is critical | None | Other bounded contexts |
-| Sellers.Service — `src/Sellers/Sellers.Service/Program.cs` | No; No | MongoDB `sellers` is critical | Consumer/publisher bus is critical | None | Future Document Intelligence/tax providers |
+| Sellers.EventsProcessor — `src/Sellers/Sellers.EventsProcessor/Program.cs` | Yes; Yes (private management) | MongoDB `sellers` is critical | Consumer/publisher bus is critical | None | Other bounded contexts |
+| Sellers.Service — `src/Sellers/Sellers.Service/Program.cs` | Yes; Yes (private management) | MongoDB `sellers` is critical | Consumer/publisher bus is critical | None | Future Document Intelligence/tax providers |
 | Shipping.Api — `src/Shipping/Shipping.Api/Program.cs` | Yes; Yes (self) | MongoDB `shipping` is critical | Publisher bus is critical | Provider base URI/config validates at startup | Shipping provider availability |
 | Shipping.gRPC — `src/Shipping/Shipping.gRPC/Program.cs` | No; No | None currently wired | No | None | Shipping provider and other services |
-| Shipping.Service — `src/Shipping/Shipping.Service/Program.cs` | No; No | MongoDB `shipping` is critical | Consumer/publisher bus is critical | Provider base URI/config validates at startup | Shipping provider availability |
+| Shipping.Service — `src/Shipping/Shipping.Service/Program.cs` | Yes; Yes (private management) | MongoDB `shipping` is critical | Consumer/publisher bus is critical | Provider base URI/config validates at startup | Shipping provider availability |
 | Shipping.Simulator — `src/Shipping/Shipping.Simulator/Program.cs` | Yes; Yes (self) | Redis database 1 is critical | No | None | Webhook destinations, map/geocoding/tile providers used by browser UI |
 | Stock.API — `src/Stock/Stock.API/Program.cs` | Yes; Yes (self) | MongoDB `stock` is critical | Publisher bus is critical | None | Basket/orders services; development seeding |
 | Stock.gRPC — `src/Stock/Stock.gRPC/Program.cs` | No; No | MongoDB `stock` is critical | Publisher bus is critical | None | Orders API |
-| Stock.Messaging.Processor — `src/Stock/Stock.Messaging.Processor/Program.cs` | No; No | MongoDB `stock` is critical | Consumer/publisher bus is critical | None | Basket/orders services |
+| Stock.Messaging.Processor — `src/Stock/Stock.Messaging.Processor/Program.cs` | Yes; Yes (dedicated private management) | MongoDB `stock` is critical | Consumer/publisher bus is critical | None | Basket/orders services |
 
 No process currently registers MongoDB, PostgreSQL, Redis, Blob Storage, or MassTransit health checks. AppHost `WaitFor` establishes local startup ordering only; it is not runtime readiness.
 
@@ -66,12 +66,14 @@ Every worker must expose a private management HTTP endpoint even if it has no bu
 
 Required workers are Basket.EventsProcessor, Customers.Messaging, Notifications.Service, Operations.Service, Orchestration, Orders.Messaging, Payments.Messaging, Sellers.EventsProcessor, Sellers.Service, Shipping.Service, and Stock.Messaging.Processor.
 
+AppHost assigns those workers non-proxied management ports 8101 through 8111 respectively, with Sellers Service and Sellers EventsProcessor occupying 8103 and 8104 before Stock. Each resource has a `/health` Aspire probe. No management endpoint is referenced by the Gateway.
+
 ## Findings and acceptance
 
 | ID | Severity | Affected files | Finding and proposed standard | Acceptance criteria | Recommended automated test |
 |---|---|---|---|---|---|
 | HLT-01 | High | `src/ServiceDefaults/Extensions.cs`; every `Program.cs` marked “Yes (self)” | `/health` is only the self check. Add only matrix-critical checks while retaining the now-independent registration. | `/alive` remains healthy during broker/DB outage; `/health` becomes unhealthy within 2 seconds; disabling exporters does not remove routes. | `WebApplicationFactory` contract tests plus container dependency-stop tests. |
-| HLT-02 | High | The eleven worker `Program.cs` files listed above | Workers expose no probe endpoint. Add the platform-owned private management listener and shutdown-aware readiness. | Every worker has reachable private `/alive` and `/health`; bus/store failures and shutdown change readiness as specified. | Architecture test enumerating `AddServiceDefaults` worker projects and runtime probe tests per dependency type. |
+| HLT-02 | High | The eleven worker `Program.cs` files listed above; `src/AppHost/Setup/WorkerManagementEndpoints.cs` | Private listeners and AppHost `/health` probes are implemented. Dependency outage, recovery, and shutdown behavior still requires complete runtime evidence. | Every worker has reachable private `/alive` and `/health`; bus/store failures and shutdown change readiness as specified. | Architecture test enumerating worker endpoints plus runtime probe tests per dependency type. |
 | HLT-03 | High | `Products.gRPC/Program.cs`, `Shipping.gRPC/Program.cs`, `Stock.gRPC/Program.cs`, `PSP.Simulator/Program.cs` | These web processes call defaults but never map default endpoints; Products.gRPC also has an unresolved service dependency graph. Map endpoints and validate required service graphs/config at startup. | Both routes exist on the management endpoint and core service dependencies resolve before ready. | Startup smoke test that resolves every mapped gRPC service and calls both probes. |
 | HLT-04 | Medium | `Gateway/Program.cs`, `Gateway/appsettings.json` | Gateway readiness must not query all destinations. Limit it to local route/auth option validation and process health. | All downstreams may be stopped while Gateway `/health` stays healthy; malformed route configuration prevents startup/readiness. | Test host with unreachable destinations and a separate invalid-config test. |
 | HLT-05 | Medium | Shared defaults and all database/cache registrations in the matrix | There are no bounded, sanitized dependency checks. Provide common check factories with 1-second dependency and 2-second aggregate budgets. | Hung dependencies never hold a probe beyond budget; responses contain no endpoint, exception, or secret data. | Slow/failing fake check tests and response snapshot/secret-canary test. |

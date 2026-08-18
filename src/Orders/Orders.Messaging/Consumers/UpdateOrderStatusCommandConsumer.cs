@@ -162,6 +162,7 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
 
                 var grossAmount = Convert.ToDecimal(item.Price);
                 var commissionAmount = decimal.Round(grossAmount * _sellerCommissionRate, 2, MidpointRounding.AwayFromZero);
+                var sellerSaleOperationId = SellerAttributionContract.CreateOperationId(order.Id, item.Id);
 
                 await context.Publish(new OrderSellerSaleRegistrationRequestedEvent
                 {
@@ -172,6 +173,7 @@ public sealed class UpdateOrderStatusCommandConsumer : IConsumer<UpdateOrderStat
                     CustomerEmail = command.CustomerEmail,
                     SellerId = item.Product.SellerId,
                     OrderItemId = item.Id,
+                    SellerSaleOperationId = sellerSaleOperationId,
                     ProductId = item.ProductID,
                     ProductName = item.Product?.Name ?? string.Empty,
                     Quantity = item.Quantity,

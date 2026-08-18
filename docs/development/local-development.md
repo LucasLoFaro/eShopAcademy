@@ -4,7 +4,7 @@
 
 - .NET SDK 10.0; the repository does not currently pin a patch SDK with `global.json`.
 - Aspire CLI compatible with the AppHost's 13.4 SDK/packages.
-- Docker Desktop, Docker Engine, or Podman available to Aspire for container resources.
+- Docker Desktop, Docker Engine, or a supported Podman version available to Aspire for container resources. Full-topology startup is proven on Windows with Podman 5.8.3. Podman 6.0.x is unsupported on Windows until its forwarding regression is resolved.
 - Node.js and npm for the Vite frontends.
 - A development SendGrid API key, or a placeholder when email delivery is not being exercised.
 - Azure developer credentials only for features that call Azure-hosted services such as Content Safety.
@@ -48,6 +48,8 @@ Use the Aspire dashboard or `aspire describe` for actual endpoint URLs. Although
 
 The bounded-context API ports requested in AppHost extensions are Products 8001, Stock 8002, Orders 8003, Basket 8004, Payments 8006, Shipping 8007, Customers 8008, Operations 8009, Sellers 8010, and Notifications 8011. gRPC endpoints request Products 8021, Stock 8022, and Payments 8026. The shipping and PSP simulators request 8027 and 8050. Prefer discovered URLs over these requested values.
 
+Private worker management endpoints use ports 8101 through 8111 in this order: Basket EventsProcessor, Customers Messaging, Sellers Service, Sellers EventsProcessor, Stock Messaging, Shipping Service, Operations Service, Notifications Service, Orders Messaging, Orchestration, and Payments Messaging. Each listener exposes `/alive` and `/health`, is not routed through the Gateway, and is registered with an Aspire `/health` readiness probe.
+
 ## Messaging by environment
 
 The Visual Studio AppHost profiles explicitly set `Messaging__Transport=RabbitMq`. The shared resolver also defaults Development to RabbitMQ and other environments to Azure Service Bus.
@@ -64,4 +66,3 @@ $env:Messaging__AzureServiceBus__NamespaceUri = "https://<namespace>.servicebus.
 ## Stop and inspect
 
 For a detached CLI session started with `aspire start`, use `aspire ps`, `aspire describe`, `aspire wait <resource>`, and `aspire stop`. Agent/worktree automation should add `--isolated --non-interactive` to `aspire start` and must stop the AppHost before running builds that could encounter file locks.
-

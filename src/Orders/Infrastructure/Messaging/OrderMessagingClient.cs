@@ -19,7 +19,7 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
     public Task PublishOrderSubmitted(Order order, Guid basketClientId, CancellationToken cancellationToken = default)
     {
         var messageId = OrderMessageIdentity.Create(order.Id, Guid.Empty, "order-submitted");
-        return _publishEndpoint.Publish(new OrderSubmittedEvent
+        var message = new OrderSubmittedEvent
         {
             EventId = messageId,
             CorrelationId = order.Id,
@@ -30,8 +30,15 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
             BasketClientId = basketClientId,
             TotalAmount = Convert.ToDecimal(order.TotalPrice),
             PaymentId = order.Payment?.Id ?? Guid.Empty,
-            ReservationId = order.Stock?.ReservationId ?? Guid.Empty
-        }, context => SetHeaders(context, messageId, order.Id), cancellationToken);
+            ReservationId = order.Stock?.ReservationId ?? Guid.Empty,
+            SellerAttributions = CreateSellerAttributions(order)
+        };
+        SellerAttributionContract.Validate(message);
+
+        return _publishEndpoint.Publish(
+            message,
+            context => SetHeaders(context, messageId, order.Id),
+            cancellationToken);
     }
 
     public Task PublishOrderCancelled(Guid orderId, string customerEmail, string reason, CancellationToken cancellationToken = default)
@@ -74,4 +81,16 @@ public sealed class OrderMessagingClient : IOrderMessagingClient
         context.MessageId = messageId;
         context.CorrelationId = orderId;
     }
+
+    private static IReadOnlyList<OrderItemSellerAttribution> CreateSellerAttributions(Order order) =>
+        order.Items
+            .Where(item => item.Product is not null && item.Product.SellerId != Guid.Empty)
+            .Select(item => new OrderItemSellerAttribution
+            {
+                OrderItemId = item.Id,
+                ProductId = item.ProductID,
+                SellerId = item.Product.SellerId,
+                SellerSaleOperationId = SellerAttributionContract.CreateOperationId(order.Id, item.Id)
+            })
+            .ToArray();
 }

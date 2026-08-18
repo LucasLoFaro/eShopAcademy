@@ -89,7 +89,18 @@ public static class EnvironmentSetup
         OperationsExtensions.Configure(operationsApi, operationsService, operationsdb, rabbit);
         SellersExtensions.Configure(sellersApi, sellersService, sellersEventsProcessor, sellersdb, rabbit, productImages);
         GatewayExtensions.Configure(gateway);
+        WorkerManagementEndpoints.Configure(
+            basketEvents,
+            customersMessaging,
+            sellersService,
+            sellersEventsProcessor,
+            stockMessaging,
+            shippingService,
+            operationsService,
+            notificationService,
+            ordersMessaging,
+            ordersOrchestration,
+            paymentsMessaging);
     }
 }
-
 

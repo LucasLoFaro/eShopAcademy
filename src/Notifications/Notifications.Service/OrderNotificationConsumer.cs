@@ -137,13 +137,12 @@ IConsumer<OrderStatusUpdatedEvent>
         try
         {
             await _emailSender.SendAsync(email, subject, html, cancellationToken);
+            _logger.LogInformation("Sent notification template {Template} for order {OrderId}.", template, orderId);
         }
         catch (Exception exception)
         {
             NotificationMetrics.RecordFailure("email", exception is HttpRequestException ? "provider" : "unexpected");
-            NotificationMetrics.RecordConsumerRetry(nameof(OrderNotificationConsumer), "provider");
-            throw;
+            _logger.LogWarning(exception, "[Notification] Email send failed for template {Template}, order {OrderId}. Notification was persisted but email delivery failed.", template, orderId);
         }
-        _logger.LogInformation("Sent notification template {Template} for order {OrderId}.", template, orderId);
     }
 }

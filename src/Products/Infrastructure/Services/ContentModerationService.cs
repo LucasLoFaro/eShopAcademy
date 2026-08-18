@@ -4,6 +4,7 @@ using Core.Application.Interfaces.Services;
 using Domain.Products.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,7 +18,11 @@ public class ContentModerationService : IContentModerationService
     public ContentModerationService(IOptions<ContentSafetyOptions> options, ILogger<ContentModerationService> logger)
     {
         _logger = logger;
-        _client = new ContentSafetyClient(new Uri(options.Value.Endpoint), new DefaultAzureCredential());
+        var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+        {
+            ExcludeManagedIdentityCredential = options.Value.ExcludeManagedIdentity
+        });
+        _client = new ContentSafetyClient(new Uri(options.Value.Endpoint), credential);
     }
 
     public async Task<ContentModerationResult> ModerateProductAsync(Product product, CancellationToken cancellationToken = default)
@@ -99,16 +104,23 @@ public class ContentModerationService : IContentModerationService
 public sealed class ContentSafetyOptions
 {
     public string Endpoint { get; set; } = string.Empty;
+    public bool ExcludeManagedIdentity { get; set; }
 }
 
 public static class ContentModerationRegistration
 {
     public static IServiceCollection AddProductContentModeration(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
         services.AddOptions<ContentSafetyOptions>()
             .Bind(configuration.GetSection("ContentSafety"))
+            .PostConfigure(options =>
+            {
+                if (environment.IsDevelopment())
+                    options.ExcludeManagedIdentity = true;
+            })
             .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out var endpoint) &&
                                  endpoint.Scheme == Uri.UriSchemeHttps,
                 "ContentSafety:Endpoint must be an absolute HTTPS URI.")

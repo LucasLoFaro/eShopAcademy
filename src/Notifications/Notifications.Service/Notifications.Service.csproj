@@ -31,4 +31,8 @@
   <ItemGroup>
     <Content Include="Templates\*.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Properties\launchSettings.json" />
+  </ItemGroup>
 </Project>

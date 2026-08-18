@@ -20,9 +20,8 @@ public static class BasketStorage
     {
         services.AddOptions<BasketRedisOptions>()
             .Configure(options => options.ConnectionString = configuration.GetConnectionString("Redis") ?? string.Empty)
-            .Validate(options => Uri.TryCreate(options.ConnectionString, UriKind.Absolute, out var uri) &&
-                                 (uri.Scheme == "redis" || uri.Scheme == "rediss"),
-                "ConnectionStrings:Redis must be an absolute redis/rediss URI.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString),
+                "ConnectionStrings:Redis is required.")
             .ValidateOnStart();
 
         services.AddSingleton<IDatabaseClient, DatabaseClient>();

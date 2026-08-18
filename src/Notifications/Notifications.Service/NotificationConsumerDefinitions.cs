@@ -33,6 +33,6 @@ public abstract class NotificationConsumerDefinition<TConsumer> : ConsumerDefini
             retry.Handle<TimeoutException>();
             retry.Intervals(TimeSpan.FromMilliseconds(200), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3));
         });
-        endpointConfigurator.UseMongoDbOutbox(context);
+        endpointConfigurator.UseInMemoryOutbox(context);
     }
 }

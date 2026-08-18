@@ -19,13 +19,7 @@ builder.AddServiceDefaults()
         messaging.ReceiveEndpoint<CommitStockReservationConsumer>("commit-stock-reservation");
         messaging.ReceiveEndpoint<ReleaseStockReservationConsumer>("release-stock-reservation");
         messaging.ReceiveEndpoint<ProductPublishedConsumer>("product-published-stock");
-        messaging.Registration(registration => registration.AddMongoDbOutbox(options =>
-        {
-            options.ClientFactory(provider => provider.GetRequiredService<IMongoClient>());
-            options.DatabaseFactory(provider => provider.GetRequiredService<IMongoDatabase>());
-            options.QueryDelay = TimeSpan.FromSeconds(1);
-            options.DuplicateDetectionWindow = TimeSpan.FromHours(1);
-        }));
+
     }, typeof(CommitStockReservationConsumer).Assembly)
     .AddWorkerHealthEndpoints();
 

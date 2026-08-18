@@ -8714,7 +8714,7 @@ function useMarkReadyForPickup(sellerId) {
       await api.post(
         `/api/operations/seller/orders/${orderId}/ready-for-pickup`,
         {},
-        { headers: { "X-Seller-Id": sellerId } }
+        { headers: { "X-Seller-Id": sellerId, "Idempotency-Key": crypto.randomUUID() } }
       );
     },
     onSuccess: () => {
@@ -8731,7 +8731,7 @@ function useStartProcessing(sellerId) {
       await api.post(
         `/api/operations/seller/orders/${orderId}/start-processing`,
         {},
-        { headers: { "X-Seller-Id": sellerId } }
+        { headers: { "X-Seller-Id": sellerId, "Idempotency-Key": crypto.randomUUID() } }
       );
     },
     onSuccess: () => {
@@ -8748,7 +8748,7 @@ function useReportIssue(sellerId) {
       await api.post(
         `/api/operations/seller/orders/${orderId}/report-issue`,
         { issueType, details },
-        { headers: { "X-Seller-Id": sellerId } }
+        { headers: { "X-Seller-Id": sellerId, "Idempotency-Key": crypto.randomUUID() } }
       );
     },
     onSuccess: () => {

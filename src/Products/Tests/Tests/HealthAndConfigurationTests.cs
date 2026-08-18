@@ -56,7 +56,7 @@ public class HealthAndConfigurationTests
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddProductContentModeration(configuration);
+        services.AddProductContentModeration(configuration, new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" });
         using var provider = services.BuildServiceProvider();
 
         Assert.Throws<OptionsValidationException>(() =>

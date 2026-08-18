@@ -5,6 +5,8 @@ using Sellers.Application.Services;
 using ServiceDefaults;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using Azure;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System.Text.Json;
@@ -60,7 +62,14 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddSellerStorage(builder.Configuration);
 builder.Services.AddScoped<ISellerService, SellerService>();
 
-builder.AddAzureBlobServiceClient("productimages", settings => settings.DisableHealthChecks = true);
+builder.AddAzureBlobServiceClient("productimages", settings =>
+{
+    settings.DisableHealthChecks = true;
+    settings.Credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+    {
+        ExcludeManagedIdentityCredential = builder.Environment.IsDevelopment()
+    });
+});
 builder.Services.AddHealthChecks().AddCheck<BlobReadinessHealthCheck>(
     "product-images-blob",
     failureStatus: HealthStatus.Unhealthy,
@@ -423,6 +432,7 @@ app.MapPost("/api/sellers/analyze-document", (IFormFile document) =>
 app.MapPost("/api/sellers/products/upload-image", async (
     IFormFile file,
     BlobServiceClient blobServiceClient,
+    ILogger<Program> logger,
     CancellationToken cancellationToken) =>
 {
     if (file is null || file.Length == 0)
@@ -436,17 +446,41 @@ app.MapPost("/api/sellers/products/upload-image", async (
         return Results.BadRequest("Invalid file type. Only JPEG, PNG, WebP and GIF are allowed.");
     }
 
-    var containerClient = blobServiceClient.GetBlobContainerClient("product-images");
-    await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
+    const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+    if (file.Length > maxFileSize)
+    {
+        return Results.BadRequest("File size exceeds the 10 MB limit.");
+    }
 
-    var extension = Path.GetExtension(file.FileName);
-    var blobName = $"{Guid.NewGuid():N}{extension}";
-    var blobClient = containerClient.GetBlobClient(blobName);
+    try
+    {
+        var containerClient = blobServiceClient.GetBlobContainerClient("product-images");
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
 
-    await using var stream = file.OpenReadStream();
-    await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = file.ContentType }, cancellationToken: cancellationToken);
+        var extension = Path.GetExtension(file.FileName);
+        var blobName = $"{Guid.NewGuid():N}{extension}";
+        var blobClient = containerClient.GetBlobClient(blobName);
 
-    return Results.Ok(new { url = blobClient.Uri.ToString() });
+        await using var stream = file.OpenReadStream();
+        await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = file.ContentType }, cancellationToken: cancellationToken);
+
+        return Results.Ok(new { url = blobClient.Uri.ToString() });
+    }
+    catch (Azure.RequestFailedException ex)
+    {
+        logger.LogError(ex, "Azure Storage request failed during image upload. Status={Status}, ErrorCode={ErrorCode}",
+            ex.Status, ex.ErrorCode);
+        return Results.Problem(
+            detail: "Image upload failed. Ensure the storage account is accessible and credentials are configured.",
+            statusCode: StatusCodes.Status502BadGateway);
+    }
+    catch (Azure.Identity.AuthenticationFailedException ex)
+    {
+        logger.LogError(ex, "Azure credential authentication failed during image upload");
+        return Results.Problem(
+            detail: "Image upload failed. Azure credentials are not configured for storage access.",
+            statusCode: StatusCodes.Status502BadGateway);
+    }
 }).RequireAuthorization("sellers-authenticated")
   .DisableAntiforgery();
 
@@ -467,6 +501,30 @@ app.MapPost("/api/sellers/products", async (
     if (seller is null)
     {
         return Results.Forbid();
+    }
+
+    if (string.IsNullOrWhiteSpace(request.Name))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["Name"] = ["Product name is required."]
+        });
+    }
+
+    if (string.IsNullOrWhiteSpace(request.ImageUrl))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["ImageUrl"] = ["At least one product image is required."]
+        });
+    }
+
+    if (!Uri.TryCreate(request.ImageUrl, UriKind.Absolute, out _))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["ImageUrl"] = ["Product image must be a valid URL."]
+        });
     }
 
     var product = new
@@ -507,6 +565,7 @@ app.MapPost("/api/sellers/products", async (
         stockForm.Add(new StringContent(product.Id.ToString()), "ProductGuid");
         stockForm.Add(new StringContent(request.InitialStock.ToString()), "Quantity");
         stockForm.Add(new StringContent("WH-01"), "Warehouse");
+        stockClient.DefaultRequestHeaders.Add("Idempotency-Key", Guid.NewGuid().ToString("N"));
         await stockClient.PostAsync("/api/stock/Increase", stockForm, cancellationToken);
     }
 
@@ -578,6 +637,7 @@ app.MapPost("/api/sellers/{sellerId:guid}/products/{productId:guid}/stock", asyn
     absForm.Add(new StringContent(absQuantity.ToString()), "Quantity");
     absForm.Add(new StringContent(stockRequest.Warehouse ?? "WH-01"), "Warehouse");
 
+    client.DefaultRequestHeaders.Add("Idempotency-Key", Guid.NewGuid().ToString("N"));
     var response = await client.PostAsync(endpoint, absForm, cancellationToken);
 
     if (!response.IsSuccessStatusCode)

@@ -38,16 +38,7 @@ builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>(
 });
 
 builder.AddServiceDefaults()
-    .WithMassTransit(messaging =>
-    {
-        messaging.Registration(registration => registration.AddMongoDbOutbox(options =>
-        {
-            options.ClientFactory(provider => provider.GetRequiredService<IMongoClient>());
-            options.DatabaseFactory(provider => provider.GetRequiredService<IMongoDatabase>());
-            options.QueryDelay = TimeSpan.FromSeconds(1);
-            options.DuplicateDetectionWindow = TimeSpan.FromHours(1);
-        }));
-    }, typeof(ScheduleShippingCommandConsumer).Assembly);
+    .WithMassTransit(assemblies: typeof(ScheduleShippingCommandConsumer).Assembly);
 
 builder.Services.AddHealthChecks().AddAsyncCheck(
     "shipping-database",

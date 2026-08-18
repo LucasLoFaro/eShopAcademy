@@ -21,7 +21,7 @@ builder.Services.AddControllers()
 builder.Services.AddProductStorage(builder.Configuration);
 builder.Services.AddTransient<IProductMessagingService, ProductMessagingService>();
 builder.Services.AddTransient<IProductService, ProductService>();
-builder.Services.AddProductContentModeration(builder.Configuration);
+builder.Services.AddProductContentModeration(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 app.UseExceptionHandler();

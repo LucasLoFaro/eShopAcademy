@@ -4,7 +4,7 @@
 
 - .NET SDK 10.0; the repository does not currently pin a patch SDK with `global.json`.
 - Aspire CLI compatible with the AppHost's 13.4 SDK/packages.
-- Docker Desktop, Docker Engine, or Podman available to Aspire for container resources.
+- Docker Desktop, Docker Engine, or a supported Podman version available to Aspire for container resources. Full-topology startup is proven on Windows with Podman 5.8.3. Podman 6.0.x is unsupported on Windows until its forwarding regression is resolved.
 - Node.js and npm for the Vite frontends.
 - A development SendGrid API key, or a placeholder when email delivery is not being exercised.
 - Azure developer credentials only for features that call Azure-hosted services such as Content Safety.
@@ -64,4 +64,3 @@ $env:Messaging__AzureServiceBus__NamespaceUri = "https://<namespace>.servicebus.
 ## Stop and inspect
 
 For a detached CLI session started with `aspire start`, use `aspire ps`, `aspire describe`, `aspire wait <resource>`, and `aspire stop`. Agent/worktree automation should add `--isolated --non-interactive` to `aspire start` and must stop the AppHost before running builds that could encounter file locks.
-

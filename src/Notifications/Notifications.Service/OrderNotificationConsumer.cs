@@ -142,7 +142,9 @@ IConsumer<OrderStatusUpdatedEvent>
         catch (Exception exception)
         {
             NotificationMetrics.RecordFailure("email", exception is HttpRequestException ? "provider" : "unexpected");
-            _logger.LogWarning(exception, "[Notification] Email send failed for template {Template}, order {OrderId}. Notification was persisted but email delivery failed.", template, orderId);
+            NotificationMetrics.RecordConsumerRetry(nameof(OrderNotificationConsumer), "email");
+            _logger.LogWarning(exception, "[Notification] Email send failed for template {Template}, order {OrderId}. Notification was persisted and email delivery will be retried.", template, orderId);
+            throw;
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Domain.Shipping.Contracts.Responses;
+using ServiceDefaults;
 using Shipping.Simulator.Storage;
 using StackExchange.Redis;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddRequiredSecret("Shipping:SignatureSecret");
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpClient("webhook", client => client.Timeout = TimeSpan.FromSeconds(5));
 

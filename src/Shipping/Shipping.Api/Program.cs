@@ -15,6 +15,7 @@ builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(Ship
 builder.AddServiceDefaults()
        .WithSwagger()
        .WithMassTransit();
+builder.AddRequiredSecret("Shipping:SignatureSecret");
 
 var connectionString = builder.Configuration.GetConnectionString("shipping");
 if (string.IsNullOrWhiteSpace(connectionString))

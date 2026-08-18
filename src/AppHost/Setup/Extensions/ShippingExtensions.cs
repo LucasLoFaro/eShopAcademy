@@ -10,7 +10,8 @@ public static class ShippingExtensions
         IResourceBuilder<ProjectResource> shippingSimulator,
         IResourceBuilder<RabbitMQServerResource> rabbit,
         IResourceBuilder<MongoDBDatabaseResource> shippingdb,
-        IResourceBuilder<RedisResource> redis)
+        IResourceBuilder<RedisResource> redis,
+        IResourceBuilder<ParameterResource> shippingSignatureSecret)
     {
         shippingSimulator
             .WithReference(shippingApi)
@@ -18,7 +19,8 @@ public static class ShippingExtensions
             .WaitFor(redis)
             .WithCommonEnvironments()
             .WithHttpEndpoint(port: 8027, name: "shipping-simulator")
-            .WithEnvironment("ShippingSimulator__RedisDatabase", "1");
+            .WithEnvironment("ShippingSimulator__RedisDatabase", "1")
+            .WithEnvironment("Shipping__SignatureSecret", shippingSignatureSecret);
 
         shippingApi
             .WithReference(shippingdb)
@@ -29,7 +31,7 @@ public static class ShippingExtensions
             .WaitFor(rabbit)
             .WithCommonEnvironments()
             .WithHttpEndpoint(port: 8007, name: "shipping-api")
-            .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
+            .WithEnvironment("Shipping__SignatureSecret", shippingSignatureSecret)
             .WithEnvironment("Shipping__Provider__BaseUrl", "http://_shipping-simulator.eshopacademy-shipping-simulator");
 
         shippingService
@@ -40,7 +42,7 @@ public static class ShippingExtensions
             .WithReference(rabbit)
             .WaitFor(rabbit)
             .WithCommonEnvironments()
-            .WithEnvironment("Shipping__SignatureSecret", "Sup3rSecr3t!")
+            .WithEnvironment("Shipping__SignatureSecret", shippingSignatureSecret)
             .WithEnvironment("Shipping__Provider__BaseUrl", "http://_shipping-simulator.eshopacademy-shipping-simulator");
     }
 }

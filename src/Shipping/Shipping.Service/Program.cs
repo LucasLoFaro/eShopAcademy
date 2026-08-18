@@ -39,6 +39,7 @@ builder.Services.AddHttpClient<IShippingProviderClient, ShippingProviderClient>(
 
 builder.AddServiceDefaults()
     .WithMassTransit(assemblies: typeof(ScheduleShippingCommandConsumer).Assembly);
+builder.AddRequiredSecret("Shipping:SignatureSecret");
 
 builder.Services.AddHealthChecks().AddAsyncCheck(
     "shipping-database",

@@ -11,13 +11,16 @@
 
 The repository uses `src/NuGet.config`. If restore requires the configured GitHub Packages source, authenticate that source with a package-readable token; do not commit the token.
 
-## Configure the AppHost secret
+## Configure the AppHost secrets
 
-The AppHost declares `sendgrid-apikey` as a secret Aspire parameter. Store it in the AppHost user-secrets store:
+The AppHost declares `sendgrid-apikey` and `shipping-signature-secret` as secret Aspire parameters. Store them in the AppHost user-secrets store. The shipping secret must contain at least 32 characters and the same parameter is supplied to Shipping API, Shipping Service, and Shipping Simulator.
 
 ```powershell
 dotnet user-secrets set "Parameters:sendgrid-apikey" "<development-key>" --project src/AppHost/AppHost.csproj
+dotnet user-secrets set "Parameters:shipping-signature-secret" "<generated-development-secret>" --project src/AppHost/AppHost.csproj
 ```
+
+Do not put either value in `appsettings.json`, launch profiles, tracked environment files, or command history shared with other users.
 
 ## Start the distributed application
 

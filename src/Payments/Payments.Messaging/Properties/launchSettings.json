@@ -4,6 +4,7 @@
     "Payments.Messaging": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:8007",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

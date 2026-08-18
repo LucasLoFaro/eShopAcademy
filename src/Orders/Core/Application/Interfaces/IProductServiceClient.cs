@@ -4,5 +4,5 @@ namespace Core.Application.Interfaces;
 
 public interface IProductServiceClient
 {
-    Task<Product> GetProductByIdAsync(Guid productId);
+    Task<Product> GetProductByIdAsync(Guid productId, CancellationToken cancellationToken = default);
 }

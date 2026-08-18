@@ -13,7 +13,7 @@
     <!-- TODO: revert to the Stock.Domain package once the local project references are no longer necessary -->
     <!-- <PackageReference Include="eShopAcademy.Stock.Domain" Version="1.0.1" /> -->
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>

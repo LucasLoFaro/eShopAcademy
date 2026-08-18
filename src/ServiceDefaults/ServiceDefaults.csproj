@@ -13,28 +13,28 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.2.0" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
-    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.8.2" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.8.3" />
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="$(MassTransitVersion)" />
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="$(MassTransitVersion)" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="$(MassTransitVersion)" />
     <PackageReference Include="MassTransit.Quartz" Version="$(MassTransitVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.5.0" />
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.7.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300">
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="8.6.0" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.9.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.400">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenTelemetry" Version="1.16.0" />
-	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.7.0" />
-	<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
-	<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.16.0" />
-	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
+    <PackageReference Include="OpenTelemetry" Version="1.17.0" />
+	<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
+	<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+	<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.17.0" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
 	<PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.12.0-beta.1" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.16.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
 	<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.16.0-beta.1" />
-	<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 

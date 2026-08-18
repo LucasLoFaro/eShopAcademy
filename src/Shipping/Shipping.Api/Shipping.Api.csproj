@@ -9,7 +9,7 @@
   <ItemGroup>
     <!-- TODO: revert to the packaged Shipping.Domain when the domain release is stable -->
     <!-- <PackageReference Include="eShopAcademy.Shipping.Domain" Version="1.0.4" /> -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
-    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.5.0" />
+    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="8.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Domain\Basket.Domain\Basket.Domain.csproj" />

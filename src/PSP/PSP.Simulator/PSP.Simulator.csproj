@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\Payments.Domain\Payments.Domain.csproj" />
     <ProjectReference Include="..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Payments\Payments.Infrastructure\Payments.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

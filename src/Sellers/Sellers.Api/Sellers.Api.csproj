@@ -10,9 +10,9 @@
     <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="13.4.6" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="MassTransit" Version="$(MassTransitVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.7.0" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="4.12.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="4.14.2" />
   </ItemGroup>
 
   <ItemGroup>

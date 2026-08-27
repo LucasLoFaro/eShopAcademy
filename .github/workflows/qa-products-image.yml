@@ -47,6 +47,7 @@ jobs:
         run: >-
           dotnet restore
           src/Products/Presentation/Products.API/Products.API.csproj
+          --runtime linux-x64
           --source https://api.nuget.org/v3/index.json
 
       - name: Build and push image

@@ -13,6 +13,7 @@ public static partial class Extentions
         if (!builder.Environment.IsDevelopment())
         {
             var appConfigName = Environment.GetEnvironmentVariable("APPCONFIGURATION");
+            var appConfigLabel = Environment.GetEnvironmentVariable("APPCONFIGURATION_LABEL");
 
             if (!string.IsNullOrEmpty(appConfigName))
             {
@@ -26,7 +27,16 @@ public static partial class Extentions
                             kv.SetCredential(new DefaultAzureCredential());
                         })
                         .Select("common:*", LabelFilter.Null)
-                        .Select($"{builder.Environment.ApplicationName}:*", LabelFilter.Null)
+                        .Select($"{builder.Environment.ApplicationName}:*", LabelFilter.Null);
+
+                    if (!string.IsNullOrWhiteSpace(appConfigLabel))
+                    {
+                        options
+                            .Select("common:*", appConfigLabel)
+                            .Select($"{builder.Environment.ApplicationName}:*", appConfigLabel);
+                    }
+
+                    options
                         .TrimKeyPrefix("common:")
                         .TrimKeyPrefix($"{builder.Environment.ApplicationName}:");
                 });

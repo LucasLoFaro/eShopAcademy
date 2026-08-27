@@ -270,7 +270,9 @@ public class MessagingArchitectureTests
             "Extensions.Configuration.cs"));
 
         Assert.Contains("if (!builder.Environment.IsDevelopment())", configurationExtensions);
+        Assert.Contains("Environment.GetEnvironmentVariable(\"APPCONFIGURATION_LABEL\")", configurationExtensions);
         Assert.Contains(".Select(\"common:*\", LabelFilter.Null)", configurationExtensions);
+        Assert.Contains(".Select(\"common:*\", appConfigLabel)", configurationExtensions);
         Assert.Contains(".TrimKeyPrefix(\"common:\")", configurationExtensions);
         Assert.Contains(".TrimKeyPrefix($\"{builder.Environment.ApplicationName}:\")", configurationExtensions);
 

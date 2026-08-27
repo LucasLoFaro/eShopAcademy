@@ -1,6 +1,6 @@
 # QA Azure infrastructure — manual-first implementation plan
 
-Status: manual implementation in progress. Shared QA services are live and validated, and the first application slice, Products API, is deployed and healthy. The next slice is Stock. Bicep remains deferred.
+Status: manual implementation in progress. Shared QA services are live and validated, and the Products + Stock application slice is deployed and healthy. The next slice is Customers + Basket. Bicep remains deferred.
 
 ## Goal and boundary
 
@@ -25,10 +25,12 @@ This is intentionally a QA design: single region, no SLA, cold starts, public Pa
 - Products revision `eshopacademy-products-api--0000002` is healthy with min 0 / max 1 scaling. Public `/alive`, `/health`, and `GET /api/product` returned HTTP 200; the full health report confirms Azure Service Bus and the `products` DocumentDB database are connected.
 - Products uses a system-assigned identity with narrowly scoped App Configuration reader, Service Bus sender, and Cognitive Services user roles. Its DocumentDB connection is an encrypted Container Apps secret sourced from Key Vault at deployment time, and the DocumentDB firewall permits only its observed outbound IP.
 - The first Products revision exposed an optional App Configuration cold-start delay. The current manual slice supplies the complete QA settings directly to Container Apps; the identity and reader role are retained while App Configuration startup is corrected before Bicep automation.
+- Stock API is deployed at `https://eshopacademy-stock-api.yellowforest-6e2fb526.eastus.azurecontainerapps.io` from immutable GHCR image `qa-83914598eb1eaea1fc33e2efd77bf36e59134b0e`. GitHub Actions run `33123942668` built the image.
+- Stock revision `eshopacademy-stock-api--522pkpc` is healthy with min 0 / max 1 scaling. Public `/alive`, `/health`, and `GET /api/stock` returned HTTP 200; health confirms Service Bus and the `stock` DocumentDB database are connected. Its system identity has only Service Bus Data Sender, and it shares the already-whitelisted Container Apps environment outbound IP.
 
 ## Current-state summary
 
-The live resource group now contains the nine original resources plus DocumentDB Free Tier, Log Analytics, Application Insights, a Consumption Container Apps environment, a QA data storage account, PostgreSQL, Redis, and Products API Container Apps, an Application Insights action group, and one temporary PostgreSQL initializer job. There is no ACR or managed PostgreSQL server.
+The live resource group now contains the nine original resources plus DocumentDB Free Tier, Log Analytics, Application Insights, a Consumption Container Apps environment, a QA data storage account, PostgreSQL, Redis, Products API, and Stock API Container Apps, an Application Insights action group, and one temporary PostgreSQL initializer job. There is no ACR or managed PostgreSQL server.
 
 The application model contains 27 .NET processes and two Vite frontends. It needs seven MongoDB logical databases (`stock`, `customers`, `shipping`, `operations`, `notifications`, `sellers`, and `products`), two PostgreSQL databases (`orders` and `orchestration`), Redis, Service Bus, and Blob Storage.
 

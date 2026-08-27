@@ -1,0 +1,67 @@
+name: QA Stock image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/qa-azure-products
+    paths:
+      - .github/workflows/qa-stock-image.yml
+      - Directory.Packages.props
+      - src/Directory.Build.props
+      - src/NuGet.config
+      - src/Domain/Stock.Domain/**
+      - src/Stock/**
+      - src/ServiceDefaults/**
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/lucaslofaro/eshopacademy-stock-api
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: preview
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore from NuGet.org
+        run: >-
+          dotnet restore
+          src/Stock/Stock.API/Stock.API.csproj
+          --runtime linux-x64
+          --source https://api.nuget.org/v3/index.json
+
+      - name: Build and push image
+        run: >-
+          dotnet publish
+          src/Stock/Stock.API/Stock.API.csproj
+          --configuration Release
+          --no-restore
+          --os linux
+          --arch x64
+          /t:PublishContainer
+          -p:ContainerRegistry=ghcr.io
+          -p:ContainerRepository=lucaslofaro/eshopacademy-stock-api
+          -p:ContainerImageTag=qa-${GITHUB_SHA}
+
+      - name: Record immutable image name
+        run: echo "${IMAGE_NAME}:qa-${GITHUB_SHA}" >> "${GITHUB_STEP_SUMMARY}"
